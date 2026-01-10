@@ -30,6 +30,7 @@ export default function CreatePartyPage() {
   const isPeopleEmpty = policeCount === "" && thiefCount === "";
   const isPeopleInvalid =
     !isPeopleEmpty &&
+<<<<<<< HEAD
     (totalPeople <= 0 || police > thief * 2 || totalPeople > 20);
 
   const isFormValid = useMemo(() => {
@@ -123,6 +124,9 @@ export default function CreatePartyPage() {
   }
 
   const isDateTimeInvalid = dateTime !== "" && !isFutureDateTime(dateTime);
+=======
+    (totalPeople <= 0 || police >= thief * 1.5 || totalPeople > 20);
+>>>>>>> f19b6f3 (feat:팟 생성하기 화면 구현 완료)
 
   const isFormValid = useMemo(() => {
     return (
@@ -133,9 +137,10 @@ export default function CreatePartyPage() {
       policeCount.trim().length > 0 &&
       Number(policeCount) >= 0 &&
       thiefCount.trim().length > 0 &&
-      Number(thiefCount) >= 0
+      Number(thiefCount) >= 0 &&
+      !isPeopleInvalid
     );
-  }, [title, dateTime, location, policeCount, thiefCount]);
+  }, [title, dateTime, location, policeCount, thiefCount, isPeopleInvalid]);
 
   return (
     <>
