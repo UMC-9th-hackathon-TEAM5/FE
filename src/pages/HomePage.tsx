@@ -93,6 +93,17 @@ const HomePage = () => {
   const mapRef = useRef<MapInstance | null>(null);
   const mapsRef = useRef<MapsApi | null>(null);
   const markersRef = useRef<unknown[]>([]);
+  const handleConfirmParty = () => {
+    if (selectedRoom) {
+      // 1. 상세 페이지로 이동하면서 roomId를 state로 전달
+      navigate("/party/detail", { 
+        state: { roomId: selectedRoom.roomId } 
+      });
+      
+      // 2. 바텀 시트 닫기 (다시 돌아왔을 때를 대비)
+      setIsSheetOpen(false);
+    }
+  };
   
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
   
@@ -225,12 +236,12 @@ const HomePage = () => {
   }, [rooms]); // navigate 의존성 제거 (이벤트 핸들러 내부 로직 변경으로 인해)
 
   // [변경 4] 참여하기 버튼 핸들러
-  const handleConfirmParty = () => {
-    if (selectedRoom) {
-      navigate("/party/detail", { state: { roomId: selectedRoom.roomId } });
-      setIsSheetOpen(false);
-    }
-  };
+  // const handleConfirmParty = () => {
+  //   if (selectedRoom) {
+  //     navigate("/party/detail", { state: { roomId: selectedRoom.roomId } });
+  //     setIsSheetOpen(false);
+  //   }
+  // };
 
   const handleCloseSheet = () => {
     setIsSheetOpen(false);
@@ -281,14 +292,15 @@ const HomePage = () => {
 
         {/* [변경 5] 바텀 시트 연결 */}
         {/* 바텀 시트 내부에서 선택된 방의 정보를 보여주려면 props로 selectedRoom을 전달해야 합니다. */}
-        <PartyDetailBottomSheet
+        
+    </div>
+    <PartyDetailBottomSheet
           isOpen={isSheetOpen}
           onClose={handleCloseSheet}
-          onConfirm={handleConfirmParty}
+          onConfirm={handleConfirmParty} // <-- 여기가 핵심입니다!
           summaryData={selectedRoom}
         />
       </div>
-    </div>
   );
 };
 
