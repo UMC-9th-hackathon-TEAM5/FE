@@ -20,7 +20,7 @@ import InfoIcon from "@/assets/info/info.svg?react";
 import { GameRuleModal } from "@/components/common/Modal/GameruleModal";
 
 import { validatePlayers } from "@/utils/validatePartyPlayers";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 type PlayerRole = "police" | "thief";
@@ -70,6 +70,7 @@ export default function WaitingPartyPage() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const state = (location.state as LocationState | null) ?? null;
   const userId = useMemo(() => {
@@ -81,11 +82,16 @@ export default function WaitingPartyPage() {
 
   const roomId = useMemo(() => {
     if (state?.roomId) return state.roomId;
+    const queryValue = searchParams.get("roomId");
+    if (queryValue) {
+      const parsed = Number(queryValue);
+      if (!Number.isNaN(parsed)) return parsed;
+    }
     const value = localStorage.getItem("roomId");
     if (!value) return null;
     const parsed = Number(value);
     return Number.isNaN(parsed) ? null : parsed;
-  }, [state?.roomId]);
+  }, [state?.roomId, searchParams]);
 
   const hostId = useMemo(() => {
     if (state?.hostId) return state.hostId;
@@ -113,9 +119,18 @@ export default function WaitingPartyPage() {
       roleOverrides?: Map<number, PlayerRole>,
     ): PlayerState[] =>
       participants.map((participant) => {
-        const mappedRole =
-          roleOverrides?.get(participant.userId) ??
-          (participant.role === "POLICE" ? "police" : "thief");
+        const normalizedRole = participant.role?.trim().toUpperCase();
+        let mappedRole: PlayerRole;
+
+        if (normalizedRole === "POLICE") {
+          mappedRole = "police";
+        } else if (normalizedRole === "THIEF") {
+          mappedRole = "thief";
+        } else if (roleOverrides?.has(participant.userId)) {
+          mappedRole = roleOverrides.get(participant.userId) as PlayerRole;
+        } else {
+          mappedRole = "thief";
+        }
 
         return {
           userId: participant.userId,
@@ -141,6 +156,22 @@ export default function WaitingPartyPage() {
         const response = await getRoom(roomId);
         setRoomDetail(response.data);
         setPlayers(mapParticipants(response.data.participants));
+
+        const participantsResponse = await getParticipants(roomId);
+        const overrides = new Map<number, PlayerRole>(
+          response.data.participants.map((participant) => [
+            participant.userId,
+            participant.role === "POLICE" ? "police" : "thief",
+          ]),
+        );
+        setPlayers(
+          mapParticipants(participantsResponse.data.participants, overrides),
+        );
+
+        const participantsResponseRetry = await getParticipants(roomId);
+        setPlayers(
+          mapParticipants(participantsResponseRetry.data.participants, overrides),
+        );
       } catch (error) {
         console.error("대기방 조회 실패:", error);
         setErrorMessage("대기방 정보를 불러오지 못했습니다.");
@@ -184,21 +215,18 @@ export default function WaitingPartyPage() {
     );
   };
 
-  const handleToggleArrival = async () => {
+  const handleToggleArrival = async (targetId: number) => {
     if (!roomId || !userId) return;
     setErrorMessage(null);
 
     try {
-      const response = await updateArrivalStatus(roomId);
+      if (!isHost && targetId !== userId) return;
+      await updateArrivalStatus(roomId, targetId);
+
+      const participantsResponse = await getParticipants(roomId);
       const overrides = new Map<number, PlayerRole>(
         players.map((player) => [player.userId, player.role]),
       );
-      const participants = response?.data?.participants;
-      if (participants && participants.some((p) => p.isArrived !== undefined)) {
-        setPlayers(mapParticipants(participants, overrides));
-        return;
-      }
-      const participantsResponse = await getParticipants(roomId);
       setPlayers(
         mapParticipants(participantsResponse.data.participants, overrides),
       );
@@ -293,13 +321,16 @@ export default function WaitingPartyPage() {
                   arrivalStatus={player.arrivalStatus}
                   isHost={player.isHost}
                   isMe={player.isMe}
+                  canEditRole={isHost}
                   onToggleRole={
                     isHost || player.isMe
                       ? () => handleToggleRole(player.userId)
                       : undefined
                   }
                   onToggleArrival={
-                    player.isMe ? handleToggleArrival : undefined
+                    isHost || player.isMe
+                      ? () => handleToggleArrival(player.userId)
+                      : undefined
                   }
                 />
               </div>

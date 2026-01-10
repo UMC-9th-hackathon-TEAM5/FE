@@ -20,6 +20,7 @@ interface PlayerArrivalCardProps {
   className?: string;
   onToggleRole?: () => void;
   onToggleArrival?: () => void;
+  canEditRole?: boolean;
 }
 
 const cardStyles = cva(
@@ -46,6 +47,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   className,
   onToggleRole,
   onToggleArrival,
+  canEditRole = false,
 }) => {
   const isArrived = arrivalStatus === "arrived";
   const roleLabel = role === "police" ? "경찰" : "도둑";
@@ -63,7 +65,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
           {roleLabel}
         </span>
       </div>
-      {(isHost || isMe) && (
+      {(canEditRole || isHost || isMe) && (
         <button
           type="button"
           aria-label={`역할 전환 (현재: ${roleLabel})`}
