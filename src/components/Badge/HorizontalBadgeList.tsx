@@ -13,9 +13,13 @@ export default function HorizontalBadgeList({
   return (
     <div
 <<<<<<< HEAD
+<<<<<<< HEAD
       role="listitem"
 =======
 >>>>>>> 5a70782 (feat:HorizontalPlayBadgeList 컴포넌트 구현)
+=======
+      role="listitem"
+>>>>>>> ec2f194 (chore:role 속성 보완)
       className={clsx(
         "scrollbar-hide flex items-center gap-3 overflow-x-auto py-2",
         className,
