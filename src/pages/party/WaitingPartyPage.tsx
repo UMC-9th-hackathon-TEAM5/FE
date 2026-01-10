@@ -12,7 +12,8 @@ import ChangeRoleIcon from "@/assets/change/change.svg?react";
 import InfoIcon from "@/assets/info/info.svg?react";
 
 import { GameRuleModal } from "@/components/common/Modal/GameruleModal";
-import EndConfirmModal from "@/components/common/Modal/EndConfirmModal";
+
+import { validatePlayers } from "@/utils/validatePartyPlayers";
 
 const mockPartyInfo: PartyInfo = {
   date: "2026-01-11",
@@ -81,11 +82,8 @@ const mockPlayers = [
 
 export default function WaitingPartyPage() {
   const [isRuleOpen, setIsRuleOpen] = useState(false);
-  const [isEndConfirmOpen, setIsEndConfirmOpen] = useState(false);
 
-  const handleGameEnd = () => {
-    setIsEndConfirmOpen(false);
-  };
+  const isGuest = !mockPlayers.some((p) => p.isMe);
 
   return (
     <>
@@ -149,18 +147,28 @@ export default function WaitingPartyPage() {
             <InfoIcon className="h-6 w-6" aria-hidden="true" />
             <span>게임 규칙 확인하기</span>
           </button>
-          <Button width="xl" state="active" className="my-4" onClick={() => {}}>
-            게임시작하기
-          </Button>
+          {!isGuest && (
+            <Button
+              width="xl"
+              state="active"
+              className="my-4"
+              onClick={() => {
+                const result = validatePlayers(mockPlayers);
+
+                if (!result.isValid) {
+                  alert(result.message);
+                  return;
+                }
+
+                // TODO (예: 모달 열기 / 게임 시작)
+              }}
+            >
+              게임시작하기
+            </Button>
+          )}
         </section>
       </main>
       <GameRuleModal isOpen={isRuleOpen} onClose={() => setIsRuleOpen(false)} />
-
-      <EndConfirmModal
-        isOpen={isEndConfirmOpen}
-        onClose={() => setIsEndConfirmOpen(false)}
-        onConfirm={handleGameEnd}
-      />
     </>
   );
 }
