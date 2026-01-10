@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Pretendard";
+  src: url("assets/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 100 900;
+}
+
 @theme {
   --color-main: #00fd9e;
   --color-main-variant: #008e58;
@@ -10,6 +16,11 @@
   --color-point-variant: #faa916;
   --color-white: #ffffff;
   --color-gray: #808080;
+  --font-sans: "Pretendard", "ui-sans-serif", "system-ui", "sans-serif";
+}
+
+body {
+  font-family: "Pretendard", sans-serif;
 }
 
 button {
@@ -31,3 +42,4 @@ button {
 .datetime-local-input:valid::-webkit-datetime-edit {
   color: #ffffff;
 }
+

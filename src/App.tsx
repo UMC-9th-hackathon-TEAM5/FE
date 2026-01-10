@@ -15,7 +15,7 @@ import ButtonTestPage from "./pages/test/ButtonTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
-import CreatePartyPage from "./pages/party/CreatePartyPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -38,6 +38,7 @@ function App() {
             />
 
             {/* 실제 페이지 */}
+            <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
 
