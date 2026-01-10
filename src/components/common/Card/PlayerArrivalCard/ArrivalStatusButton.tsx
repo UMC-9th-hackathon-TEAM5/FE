@@ -13,16 +13,18 @@ export const ArrivalStatusButton: React.FC<ArrivalStatusButtonProps> = ({
     <button
       type="button"
       disabled
+      role="status"
+      aria-live="polite"
       className={twMerge(
         "flex h-9 w-15 items-center justify-center rounded-lg text-sm font-medium transition-colors select-none",
         isArrived
           ? "bg-[#10B981] pl-2 text-white"
           : "bg-[#E3E6EA] text-gray-700",
       )}
-      aria-label={isArrived ? "Arrived" : "Not arrived"}
+      aria-label={isArrived ? "도착 상태: 도착 완료" : "도착 상태: 미도착"}
     >
       {isArrived ? "도착" : "미도착"}
-      {isArrived && <CheckIcon className="text-[#E3E6EA]" />}
+      {isArrived && <CheckIcon aria-hidden="true" className="text-[#E3E6EA]" />}
     </button>
   );
 };
