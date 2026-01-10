@@ -55,6 +55,7 @@ function App() {
             PlayerResultCardTestPage
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
+            <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
             <Route path="party/waiting" element={<WaitingPartyPage />} />
