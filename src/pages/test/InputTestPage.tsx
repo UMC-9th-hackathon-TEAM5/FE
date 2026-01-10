@@ -40,12 +40,9 @@ export default function InputTestPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </section>
-
-      {/* DISABLED */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-main-variant text-sm font-semibold">Disabled</h2>
-
-        <Input disabled placeholder="disabled 상태" value="비활성화" />
+      <section>
+        <h2 className="text-main-variant text-sm font-semibold">Date Input</h2>
+        <Input type="date" required />
       </section>
     </div>
   );
