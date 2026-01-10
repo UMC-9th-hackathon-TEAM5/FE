@@ -1,8 +1,9 @@
+import { useState, useMemo } from "react";
+
 import Header from "@/components/common/Header";
 import InputLabel from "@/components/common/Input/InputLabel";
 import Input from "@/components/common/Input/Input";
 import { Button } from "@/components/common/Button";
-import { useState, useMemo } from "react";
 
 export default function CreatePartyPage() {
   const [title, setTitle] = useState("");
@@ -11,10 +12,20 @@ export default function CreatePartyPage() {
   const [policeCount, setPoliceCount] = useState("");
   const [thiefCount, setThiefCount] = useState("");
 
+  function isFutureDateTime(value: string): boolean {
+    if (!value) return false;
+    const inputDate = new Date(value);
+    const now = new Date();
+    return inputDate > now;
+  }
+
+  const isDateTimeInvalid = dateTime !== "" && !isFutureDateTime(dateTime);
+
   const isFormValid = useMemo(() => {
     return (
       title.trim().length > 0 &&
       dateTime.trim().length > 0 &&
+      isFutureDateTime(dateTime) &&
       location.trim().length > 0 &&
       policeCount.trim().length > 0 &&
       Number(policeCount) >= 0 &&
@@ -45,6 +56,11 @@ export default function CreatePartyPage() {
             value={dateTime}
             onChange={(e) => setDateTime(e.target.value)}
           />
+          {isDateTimeInvalid && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              모임 일시는 현재 시간 이후여야 합니다.
+            </span>
+          )}
         </section>
 
         <section className="flex flex-col pt-3" role="파티 장소 정하기">
