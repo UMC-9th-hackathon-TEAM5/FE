@@ -5,12 +5,12 @@ type Role = "police" | "thief";
 
 export const PlayerAvatar: React.FC<{ role: Role }> = ({ role }) => {
   const roleColors = {
-    police: "bg-blue-500",
-    thief: "bg-red-500",
+    police: "bg-[#3B82F6]",
+    thief: "bg-[#1E293B]",
   };
   const roleIcons = {
     police: "👮",
-    thief: "🕵️",
+    thief: "🥷",
   };
   return (
     <div
@@ -18,6 +18,7 @@ export const PlayerAvatar: React.FC<{ role: Role }> = ({ role }) => {
         "flex h-12 w-12 items-center justify-center rounded-full text-xl text-white select-none",
         roleColors[role],
       )}
+      role="img"
       aria-label={role === "police" ? "Police avatar" : "Thief avatar"}
     >
       {roleIcons[role]}
