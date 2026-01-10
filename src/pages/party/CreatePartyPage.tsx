@@ -1,38 +1,30 @@
 import Header from "@/components/common/Header";
 import InputLabel from "@/components/common/Input/InputLabel";
 import Input from "@/components/common/Input/Input";
+import { Button } from "@/components/common/Button";
 
 export default function CreatePartyPage() {
   return (
     <>
       <Header title="팟 만들기" />
-      <main className="h-full w-full border border-white px-10">
-        <section
-          className="flex flex-col border border-white py-3"
-          role="파티 제목 입력"
-        >
+      <main className="h-full w-full px-10">
+        <section className="flex flex-col py-3" role="파티 제목 입력">
           <InputLabel label="팟 제목" isRequired={true} />
           <Input placeholder="예 : 수지구 경도팟 모임" required />
         </section>
 
-        <section
-          className="flex flex-col border border-white py-3"
-          role="파티 모임 일정 정하기"
-        >
+        <section className="flex flex-col py-3" role="파티 모임 일정 정하기">
           <InputLabel label="모임 일시" isRequired={true} />
           <Input type="datetime-local" required />
         </section>
 
-        <section
-          className="flex flex-col border border-white pt-3"
-          role="파티 장소 정하기"
-        >
+        <section className="flex flex-col pt-3" role="파티 장소 정하기">
           <InputLabel label="모임 장소" isRequired={true} />
           <Input placeholder="예 : 수지생태공원 분수대 앞" required />
         </section>
 
-        <section className="flex flex-col border border-white py-3">
-          <InputLabel label="모집 인원" />
+        <section className="mt-2 flex flex-col py-3">
+          <InputLabel label="모집 인원" className="mb-2" />
           <div className="flex justify-center gap-2">
             <div className="flex flex-col">
               <InputLabel label="경찰" className="mb-1" />
@@ -46,11 +38,8 @@ export default function CreatePartyPage() {
           </div>
         </section>
 
-        <section
-          className="flex flex-col border border-white pt-3"
-          role="게임 시간 정하기"
-        >
-          <InputLabel label="시간 설정" className="mb-4" />
+        <section className="mt-3 flex flex-col pt-3" role="게임 시간 정하기">
+          <InputLabel label="시간 설정" className="mb-2" />
 
           <InputLabel label="게임 진행 시간 (분)" className="mb-1" />
           <Input defaultValue={60} type="number" className="mb-4" />
@@ -61,13 +50,14 @@ export default function CreatePartyPage() {
           </span>
         </section>
 
-        <section
-          className="flex flex-col border border-white pt-3"
-          role="게임 시간 정하기"
-        >
-          <InputLabel label="설명" className="mb-4" />
+        <section className="mt-2 flex flex-col pt-3" role="게임 시간 정하기">
+          <InputLabel label="설명" className="mb-2" />
           <Input placeholder="경도팟에 대한 설명을 적어주세요" />
         </section>
+
+        <Button width="xl" state="active" className="mt-6">
+          팟 생성하기
+        </Button>
       </main>
       ;
     </>
