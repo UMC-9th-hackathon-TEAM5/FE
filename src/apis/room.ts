@@ -103,9 +103,14 @@ export const getRoom = async (
 };
 
 // 근처 방 조회
-export const getNearbyRoom = async (): Promise<ApiResponse<NearbyRoomData>> => {
+export const getNearbyRoom = async (
+  userId: number,
+): Promise<ApiResponse<NearbyRoomData>> => {
   const { data } = await axiosInstance.get<ApiResponse<NearbyRoomData>>(
     "/api/v1/rooms/nearby",
+    {
+      params: { userId },
+    },
   );
   return data;
 };
