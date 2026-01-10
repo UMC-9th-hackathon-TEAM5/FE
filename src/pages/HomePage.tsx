@@ -3,6 +3,8 @@ import { Button } from "@/components/common/Button";
 import { useNavigate } from "react-router-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import CustomMarker from "@/components/map/CustomMarker";
+import PartyDetailBottomSheet from "@/components/common/BottomSheet/PartyDetailBottomSheet";
+
 
 type GeocodeStatus = "OK" | string;
 
@@ -49,6 +51,7 @@ const dummyRooms = [
 const HomePage = () => {
   const mapElement = useRef<HTMLDivElement | null>(null);
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -270,10 +273,15 @@ const HomePage = () => {
         <Button
           state="active"
           width="xl"
-          onClick={() => navigate("/party/create")}
+          onClick={() => setIsSheetOpen(true)}
         >
           + 새로운 경도팟 만들기
         </Button>
+        <PartyDetailBottomSheet
+          isOpen={isSheetOpen} 
+          onClose={() => setIsSheetOpen(false)} 
+          onConfirm={() => navigate('/party/detail')}
+        />
       </div>
     </div>
   );
