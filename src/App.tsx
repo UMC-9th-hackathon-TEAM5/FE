@@ -6,27 +6,15 @@ import MobileLayout from "@/layouts/MobileLayout";
 // 테스트 페이지에 대한 라우팅
 import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
-import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
-import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
-<<<<<<< HEAD
-import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
-=======
-
->>>>>>> b389011 (feat : BaseModal 구현)
+import PartyInfoCardTestPage from "@/pages/test/PartyInfoCardTestPage";
+import RoleButtonTestPage from "@/pages/test/RoleButtonTestPage";
+import ButtonTestPage from "@/pages/test/ButtonTestPage";
+import PlayerBadgeTestPage from "@/pages/test/PlayerBadgeTestPage";
+import CreatePartyPage from "@/pages/party/CreatePartyPage";
 
 // 실제 페이지
-import PartyDetailPage from "./pages/party/PartyDetailPage";
-import LoginPage from "./pages/LoginPage";
-<<<<<<< HEAD
-<<<<<<< HEAD
-import CreatePartyPage from "./pages/party/CreatePartyPage";
-import WaitingPartyPage from "./pages/party/WaitingPartyPage";
-=======
->>>>>>> 583fb23 (feat : 로그인 페이지 구현)
-=======
-import CreatePartyPage from "./pages/party/CreatePartyPage";
-import ModalTestPage from "./pages/test/ModalTestPage";
->>>>>>> b389011 (feat : BaseModal 구현)
+import PartyDetailPage from "@/pages/party/PartyDetailPage";
+import LoginPage from "@/pages/LoginPage";
 
 function App() {
   return (
