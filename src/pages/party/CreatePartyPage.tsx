@@ -28,7 +28,7 @@ export default function CreatePartyPage() {
   const isPeopleEmpty = policeCount === "" && thiefCount === "";
   const isPeopleInvalid =
     !isPeopleEmpty &&
-    (totalPeople <= 0 || police >= thief * 1.5 || totalPeople > 20);
+    (totalPeople <= 0 || police > thief * 2 || totalPeople > 20);
 
   const isFormValid = useMemo(() => {
     return (
