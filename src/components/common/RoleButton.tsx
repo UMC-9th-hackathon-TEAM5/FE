@@ -2,9 +2,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
 const buttonStyles = cva(
   clsx(
     // 기본 모양
@@ -34,15 +37,20 @@ const buttonStyles = cva(
       state: "default",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
   },
 =======
   }
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
+=======
+  },
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
 );
 
 // Role 정의
 const ROLE_DATA = {
   police: { icon: "👮🏻", label: "경찰" },
+<<<<<<< HEAD
 <<<<<<< HEAD
   thief: { icon: "🥷🏻", label: "도둑" },
   random: { icon: "🎲", label: "랜덤" },
@@ -59,10 +67,20 @@ interface RoleButtonProps
 interface RoleButtonProps 
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
+=======
+  thief: { icon: "🥷🏻", label: "도둑" },
+  random: { icon: "🎲", label: "랜덤" },
+} as const;
+
+interface RoleButtonProps
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
     VariantProps<typeof buttonStyles> {
   roleType: keyof typeof ROLE_DATA;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export const RoleButton = ({
   className,
@@ -79,6 +97,9 @@ export const RoleButton = ({
   ...props 
 }: RoleButtonProps) => {
   
+=======
+export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
   const content = ROLE_DATA[roleType];
 
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
@@ -88,6 +109,7 @@ export const RoleButton = ({
       className={buttonStyles({ state, roleType })}
       {...props}
     >
+<<<<<<< HEAD
 <<<<<<< HEAD
       <div className="flex w-full items-center justify-center gap-2 text-sm">
         <p className="">{content.icon}</p>
@@ -100,10 +122,18 @@ export const RoleButton = ({
 };
 =======
       <div className="w-full flex items-center justify-center gap-2 text-sm">
+=======
+      <div className="flex w-full items-center justify-center gap-2 text-sm">
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
         <p className="">{content.icon}</p>
-        <p className="font-normal whitespace-nowrap leading-[140%] tracking-[-0.4px]">{content.label}</p>
+        <p className="leading-[140%] font-normal tracking-[-0.4px] whitespace-nowrap">
+          {content.label}
+        </p>
       </div>
     </button>
   );
 };
+<<<<<<< HEAD
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> 83c7f93 (wip-page:"팟 상세" 페이지 구현 중)
