@@ -1,14 +1,23 @@
+import clsx from "clsx";
+
 interface inputLabelProps {
   isRequired?: boolean;
   label: string;
+  className?: string;
 }
 
-const InputLabel = ({ label, isRequired = false }: inputLabelProps) => {
+const InputLabel = ({
+  label,
+  isRequired = false,
+  className,
+}: inputLabelProps) => {
   return (
-    <div className="text-main mb-3.5 w-full text-base font-medium">
+    <span
+      className={clsx("text-main ml-1 w-full text-base font-medium", className)}
+    >
       {label}
       {isRequired && <span className="ml-1">*</span>}
-    </div>
+    </span>
   );
 };
 
