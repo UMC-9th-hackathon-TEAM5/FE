@@ -11,6 +11,13 @@ import { Button } from "@/components/common/Button";
 import EndConfirmModal from "@/components/common/Modal/EndConfirmModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  webSocketService,
+  type WebSocketMessage,
+  type ThiefCapturedData,
+  type EscapeSuccessData,
+  type GameFinishedData,
+} from "@/apis/websocket";
 
 type Player = {
   id: number;
@@ -111,6 +118,43 @@ export default function GamePlayPage() {
     };
 
     fetchParticipants();
+
+    // WebSocket 연결
+    const handleWebSocketMessage = (message: WebSocketMessage) => {
+      console.log("WebSocket 이벤트 수신:", message.eventType, message.data);
+
+      if (message.eventType === "THIEF_CAPTURED") {
+        const data = message.data as ThiefCapturedData;
+        setPlayers((prev) =>
+          prev.map((player) =>
+            player.id === data.thiefUserId
+              ? { ...player, status: "jailed" as const }
+              : player,
+          ),
+        );
+      } else if (message.eventType === "ESCAPE_SUCCESS") {
+        const data = message.data as EscapeSuccessData;
+        setPlayers((prev) =>
+          prev.map((player) =>
+            player.id === data.thiefUserId
+              ? { ...player, status: "caught" as const }
+              : player,
+          ),
+        );
+      } else if (message.eventType === "GAME_FINISHED") {
+        const data = message.data as GameFinishedData;
+        console.log("게임 종료 이벤트 수신:", data);
+        navigate("/game/result", { state: { roomId } });
+      }
+    };
+
+    webSocketService.addMessageHandler(handleWebSocketMessage);
+    webSocketService.connect(String(roomId));
+
+    return () => {
+      webSocketService.removeMessageHandler(handleWebSocketMessage);
+      webSocketService.disconnect();
+    };
   }, [roomId, navigate, mapParticipants]);
 
   useEffect(() => {
