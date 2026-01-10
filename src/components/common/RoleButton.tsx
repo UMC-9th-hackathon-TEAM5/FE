@@ -53,7 +53,6 @@ export const RoleButton = ({
   ...props
 }: RoleButtonProps) => {
   const content = ROLE_DATA[roleType];
-
   return (
     <button
       type="button"
