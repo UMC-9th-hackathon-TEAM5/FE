@@ -2,6 +2,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import clsx from "clsx";
 
 import HeaderArrowIcon from "@/assets/arrow/arrow_back.svg?react";
+import { useNavigate } from "react-router-dom";
 
 const headerStyles = cva(
   clsx(
@@ -16,15 +17,16 @@ type HeaderStyleProps = VariantProps<typeof headerStyles>;
 type HeaderProps = {
   title?: React.ReactNode;
   className?: string;
-  onLeftClick?: () => void;
 } & HeaderStyleProps;
 
-const Header = ({ title, onLeftClick, className }: HeaderProps) => {
+const Header = ({ title, className }: HeaderProps) => {
+
+  const navigate = useNavigate();
   return (
     <header className={clsx(headerStyles(), "justify-between", className)}>
       <button
         type="button"
-        onClick={onLeftClick}
+        onClick={() => navigate(-1)}
         className="flex shrink-0 items-center justify-start gap-2"
       >
         <HeaderArrowIcon />
