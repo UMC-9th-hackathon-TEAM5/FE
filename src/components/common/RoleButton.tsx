@@ -75,7 +75,6 @@ export const RoleButton = ({
   
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
   const content = ROLE_DATA[roleType];
-
   return (
     <button
       type="button"
