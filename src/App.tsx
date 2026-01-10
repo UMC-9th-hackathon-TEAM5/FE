@@ -10,11 +10,10 @@ import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
 import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
 import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
-import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
-import ButtonTestPage from "./pages/test/ButtonTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
+import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 
 function App() {
@@ -36,6 +35,7 @@ function App() {
             />
 
             {/* 실제 페이지 */}
+            <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
 
