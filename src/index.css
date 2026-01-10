@@ -9,4 +9,16 @@
   --color-point: #facc16;
   --color-point-variant: #faa916;
   --color-white: #ffffff;
+  --color-main: #00fd9e;
+  --color-main-variant: #008e58;
+  --color-main-dark1: #0a3d2e;
+  --color-main-dark2: #0c2620;
+  --color-sub: #1e293b;
+  --color-point: #facc16;
+  --color-point-variant: #faa916;
+  --color-white: #ffffff;
+}
+
+button {
+  cusor: pointer;
 }
