@@ -60,6 +60,7 @@ export default function ButtonTestPage() {
         </section>
 
         {/* Role State Button */}
+        {/* Role State Button */}
         <section className="flex flex-col gap-3">
           <h2 className="border-b border-gray-700 pb-2 text-sm font-bold text-gray-400">
             Role State Buttons
@@ -83,6 +84,7 @@ export default function ButtonTestPage() {
           </div>
         </section>
 
+        {/* 모달 버튼*/}
         {/* 모달 버튼*/}
         <section className="flex flex-col gap-3">
           <h2 className="border-b border-gray-700 pb-2 text-sm font-bold text-gray-400">

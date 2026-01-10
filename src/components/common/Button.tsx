@@ -10,6 +10,7 @@ const buttonStyles = cva(
     "rounded-lg",
     "flex items-center justify-center",
     "text-white leading-[140%] tracking-[-0.4px] font-medium",
+    "text-white leading-[140%] tracking-[-0.4px] font-medium",
   ),
   {
     variants: {
@@ -19,8 +20,10 @@ const buttonStyles = cva(
         lg: "w-[300px]",
         md: "w-[149px]",
         base: "w-[72px]",
+        base: "w-[72px]",
         sm: "w-[60px]",
       },
+      // state == style?
       // state == style?
       state: {
         // default : inactive
@@ -67,11 +70,13 @@ export const Button = ({
   children,
   state,
   className,
+  className,
   ...props
 }: ButtonProps) => {
   return (
     <button
       type="button"
+      className={twMerge(buttonStyles({ width, state }), className)}
       className={twMerge(buttonStyles({ width, state }), className)}
       {...props}
     >
