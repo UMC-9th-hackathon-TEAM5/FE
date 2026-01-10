@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-main : #00FD9E;
-  --color-main-variant : #008E58;
-  --color-main-dark1 : #0A3D2E;
-  --color-main-dark2 : #0C2620;
-  --color-sub : #1E293B;
-  --color-point : #FACC16;
-  --color-point-variant : #FAA916;
-  --color-white : #FFFFFF;
+  --color-main: #00fd9e;
+  --color-main-variant: #008e58;
+  --color-main-dark1: #0a3d2e;
+  --color-main-dark2: #0c2620;
+  --color-sub: #1e293b;
+  --color-point: #facc16;
+  --color-point-variant: #faa916;
+  --color-white: #ffffff;
+}
+
+button {
+  cusor: pointer;
 }
