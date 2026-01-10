@@ -8,6 +8,8 @@ import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
 import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
 import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
+import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
+import ButtonTestPage from "./pages/test/ButtonTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
@@ -34,12 +36,10 @@ function App() {
             {/* 실제 페이지 */}
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
-<<<<<<< HEAD
 
             <Route path="test/Button" element={<ButtonTestPage />} />
-=======
             <Route path="test/RoleButton" element={<RoleButtonTestPage />} />
->>>>>>> 9bff580 (feat : RoleButton 컴포넌트 구현)
+            <Route path="test/Button" element={<ButtonTestPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
