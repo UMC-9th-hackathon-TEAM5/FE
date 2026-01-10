@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import CustomMarker from "@/components/map/CustomMarker";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 type GeocodeStatus = "OK" | string;
 
 interface ReverseGeocodeResponse {
@@ -50,6 +51,8 @@ const dummyRooms = [
 const HomePage = () => {
   const mapElement = useRef<HTMLDivElement | null>(null);
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
 // Window 타입 확장 (TypeScript용)
 declare global {
   interface Window {
@@ -60,11 +63,15 @@ declare global {
 const HomePage = () => {
   const mapElement = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<any | null>(null);
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
 
   const navigate = useNavigate();
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   // mock data moved to module scope
 
@@ -136,6 +143,8 @@ const HomePage = () => {
     // 1. 지도 초기화 (기본값: 서울 시청)
     const defaultPosition = new maps.LatLng(37.5665, 126.978);
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
   // 📍 (임시) Mock Data: 실제로는 API로 받아올 데이터
   const dummyRooms = [
     { id: 1, lat: 37.5660, lng: 126.9770, title: "광화문 경도팟", current: 12, max: 20 },
@@ -148,7 +157,10 @@ const HomePage = () => {
 
     // 1. 지도 초기화 (기본값: 서울 시청)
     const defaultPosition = new naver.maps.LatLng(37.5665, 126.9780);
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
     const mapOptions = {
       center: defaultPosition,
       zoom: 15,
@@ -156,17 +168,23 @@ const HomePage = () => {
       scaleControl: false,
       mapDataControl: false,
 <<<<<<< HEAD
+<<<<<<< HEAD
       logoControlOptions: { position: maps.Position.BOTTOM_LEFT },
     };
 
     const mapInstance = new maps.Map(mapElement.current, mapOptions);
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
       logoControlOptions: { position: naver.maps.Position.BOTTOM_LEFT },
     };
 
     const mapInstance = new naver.maps.Map(mapElement.current, mapOptions);
     setMap(mapInstance);
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
 
     // =========================================================
     // 2. 방 목록 마커 생성 (CustomMarker -> HTML 변환)
@@ -174,6 +192,7 @@ const HomePage = () => {
     dummyRooms.forEach((room) => {
       // 2-1. 리액트 컴포넌트를 HTML 문자열로 변환
       const markerHtml = renderToStaticMarkup(
+<<<<<<< HEAD
 <<<<<<< HEAD
         <CustomMarker
           roomId={room.id}
@@ -187,6 +206,8 @@ const HomePage = () => {
       const marker = new maps.Marker({
         position: new maps.LatLng(room.lat, room.lng),
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
         <CustomMarker 
           roomId={room.id}
           title={room.title} 
@@ -198,31 +219,44 @@ const HomePage = () => {
       // 2-2. 마커 생성
       const marker = new naver.maps.Marker({
         position: new naver.maps.LatLng(room.lat, room.lng),
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
         map: mapInstance,
         icon: {
           content: markerHtml,
           // 마커 디자인에 따라 중심점 조정 (x: 중앙, y: 하단)
 <<<<<<< HEAD
+<<<<<<< HEAD
           anchor: new maps.Point(50, 60),
 =======
           anchor: new naver.maps.Point(50, 60), 
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+          anchor: new naver.maps.Point(50, 60), 
+>>>>>>> 0c00477 (feat : homepage 구현)
         },
       });
 
       // 2-3. 마커 클릭 이벤트 리스너
+<<<<<<< HEAD
 <<<<<<< HEAD
       maps.Event.addListener(marker, "click", () => {
         console.log(`방 클릭됨: ID ${room.id}`);
         // 상세 페이지로 이동하며 roomId 전달
         navigate("/party/detail", { state: { roomId: room.id } });
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
       naver.maps.Event.addListener(marker, "click", () => {
         console.log(`방 클릭됨: ID ${room.id}`);
         // 상세 페이지로 이동하며 roomId 전달
         navigate('/party/detail', { state: { roomId: room.id } });
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
       });
     });
 
@@ -234,24 +268,33 @@ const HomePage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
 <<<<<<< HEAD
+<<<<<<< HEAD
           const currentPosition = new maps.LatLng(latitude, longitude);
 =======
           const currentPosition = new naver.maps.LatLng(latitude, longitude);
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+          const currentPosition = new naver.maps.LatLng(latitude, longitude);
+>>>>>>> 0c00477 (feat : homepage 구현)
 
           // 3-1. 지도 중심을 내 위치로 이동
           mapInstance.setCenter(currentPosition);
 
           // 3-2. 내 위치 표시 마커 (단순 초록 원)
 <<<<<<< HEAD
+<<<<<<< HEAD
           new maps.Marker({
 =======
           new naver.maps.Marker({
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+          new naver.maps.Marker({
+>>>>>>> 0c00477 (feat : homepage 구현)
             position: currentPosition,
             map: mapInstance,
             zIndex: 100, // 다른 마커보다 위에 표시
             icon: {
+<<<<<<< HEAD
 <<<<<<< HEAD
               content:
                 '<div style="width: 14px; height: 14px; background: #00FD9E; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
@@ -262,10 +305,16 @@ const HomePage = () => {
                 anchor: new naver.maps.Point(7, 7),
             }
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+                content: '<div style="width: 14px; height: 14px; background: #00FD9E; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
+                anchor: new naver.maps.Point(7, 7),
+            }
+>>>>>>> 0c00477 (feat : homepage 구현)
           });
 
           // 3-3. 좌표 -> 주소 변환 (Reverse Geocoding)
           // index.html에 &submodules=geocoder 필수!
+<<<<<<< HEAD
 <<<<<<< HEAD
           maps.Service.reverseGeocode(
             {
@@ -278,6 +327,8 @@ const HomePage = () => {
             (status: GeocodeStatus, response: ReverseGeocodeResponse) => {
               if (status !== maps.Service.Status.OK) {
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
           naver.maps.Service.reverseGeocode(
             {
               coords: currentPosition,
@@ -288,12 +339,16 @@ const HomePage = () => {
             },
             (status: any, response: any) => {
               if (status !== naver.maps.Service.Status.OK) {
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
                 setLocationText("주소 정보 없음");
                 return;
               }
 
               try {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 const result = response.v2?.results?.[0];
 
@@ -303,6 +358,11 @@ const HomePage = () => {
 
                 if (!result || !result.region) {
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+                const result = response.v2.results?.[0];
+
+                if (!result || !result.region) {
+>>>>>>> 0c00477 (feat : homepage 구현)
                   setLocationText("주소 정보 없음");
                   return;
                 }
@@ -320,6 +380,7 @@ const HomePage = () => {
                 setLocationText("주소 정보 없음");
               }
 <<<<<<< HEAD
+<<<<<<< HEAD
             },
           );
 =======
@@ -327,19 +388,29 @@ const HomePage = () => {
           );
 
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+            }
+          );
+
+>>>>>>> 0c00477 (feat : homepage 구현)
         },
         (error) => {
           console.error("Geolocation Error:", error);
           setLocationText("위치 권한 필요");
 <<<<<<< HEAD
+<<<<<<< HEAD
         },
 =======
         }
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+        }
+>>>>>>> 0c00477 (feat : homepage 구현)
       );
     } else {
       setLocationText("GPS 미지원");
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
   }, [navigate]); // 마운트 시 1회 실행
 
@@ -359,6 +430,8 @@ const HomePage = () => {
             </span>
             <span className="text-[16px] font-bold tracking-[-0.4px] text-white">
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
   }, []); // 마운트 시 1회 실행
 
   return (
@@ -374,7 +447,10 @@ const HomePage = () => {
               {locationText}
             </span>
             <span className="text-white tracking-[-0.4px] text-[16px] font-bold">
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
               사용자 이름
             </span>
           </div>
@@ -382,6 +458,7 @@ const HomePage = () => {
       </header>
 
       {/* 지도 영역 */}
+<<<<<<< HEAD
 <<<<<<< HEAD
       <div
         ref={mapElement}
@@ -396,12 +473,17 @@ const HomePage = () => {
           onClick={() => navigate("/party/create")}
         >
 =======
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
       <div ref={mapElement} className="flex-1 w-full bg-gray-800 outline-none relative" />
       
       {/* 플로팅 버튼 */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 w-full flex justify-center px-4">
         <Button state="active" width="xl" onClick={() => navigate('/party/create')}>
+<<<<<<< HEAD
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+>>>>>>> 0c00477 (feat : homepage 구현)
           + 새로운 경도팟 만들기
         </Button>
       </div>
@@ -410,7 +492,11 @@ const HomePage = () => {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default HomePage;
 =======
 export default HomePage;
 >>>>>>> a125e69 (feat : homepage 구현)
+=======
+export default HomePage;
+>>>>>>> 0c00477 (feat : homepage 구현)
