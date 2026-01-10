@@ -17,6 +17,8 @@ import PartyDetailPage from "./pages/party/PartyDetailPage";
 import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import WaitingPartyPage from "./pages/party/WaitingPartyPage";
+import ModalTestPage from "./pages/test/ModalTestPage";
+import GameStartPage from "./pages/game/GameStartPage";
 
 function App() {
   return (
@@ -38,13 +40,14 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
-            <Route path="test/Button" element={<ButtonTestPage />} />
+            <Route path="/test/modal" element={<ModalTestPage />} />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
             <Route path="party/waiting" element={<WaitingPartyPage />} />
+            <Route path="game" element={<GameStartPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
