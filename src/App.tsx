@@ -22,6 +22,8 @@ import WaitingPartyPage from "./pages/party/WaitingPartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
 import GamePlayPage from "./pages/game/GamePlayPage";
+import GameResultPage from "./pages/game/GameResultPage";
+
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -62,6 +64,7 @@ function App() {
             <Route path="party/waiting" element={<WaitingPartyPage />} />
             <Route path="game/start" element={<GameStartPage />} />
             <Route path="game/playing" element={<GamePlayPage />} />
+            <Route path="game/result" element={<GameResultPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
