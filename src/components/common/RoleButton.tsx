@@ -1,6 +1,10 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 const buttonStyles = cva(
   clsx(
     // 기본 모양
@@ -29,13 +33,21 @@ const buttonStyles = cva(
     defaultVariants: {
       state: "default",
     },
+<<<<<<< HEAD
   },
+<<<<<<< HEAD
   },
+=======
+=======
+  }
+>>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
+>>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
 );
 
 // Role 정의
 const ROLE_DATA = {
   police: { icon: "👮🏻", label: "경찰" },
+<<<<<<< HEAD
   thief: { icon: "🥷🏻", label: "도둑" },
   thief: { icon: "🥷🏻", label: "도둑" },
   random: { icon: "🎲", label: "랜덤" },
@@ -44,14 +56,35 @@ const ROLE_DATA = {
 interface RoleButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
+<<<<<<< HEAD
 interface RoleButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
+=======
+=======
+  thief:  { icon: "🥷🏻", label: "도둑" },
+  random: { icon: "🎲", label: "랜덤" },
+} as const;
+
+interface RoleButtonProps 
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+>>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
+>>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
     VariantProps<typeof buttonStyles> {
   roleType: keyof typeof ROLE_DATA;
 }
 
+<<<<<<< HEAD
 export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
+=======
+export const RoleButton = ({ 
+  className, 
+  state, 
+  roleType, 
+  ...props 
+}: RoleButtonProps) => {
+  
+>>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
   const content = ROLE_DATA[roleType];
 
   return (
@@ -60,6 +93,7 @@ export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
       className={buttonStyles({ state, roleType })}
       {...props}
     >
+<<<<<<< HEAD
       <div className="flex w-full items-center justify-center gap-2 text-sm">
       <div className="flex w-full items-center justify-center gap-2 text-sm">
         <p className="">{content.icon}</p>
@@ -73,4 +107,16 @@ export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
     </button>
   );
 };
+<<<<<<< HEAD
 
+=======
+=======
+      <div className="w-full flex items-center justify-center gap-2 text-sm">
+        <p className="">{content.icon}</p>
+        <p className="font-normal whitespace-nowrap leading-[140%] tracking-[-0.4px]">{content.label}</p>
+      </div>
+    </button>
+  );
+};
+>>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
+>>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
