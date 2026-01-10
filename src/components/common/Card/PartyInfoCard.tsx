@@ -3,7 +3,6 @@ import BaseCard from "./BaseCard";
 export interface PartyInfo {
   date: string;
   location: string;
-  regroup: string;
   playTime: string;
   people: {
     police: number;
@@ -20,7 +19,6 @@ export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
   const items = [
     { label: "일시", value: info.date },
     { label: "장소", value: info.location },
-    { label: "재집결", value: info.regroup },
     { label: "플레이", value: info.playTime },
     {
       label: "인원",
