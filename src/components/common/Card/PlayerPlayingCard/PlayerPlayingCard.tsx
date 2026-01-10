@@ -105,7 +105,12 @@ export const PlayerPlayingCard = ({
   );
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export default PlayerPlayingCard;
 =======
 >>>>>>> 0e5ca16 (feat:PlayingPartyCard 구현 완료)
+=======
+
+export default PlayerPlayingCard;
+>>>>>>> ec7b49f (feat:PlayerResultCard 구현 완료)
