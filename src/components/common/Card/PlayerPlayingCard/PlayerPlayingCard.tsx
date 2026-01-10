@@ -104,5 +104,8 @@ export const PlayerPlayingCard = ({
     </li>
   );
 };
+<<<<<<< HEAD
 
 export default PlayerPlayingCard;
+=======
+>>>>>>> 0e5ca16 (feat:PlayingPartyCard 구현 완료)
