@@ -14,7 +14,11 @@ const GameStartPage = () => {
   const navigate = useNavigate();
 
   const isHost = true; // 호스트 여부
+<<<<<<< HEAD
   const [role, setRole] = useState<"police" | "thief">("thief"); // 역할
+=======
+  const [role, setRole] = useState<"police" | "thief">("thief");
+>>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
 
   const [gameStatus, setGameStatus] = useState<"idle" | "ready" | "action">(
     "idle",

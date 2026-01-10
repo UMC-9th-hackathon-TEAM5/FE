@@ -20,7 +20,11 @@ import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
+<<<<<<< HEAD
 import HomePage from "./pages/HomePage";
+=======
+import GamePlayPage from "./pages/game/GamePlayPage";
+>>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
 
 function App() {
   return (
@@ -55,7 +59,13 @@ function App() {
             <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
+<<<<<<< HEAD
             <Route path="game" element={<GameStartPage />} />
+=======
+            <Route path="party/waiting" element={<WaitingPartyPage />} />
+            <Route path="game/start" element={<GameStartPage />} />
+            <Route path="game/playing" element={<GamePlayPage />} />
+>>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
           </Route>
         </Routes>
       </BrowserRouter>
