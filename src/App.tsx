@@ -22,6 +22,7 @@ import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
+import GamePlayPage from "./pages/game/GamePlayPage";
 
 function App() {
   return (
@@ -56,7 +57,13 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
+<<<<<<< HEAD
             <Route path="game" element={<GameStartPage />} />
+=======
+            <Route path="party/waiting" element={<WaitingPartyPage />} />
+            <Route path="game/start" element={<GameStartPage />} />
+            <Route path="game/playing" element={<GamePlayPage />} />
+>>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
           </Route>
         </Routes>
       </BrowserRouter>

@@ -111,7 +111,6 @@ export default function PartyDetailPage() {
           {mockPartyMeta.applyButtonText}
         </Button>
       </main>
-      ;
     </>
   );
 }
