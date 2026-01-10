@@ -31,6 +31,9 @@ export default function CreatePartyPage() {
   const isPeopleInvalid =
     !isPeopleEmpty &&
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 185900d (fix:로직 오류 해결  완료)
     (totalPeople <= 0 || police > thief * 2 || totalPeople > 20);
 
   const isFormValid = useMemo(() => {
