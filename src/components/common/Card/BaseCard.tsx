@@ -9,7 +9,7 @@ interface BaseCardProps {
 export default function BaseCard({ children, className = "" }: BaseCardProps) {
   return (
     <section
-      className={`bg-main-dark2 flex h-fit w-full flex-col gap-5 rounded-lg p-4 ${className}`}
+      className={`bg-main-dark2 flex h-fit w-77.5 flex-col gap-5 px-3 py-4 ${className}`}
     >
       {children}
     </section>
