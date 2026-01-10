@@ -1,10 +1,10 @@
 import "./App.css";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import MobileLayout from "./layouts/MobileLayout";
+import MobileLayout from "@/layouts/MobileLayout";
 
-import HeaderTestPage from "./pages/test/HeaderTestPage";
-import InputTestPage from "./pages/test/InputTestPage";
+import HeaderTestPage from "@/pages/test/HeaderTestPage";
+import InputTestPage from "@/pages/test/InputTestPage";
 
 function App() {
   return (
