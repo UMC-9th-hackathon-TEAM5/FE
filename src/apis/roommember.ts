@@ -10,6 +10,20 @@ export type ApiResponse<T> = {
 };
 
 export type EmptyData = null;
+export type ReleaseThiefData = {
+  thiefUserId: number;
+  thiefNickname: string;
+  remainingThieves: number;
+  message: string;
+};
+export type CaptureThiefData = {
+  thiefUserId: number;
+  thiefNickname: string;
+  policeUserId: number;
+  policeNickname: string;
+  remainingThieves: number;
+  message: string;
+};
 
 // 참가자 정보
 export type Member = {
@@ -24,7 +38,7 @@ export type Member = {
 // 사진 업로드
 
 export type RequestRoomPhotoDto = {
-  photo: string;
+  photo: File | Blob;
 };
 
 export type RoomPhotoData = {
@@ -35,9 +49,16 @@ export const uploadRoomPhoto = async (
   roomId: number,
   body: RequestRoomPhotoDto,
 ): Promise<ApiResponse<RoomPhotoData>> => {
+  const formData = new FormData();
+  formData.append("photo", body.photo);
   const { data } = await axiosInstance.post<ApiResponse<RoomPhotoData>>(
     `/api/v1/rooms/${roomId}/photo`,
-    body,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
   );
   return data;
 };
@@ -56,11 +77,15 @@ type JoinRoomData = {
 
 export const joinRoom = async (
   roomId: number,
+  userId: number,
   body: RequestRoomJoinDto,
 ): Promise<ApiResponse<JoinRoomData>> => {
   const { data } = await axiosInstance.post<ApiResponse<JoinRoomData>>(
     `/api/v1/rooms/${roomId}/join`,
     body,
+    {
+      params: { userId },
+    },
   );
   return data;
 };
@@ -87,11 +112,15 @@ export type GameStartData = {
 
 export const startGame = async (
   roomId: number,
+  hostUserId: number,
   body: RequestGameStartDto,
 ): Promise<ApiResponse<GameStartData>> => {
   const { data } = await axiosInstance.patch<ApiResponse<GameStartData>>(
     `/api/v1/rooms/${roomId}/roles`,
     body, // Body에 roles 배열을 담아 보냅니다.
+    {
+      params: { hostUserId },
+    },
   );
   return data;
 };
@@ -100,8 +129,8 @@ export const startGame = async (
 export const releaseThief = async (
   roomId: number,
   userId: number,
-): Promise<ApiResponse<EmptyData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
+): Promise<ApiResponse<ReleaseThiefData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<ReleaseThiefData>>(
     `/api/v1/rooms/${roomId}/participants/${userId}/release`,
   );
   return data;
@@ -110,10 +139,15 @@ export const releaseThief = async (
 // 도둑 검거 (Capture)
 export const captureThief = async (
   roomId: number,
-  userId: number, // 잡힌 도둑의 ID
-): Promise<ApiResponse<EmptyData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
-    `/api/v1/rooms/${roomId}/participants/${userId}/capture`,
+  thiefId: number, // 잡힌 도둑의 ID
+  currentPoliceId: number,
+): Promise<ApiResponse<CaptureThiefData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<CaptureThiefData>>(
+    `/api/v1/rooms/${roomId}/participants/${thiefId}/capture`,
+    undefined,
+    {
+      params: { currentPoliceId },
+    },
   );
   return data;
 };
@@ -121,10 +155,9 @@ export const captureThief = async (
 // 도착 상태 변경 (Arrival)
 export const updateArrivalStatus = async (
   roomId: number,
-  userId: number, // 도착한 사람의 ID
-): Promise<ApiResponse<EmptyData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
-    `/api/v1/rooms/${roomId}/participants/${userId}/arrival`,
+): Promise<ApiResponse<ParticipantsData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<ParticipantsData>>(
+    `/api/v1/rooms/${roomId}/participants/arrival`,
   );
   return data;
 };
