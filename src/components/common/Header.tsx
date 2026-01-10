@@ -3,6 +3,7 @@ import clsx from "clsx";
 
 import HeaderArrowIcon from "@/assets/arrow/arrow_back.svg?react";
 import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const headerStyles = cva(
   clsx(
@@ -25,6 +26,7 @@ const Header = ({ title, className }: HeaderProps) => {
     <header className={clsx(headerStyles(), "justify-between", className)}>
       <button
         type="button"
+        onClick={() => navigate(-1)}
         onClick={() => navigate(-1)}
         className="flex shrink-0 items-center justify-start gap-2"
       >
