@@ -11,7 +11,7 @@ const BaseModal = ({ isOpen, onClose, children }: BaseModalProps) => {
 
   return (
     <div
-      className="absolute inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-[1px]"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-[1px]"
       onClick={onClose}
     >
       <div className="relative" onClick={(e) => e.stopPropagation()}>
