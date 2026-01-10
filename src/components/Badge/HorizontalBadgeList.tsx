@@ -12,7 +12,10 @@ export default function HorizontalBadgeList({
 }: HorizontalBadgeListProps) {
   return (
     <div
+<<<<<<< HEAD
       role="listitem"
+=======
+>>>>>>> 5a70782 (feat:HorizontalPlayBadgeList 컴포넌트 구현)
       className={clsx(
         "scrollbar-hide flex items-center gap-3 overflow-x-auto py-2",
         className,
