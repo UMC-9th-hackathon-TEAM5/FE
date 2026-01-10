@@ -35,7 +35,7 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
-            <Route path="test/modal" element={<ModalTestPage />} />
+            <Route path="/test/modal" element={<ModalTestPage />} />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
