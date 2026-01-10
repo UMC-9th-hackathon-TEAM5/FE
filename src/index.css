@@ -9,8 +9,25 @@
   --color-point: #facc16;
   --color-point-variant: #faa916;
   --color-white: #ffffff;
+  --color-gray: #808080;
 }
 
 button {
   cursor: pointer;
+}
+
+/* date input calendar icon */
+.datetime-local-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  filter: invert(1);
+}
+
+.datetime-local-input:invalid::-webkit-datetime-edit {
+  color: #808080;
+}
+
+.datetime-local-input:valid::-webkit-datetime-edit {
+  color: #ffffff;
 }
