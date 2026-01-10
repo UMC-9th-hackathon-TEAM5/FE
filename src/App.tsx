@@ -11,6 +11,7 @@ import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
 import ButtonTestPage from "./pages/test/ButtonTestPage";
 import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
 import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
+import PlayerPlayingCardTestPage from "./pages/test/PlayerPlayingCardTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
@@ -41,6 +42,10 @@ function App() {
               element={<PlayerArrivalCardTestPage />}
             />
             <Route path="/test/modal" element={<ModalTestPage />} />
+            <Route
+              path="/test/player-playing-card"
+              element={<PlayerPlayingCardTestPage />}
+            />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
