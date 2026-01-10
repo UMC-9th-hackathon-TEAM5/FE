@@ -12,10 +12,9 @@ import { Button } from "@/components/common/Button";
 type RoleType = "police" | "thief" | "random" | null;
 
 const mockPartyInfo: PartyInfo = {
-  date: "2024-07-20",
-  location: "Central Park",
-  regroup: "Main Gate",
-  playTime: "90분",
+  date: "2026-01-11",
+  location: "수지구 생태공원 분수대 앞",
+  playTime: "60분",
   people: {
     police: 5,
     thief: 6,
@@ -112,7 +111,6 @@ export default function PartyDetailPage() {
           {mockPartyMeta.applyButtonText}
         </Button>
       </main>
-      ;
     </>
   );
 }
