@@ -7,6 +7,7 @@ import InputLabel from "@/components/common/Input/InputLabel";
 import HorizontalBadgeList from "@/components/Badge/HorizontalBadgeList";
 import { RoleButton } from "@/components/common/RoleButton";
 import { useState } from "react";
+import { Button } from "@/components/common/Button";
 
 type RoleType = "police" | "thief" | "random" | null;
 
@@ -43,13 +44,15 @@ export default function PartyDetailPage() {
   const getButtonState = (role: RoleType) =>
     selectedRole === role ? "active" : "default";
 
+  const isRoleSelected = selectedRole !== null;
+
   return (
     <>
       <Header title="팟 상세" />
-      <main className="h-full w-full border border-white px-10">
+      <main className="relative h-full w-full border border-white px-10">
         <section
           className="flex flex-col border border-white py-5"
-          role="파티 상세 정보"
+          aria-label="파티 상세 정보"
         >
           <div className="mb-3 flex w-full flex-col">
             <div className="text-main text-[20px] font-bold">
@@ -64,7 +67,7 @@ export default function PartyDetailPage() {
 
         <section
           className="flex flex-col border border-white py-3"
-          role="파티 설명"
+          aria-label="파티 설명"
         >
           <InputLabel label="설명" />
           <div className="px-1 text-xs font-medium text-white">
@@ -74,34 +77,45 @@ export default function PartyDetailPage() {
         </section>
         <section
           className="flex flex-col border border-white py-3"
-          role="파티 설명"
+          aria-label="파티 설명"
         >
           <InputLabel label={`참여자 (${TOTAL_PLAYERS}명)`} />
           <HorizontalBadgeList items={players} />
         </section>
         <section
           className="flex flex-col border border-white py-3"
-          role="파티 설명"
+          aria-label="파티 설명"
         >
           <InputLabel label="역할 선택" isRequired={true} />
           <div className="flex justify-center gap-3">
             <RoleButton
               roleType="police"
               state={getButtonState("police")}
+              className="w-24"
               onClick={() => setSelectedRole("police")}
             />
             <RoleButton
               roleType="thief"
+              className="w-24"
               state={getButtonState("thief")}
               onClick={() => setSelectedRole("thief")}
             />
             <RoleButton
               roleType="random"
+              className="w-24"
               state={getButtonState("random")}
               onClick={() => setSelectedRole("random")}
             />
           </div>
         </section>
+        <Button
+          width="xl"
+          state={isRoleSelected ? "active" : "default"}
+          disabled={!isRoleSelected}
+          className="absolute bottom-10"
+        >
+          참여 신청하기
+        </Button>
       </main>
       ;
     </>
