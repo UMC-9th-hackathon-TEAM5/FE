@@ -10,11 +10,12 @@ import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
 import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
 import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
-import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
 import LoginPage from "./pages/LoginPage";
+import CreatePartyPage from "./pages/party/CreatePartyPage";
+import ModalTestPage from "./pages/test/ModalTestPage";
 
 function App() {
   return (
@@ -34,14 +35,13 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
-            <Route path="test/Button" element={<ButtonTestPage />} />
+            <Route path="test/modal" element={<ModalTestPage />} />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
-            <Route path="party/waiting" element={<WaitingPartyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
