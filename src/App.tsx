@@ -23,6 +23,8 @@ import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
 import GamePlayPage from "./pages/game/GamePlayPage";
+import GameResultPage from "./pages/game/GameResultPage";
+
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -64,7 +66,7 @@ function App() {
             <Route path="party/waiting" element={<WaitingPartyPage />} />
             <Route path="game/start" element={<GameStartPage />} />
             <Route path="game/playing" element={<GamePlayPage />} />
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
+            <Route path="game/result" element={<GameResultPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
