@@ -7,3 +7,14 @@ export const axiosInstance = axios.create({
   },
   withCredentials: true,
 });
+
+axiosInstance.interceptors.request.use((config) => {
+  const accessToken = localStorage.getItem("accessToken");
+  const tokenType = localStorage.getItem("tokenType") ?? "Bearer";
+
+  if (accessToken) {
+    config.headers.Authorization = `${tokenType} ${accessToken}`;
+  }
+
+  return config;
+});
