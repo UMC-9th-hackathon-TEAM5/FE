@@ -21,6 +21,15 @@ export default function CreatePartyPage() {
 
   const isDateTimeInvalid = dateTime !== "" && !isFutureDateTime(dateTime);
 
+  const police = Number(policeCount);
+  const thief = Number(thiefCount);
+  const totalPeople = police + thief;
+
+  const isPeopleEmpty = policeCount === "" && thiefCount === "";
+  const isPeopleInvalid =
+    !isPeopleEmpty &&
+    (totalPeople <= 0 || police >= thief * 1.5 || totalPeople > 20);
+
   const isFormValid = useMemo(() => {
     return (
       title.trim().length > 0 &&
@@ -30,9 +39,10 @@ export default function CreatePartyPage() {
       policeCount.trim().length > 0 &&
       Number(policeCount) >= 0 &&
       thiefCount.trim().length > 0 &&
-      Number(thiefCount) >= 0
+      Number(thiefCount) >= 0 &&
+      !isPeopleInvalid
     );
-  }, [title, dateTime, location, policeCount, thiefCount]);
+  }, [title, dateTime, location, policeCount, thiefCount, isPeopleInvalid]);
 
   return (
     <>
@@ -100,6 +110,21 @@ export default function CreatePartyPage() {
               />
             </div>
           </div>
+          {totalPeople === 0 && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              모집 인원은 최소 1명 이상이어야 합니다.
+            </span>
+          )}
+          {totalPeople > 20 && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              모집 인원은 최대 20명까지 가능합니다.
+            </span>
+          )}
+          {police > thief * 2 && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              경찰 인원이 너무 많습니다.
+            </span>
+          )}
         </section>
 
         <section className="mt-3 flex flex-col pt-3" role="게임 시간 정하기">
