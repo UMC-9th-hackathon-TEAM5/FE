@@ -2,12 +2,6 @@ import React from "react";
 import { cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-import { PlayerAvatar } from "./PlayerAvatar";
-import { PlayerNameBadge } from "./PlayerNameBadge";
-import { ArrivalStatusButton } from "./ArrivalStatusButton";
-
-import ChangeRoleIcon from "@/assets/change/change.svg?react";
-
 type Role = "police" | "thief";
 type ArrivalStatus = "arrived" | "notArrived";
 
@@ -21,12 +15,12 @@ interface PlayerArrivalCardProps {
 }
 
 const cardStyles = cva(
-  "relative w-77.5 h-16 flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+  "flex items-center gap-4 p-4 rounded-lg border transition-colors",
   {
     variants: {
       arrived: {
-        true: "border border-main",
-        false: "bg-main-dark1",
+        true: "bg-green-50 border-green-400",
+        false: "bg-gray-50 border-gray-300",
       },
     },
     defaultVariants: {
@@ -34,6 +28,70 @@ const cardStyles = cva(
     },
   },
 );
+
+const Avatar: React.FC<{ role: Role }> = ({ role }) => {
+  const roleColors = {
+    police: "bg-blue-500",
+    thief: "bg-red-500",
+  };
+  const roleIcons = {
+    police: "👮",
+    thief: "🕵️",
+  };
+  return (
+    <div
+      className={twMerge(
+        "flex h-12 w-12 items-center justify-center rounded-full text-xl text-white select-none",
+        roleColors[role],
+      )}
+      aria-label={role === "police" ? "Police avatar" : "Thief avatar"}
+    >
+      {roleIcons[role]}
+    </div>
+  );
+};
+
+const NameBadge: React.FC<{
+  name: string;
+  isHost?: boolean;
+  isMe?: boolean;
+}> = ({ name, isHost, isMe }) => {
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 font-semibold text-gray-900">
+        <span>{name}</span>
+        {isHost && (
+          <span className="rounded bg-yellow-300 px-2 py-0.5 text-xs font-medium text-yellow-900 select-none">
+            호스트
+          </span>
+        )}
+        {isMe && (
+          <span className="rounded bg-indigo-300 px-2 py-0.5 text-xs font-medium text-indigo-900 select-none">
+            나
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ArrivalButton: React.FC<{ isArrived: boolean }> = ({ isArrived }) => {
+  return (
+    <button
+      type="button"
+      disabled
+      className={twMerge(
+        "rounded px-3 py-1 text-sm font-semibold transition-colors select-none",
+        isArrived
+          ? "cursor-default bg-green-500 text-white"
+          : "cursor-default bg-gray-300 text-gray-700",
+      )}
+      aria-label={isArrived ? "Arrived" : "Not arrived"}
+    >
+      {isArrived ? "도착" : "미도착"}
+    </button>
+  );
+};
 
 export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   name,
@@ -43,51 +101,21 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   isMe = false,
   className,
 }) => {
-  const [currentRole, setCurrentRole] = React.useState<Role>(role);
-  const [currentArrival, setCurrentArrival] =
-    React.useState<ArrivalStatus>(arrivalStatus);
-  const isArrived = currentArrival === "arrived";
+  const isArrived = arrivalStatus === "arrived";
 
-  const roleLabel = currentRole === "police" ? "경찰" : "도둑";
-
-  const handleToggleRole = () => {
-    setCurrentRole((prev) => (prev === "police" ? "thief" : "police"));
-  };
-
-  const handleToggleArrival = () => {
-    setCurrentArrival((prev) =>
-      prev === "arrived" ? "notArrived" : "arrived",
-    );
-  };
+  const roleLabel = role === "police" ? "경찰" : "도둑";
 
   return (
     <article
       className={twMerge(cardStyles({ arrived: isArrived }), className)}
-      role="group"
-      aria-label={`참여자 카드: ${name}, 역할 ${roleLabel}, ${isArrived ? "도착" : "미도착"}`}
+      aria-live="polite"
     >
-      <PlayerAvatar role={currentRole} />
+      <Avatar role={role} />
       <div className="flex flex-1 flex-col">
-        <PlayerNameBadge name={name} isHost={isHost} isMe={isMe} />
-        <span className="text-main-variant text-xs font-medium select-none">
-          {roleLabel}
-        </span>
+        <NameBadge name={name} isHost={isHost} isMe={isMe} />
+        <span className="text-sm text-gray-600 select-none">{roleLabel}</span>
       </div>
-      {(isHost || isMe) && (
-        <button
-          type="button"
-          aria-label={`역할 전환 (현재: ${roleLabel})`}
-          className="absolute top-1/2 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
-          onClick={handleToggleRole}
-        >
-          <ChangeRoleIcon className="text-white" />
-        </button>
-      )}
-      <ArrivalStatusButton
-        isArrived={isArrived}
-        onClick={handleToggleArrival}
-        aria-pressed={isArrived}
-      />
+      <ArrivalButton isArrived={isArrived} />
     </article>
   );
 };
