@@ -2,7 +2,7 @@ import { PlayerArrivalCard } from "@/components/common/Card/PlayerArrivalCard/Pl
 
 export default function PlayerArrivalCardTestPage() {
   return (
-    <main className="flex min-h-screen flex-col gap-4 bg-black p-6 text-white">
+    <main className="flex min-h-screen flex-col gap-4 overflow-y-auto bg-black p-6 text-white">
       <h1 className="mb-4 text-xl font-bold">
         PlayerArrivalCard 테스트 페이지
       </h1>
@@ -44,18 +44,6 @@ export default function PlayerArrivalCardTestPage() {
           arrivalStatus="arrived"
           isHost
           isMe
-        />
-      </section>
-
-      {/* className override */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm text-gray-400">className override</h2>
-
-        <PlayerArrivalCard
-          name="아진"
-          role="thief"
-          arrivalStatus="notArrived"
-          className="border-red-500 bg-red-50"
         />
       </section>
 

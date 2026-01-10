@@ -35,7 +35,7 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
-            PlayerArrivalCardTestPage
+
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
