@@ -4,9 +4,10 @@ import clsx from "clsx";
 
 const inputStyles = cva(
   [
+    "relative",
     "flex items-center",
     "px-4 py-2 transition-opacity duration-300",
-    "h-9 bg-main-dark2 rounded-2",
+    "h-9 bg-main-dark2 rounded-lg",
     "text-sm font-medium text-white placeholder:text-main-variant",
   ],
   {
@@ -75,6 +76,7 @@ export const Input = React.forwardRef<HTMLInputElement, BaseInputProps>(
             width: props.width,
           }),
           props.className,
+          type === "date" && "date-input pr-10",
         )}
         {...rest}
       />
