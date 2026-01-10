@@ -16,8 +16,7 @@ export default function MobileLayout() {
 >>>>>>> 6acac36 (setting:MoblieLayout width 및 height 수정)
 =======
       <div className="flex h-211 w-97.5 flex-col border border-white px-4">
-        <Header title="안녕" />
->>>>>>> 8b46bc0 (feat:Header 컴포넌트 임시 구현)
+        <Header title="팟 상세" />
         <Outlet />
       </div>
     </main>
