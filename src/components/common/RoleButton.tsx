@@ -46,7 +46,12 @@ interface RoleButtonProps
   roleType: keyof typeof ROLE_DATA;
 }
 
-export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
+export const RoleButton = ({
+  className,
+  state,
+  roleType,
+  ...props
+}: RoleButtonProps) => {
   const content = ROLE_DATA[roleType];
   return (
     <button
