@@ -8,14 +8,15 @@ import MobileLayout from "@/layouts/MobileLayout";
 // 테스트 페이지에 대한 라우팅
 import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
-import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
-import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
+import PartyInfoCardTestPage from "@/pages/test/PartyInfoCardTestPage";
+import RoleButtonTestPage from "@/pages/test/RoleButtonTestPage";
+import ButtonTestPage from "@/pages/test/ButtonTestPage";
+import PlayerBadgeTestPage from "@/pages/test/PlayerBadgeTestPage";
+import CreatePartyPage from "@/pages/party/CreatePartyPage";
 
 // 실제 페이지
-import PartyDetailPage from "./pages/party/PartyDetailPage";
-import LoginPage from "./pages/LoginPage";
-import CreatePartyPage from "./pages/party/CreatePartyPage";
-import ModalTestPage from "./pages/test/ModalTestPage";
+import PartyDetailPage from "@/pages/party/PartyDetailPage";
+import LoginPage from "@/pages/LoginPage";
 
 function App() {
   return (
