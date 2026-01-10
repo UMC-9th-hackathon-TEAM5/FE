@@ -48,7 +48,6 @@ interface RoleButtonProps
 
 export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
   const content = ROLE_DATA[roleType];
-
   return (
     <button
       type="button"
