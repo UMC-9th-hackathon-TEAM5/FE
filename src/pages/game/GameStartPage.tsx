@@ -14,10 +14,7 @@ const GameStartPage = () => {
   const navigate = useNavigate();
 
   const isHost = true; // 호스트 여부
-  type Role = "police" | "thief";
-
-  // TODO: 이후 서버 응답 또는 라우트 state로 교체 예정
-  const role = "thief" as Role;
+  const [role, setRole] = useState<"police" | "thief">("thief"); // 역할
 
   const [gameStatus, setGameStatus] = useState<"idle" | "ready" | "action">(
     "idle",

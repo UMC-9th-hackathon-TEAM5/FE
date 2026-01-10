@@ -13,8 +13,11 @@ import PlayerBadgeTestPage from "@/pages/test/PlayerBadgeTestPage";
 import CreatePartyPage from "@/pages/party/CreatePartyPage";
 
 // 실제 페이지
-import PartyDetailPage from "@/pages/party/PartyDetailPage";
-import LoginPage from "@/pages/LoginPage";
+import PartyDetailPage from "./pages/party/PartyDetailPage";
+import LoginPage from "./pages/LoginPage";
+import CreatePartyPage from "./pages/party/CreatePartyPage";
+import ModalTestPage from "./pages/test/ModalTestPage";
+import GameStartPage from "./pages/game/GameStartPage";
 
 function App() {
   return (
@@ -40,10 +43,7 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
-<<<<<<< HEAD
-            <Route path="party/waiting" element={<WaitingPartyPage />} />
-=======
->>>>>>> b389011 (feat : BaseModal 구현)
+            <Route path="game" element={<GameStartPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
