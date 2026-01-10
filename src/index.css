@@ -17,17 +17,17 @@ button {
 }
 
 /* date input calendar icon */
-.date-input::-webkit-calendar-picker-indicator {
+.datetime-local-input::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 12px;
   cursor: pointer;
   filter: invert(1);
 }
 
-.date-input::-webkit-datetime-edit {
+.datetime-local-input:invalid::-webkit-datetime-edit {
   color: #808080;
 }
 
-.date-input:valid::-webkit-datetime-edit {
+.datetime-local-input:valid::-webkit-datetime-edit {
   color: #ffffff;
 }
