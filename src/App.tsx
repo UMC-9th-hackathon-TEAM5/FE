@@ -13,11 +13,8 @@ import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
 import LoginPage from "./pages/LoginPage";
-<<<<<<< HEAD
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import WaitingPartyPage from "./pages/party/WaitingPartyPage";
-=======
->>>>>>> 583fb23 (feat : 로그인 페이지 구현)
 
 function App() {
   return (
