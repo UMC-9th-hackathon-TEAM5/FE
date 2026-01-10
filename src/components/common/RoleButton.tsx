@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
 
-
 const buttonStyles = cva(
   clsx(
     // 기본 모양
@@ -30,40 +29,41 @@ const buttonStyles = cva(
     defaultVariants: {
       state: "default",
     },
-  }
+  },
 );
 
 // Role 정의
 const ROLE_DATA = {
   police: { icon: "👮🏻", label: "경찰" },
-  thief:  { icon: "🥷🏻", label: "도둑" },
+  thief: { icon: "🥷🏻", label: "도둑" },
   random: { icon: "🎲", label: "랜덤" },
 } as const;
 
-interface RoleButtonProps 
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+interface RoleButtonProps
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonStyles> {
   roleType: keyof typeof ROLE_DATA;
 }
 
-export const RoleButton = ({ 
-  className, 
-  state, 
-  roleType, 
-  ...props 
+export const RoleButton = ({
+  className,
+  state,
+  roleType,
+  ...props
 }: RoleButtonProps) => {
-  
   const content = ROLE_DATA[roleType];
-
   return (
     <button
       type="button"
       className={buttonStyles({ state, roleType })}
       {...props}
     >
-      <div className="w-full flex items-center justify-center gap-2 text-sm">
+      <div className="flex w-full items-center justify-center gap-2 text-sm">
         <p className="">{content.icon}</p>
-        <p className="font-normal whitespace-nowrap leading-[140%] tracking-[-0.4px]">{content.label}</p>
+        <p className="leading-[140%] font-normal tracking-[-0.4px] whitespace-nowrap">
+          {content.label}
+        </p>
       </div>
     </button>
   );

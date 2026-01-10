@@ -5,6 +5,10 @@ import {
 } from "@/components/common/Card/PartyInfoCard";
 import InputLabel from "@/components/common/Input/InputLabel";
 import HorizontalBadgeList from "@/components/Badge/HorizontalBadgeList";
+import { RoleButton } from "@/components/common/RoleButton";
+import { useState } from "react";
+
+type RoleType = "police" | "thief" | "random" | null;
 
 const mockPartyInfo: PartyInfo = {
   date: "2024-07-20",
@@ -34,6 +38,11 @@ const players = [
 const TOTAL_PLAYERS = 7;
 
 export default function PartyDetailPage() {
+  const [selectedRole, setSelectedRole] = useState<RoleType>(null);
+
+  const getButtonState = (role: RoleType) =>
+    selectedRole === role ? "active" : "default";
+
   return (
     <>
       <Header title="팟 상세" />
@@ -75,7 +84,23 @@ export default function PartyDetailPage() {
           role="파티 설명"
         >
           <InputLabel label="역할 선택" isRequired={true} />
-          <div className="flex justify-center gap-3"></div>
+          <div className="flex justify-center gap-3">
+            <RoleButton
+              roleType="police"
+              state={getButtonState("police")}
+              onClick={() => setSelectedRole("police")}
+            />
+            <RoleButton
+              roleType="thief"
+              state={getButtonState("thief")}
+              onClick={() => setSelectedRole("thief")}
+            />
+            <RoleButton
+              roleType="random"
+              state={getButtonState("random")}
+              onClick={() => setSelectedRole("random")}
+            />
+          </div>
         </section>
       </main>
       ;
