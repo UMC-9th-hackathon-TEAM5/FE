@@ -11,7 +11,6 @@ type Player = {
 };
 
 const mockPlayers: Player[] = [
-  // 🔴 도둑 - 탈출 성공
   { id: "1", name: "사요", role: "thief", status: "escaped" },
   { id: "2", name: "서리", role: "thief", status: "escaped", isHost: true },
   { id: "3", name: "구디", role: "thief", status: "escaped", isMe: true },
@@ -24,7 +23,6 @@ const mockPlayers: Player[] = [
     isMe: true,
   },
 
-  // 🔴 도둑 - 감옥
   { id: "5", name: "사요", role: "thief", status: "jailed" },
   { id: "6", name: "서리", role: "thief", status: "jailed", isHost: true },
   { id: "7", name: "구디", role: "thief", status: "jailed", isMe: true },
@@ -37,7 +35,6 @@ const mockPlayers: Player[] = [
     isMe: true,
   },
 
-  // 🔵 경찰 - 검거
   { id: "9", name: "사요", role: "police", status: "caught" },
   { id: "10", name: "서리", role: "police", status: "caught", isHost: true },
   { id: "11", name: "구디", role: "police", status: "caught", isMe: true },
@@ -59,7 +56,6 @@ const mockPlayers: Player[] = [
     isMe: true,
   },
 
-  // 🔵 경찰 기본
   { id: "17", name: "사요", role: "police", status: "none" },
   { id: "18", name: "서리", role: "police", status: "none", isHost: true },
   { id: "19", name: "구디", role: "police", status: "none", isMe: true },

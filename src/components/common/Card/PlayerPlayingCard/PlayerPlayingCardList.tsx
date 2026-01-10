@@ -15,7 +15,7 @@ const initialPlayers: Player[] = [
     id: "1",
     name: "사요",
     role: "thief",
-    status: "caught", // 🔴 기본 상태
+    status: "caught",
   },
   {
     id: "2",
@@ -40,9 +40,7 @@ export const PlayerPlayingCardList = () => {
   ) => {
     setPlayers((prev) =>
       prev.map((player) =>
-        player.id === playerId
-          ? { ...player, status: nextStatus } // ⭐ 여기서 상태가 바뀜
-          : player,
+        player.id === playerId ? { ...player, status: nextStatus } : player,
       ),
     );
   };
