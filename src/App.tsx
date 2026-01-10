@@ -7,6 +7,7 @@ import MobileLayout from "@/layouts/MobileLayout";
 
 import HeaderTestPage from "@/pages/test/HeaderTestPage";
 import InputTestPage from "@/pages/test/InputTestPage";
+import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
 
 function App() {
   return (
@@ -16,6 +17,10 @@ function App() {
           <Route path="/" element={<MobileLayout />}>
             <Route path="test/header" element={<HeaderTestPage />} />
             <Route path="test/input" element={<InputTestPage />} />
+            <Route
+              path="test/party-info-card"
+              element={<PartyInfoCardTestPage />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>
