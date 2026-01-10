@@ -33,6 +33,7 @@ export default function GamePlayPage() {
   const [isEndConfirmOpen, setIsEndConfirmOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isEnding, setIsEnding] = useState(false);
+  const [gameSeconds, setGameSeconds] = useState(0);
 
   const navigate = useNavigate();
 
@@ -111,6 +112,26 @@ export default function GamePlayPage() {
 
     fetchParticipants();
   }, [roomId, navigate, mapParticipants]);
+
+  useEffect(() => {
+    const storedSeconds = localStorage.getItem("gameSeconds");
+    if (storedSeconds) {
+      const parsed = Number(storedSeconds);
+      if (!Number.isNaN(parsed)) {
+        setGameSeconds(parsed);
+        return;
+      }
+    }
+    setGameSeconds(0);
+  }, []);
+
+  useEffect(() => {
+    if (gameSeconds <= 0) return;
+    const timer = setInterval(() => {
+      setGameSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameSeconds]);
 
   useEffect(() => {
     if (thieves.length === 0) return;
@@ -195,7 +216,10 @@ export default function GamePlayPage() {
           <span className="h-7 text-[20px] font-medium text-white">
             남은 시간
           </span>
-          <span className="text-main h-21 text-[60px] font-bold">59 : 59</span>
+          <span className="text-main h-21 text-[60px] font-bold">
+            {String(Math.floor(gameSeconds / 60)).padStart(2, "0")} :{" "}
+            {String(gameSeconds % 60).padStart(2, "0")}
+          </span>
         </div>
       </section>
 

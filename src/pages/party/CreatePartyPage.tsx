@@ -14,8 +14,8 @@ export default function CreatePartyPage() {
   const [location, setLocation] = useState("");
   const [policeCount, setPoliceCount] = useState("");
   const [thiefCount, setThiefCount] = useState("");
-  const [countdownMinutes, setCountdownMinutes] = useState("60");
-  const [escapeSeconds, setEscapeSeconds] = useState("60");
+  const [countdownSecondsInput, setCountdownSecondsInput] = useState("60");
+  const [escapeMinutes, setEscapeMinutes] = useState("30");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -81,8 +81,8 @@ export default function CreatePartyPage() {
       thiefCount.trim().length > 0 &&
       Number(thiefCount) >= 0 &&
       !isPeopleInvalid &&
-      Number(countdownMinutes) > 0 &&
-      Number(escapeSeconds) > 0
+      Number(countdownSecondsInput) > 0 &&
+      Number(escapeMinutes) > 0
     );
   }, [
     title,
@@ -91,8 +91,8 @@ export default function CreatePartyPage() {
     policeCount,
     thiefCount,
     isPeopleInvalid,
-    countdownMinutes,
-    escapeSeconds,
+    countdownSecondsInput,
+    escapeMinutes,
   ]);
 
   const handleCreate = async () => {
@@ -112,8 +112,8 @@ export default function CreatePartyPage() {
         meetingTime: normalizeMeetingTime(dateTime),
         police_capacity: Number(policeCount),
         thief_capacity: Number(thiefCount),
-        countdownSeconds: Number(countdownMinutes) * 60,
-        escapeTime: Number(escapeSeconds),
+        countdownSeconds: Number(countdownSecondsInput),
+        escapeTime: Number(escapeMinutes),
       });
 
       navigate(`/party/waiting?roomId=${response.data.roomId}`, {
@@ -219,20 +219,20 @@ export default function CreatePartyPage() {
         <section className="mt-3 flex flex-col pt-3" role="게임 시간 정하기">
           <InputLabel label="시간 설정" className="mb-2" />
 
-          <InputLabel label="게임 진행 시간 (분)" className="mb-1" />
+          <InputLabel label="카운트다운 (초)" className="mb-1" />
           <Input
             type="number"
             className="mb-4"
             min={1}
-            value={countdownMinutes}
-            onChange={(e) => setCountdownMinutes(e.target.value)}
+            value={countdownSecondsInput}
+            onChange={(e) => setCountdownSecondsInput(e.target.value)}
           />
-          <InputLabel label="도망 갈 시간 (초)" className="mb-1" />
+          <InputLabel label="도망 갈 시간 (분)" className="mb-1" />
           <Input
             type="number"
             min={1}
-            value={escapeSeconds}
-            onChange={(e) => setEscapeSeconds(e.target.value)}
+            value={escapeMinutes}
+            onChange={(e) => setEscapeMinutes(e.target.value)}
           />
           <span className="text-main-variant mt-1 text-xs">
             게임 시작 직후 도둑들이 숨을 시간입니다

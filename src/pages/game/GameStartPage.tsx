@@ -1,7 +1,8 @@
+import { getRoom } from "@/apis/room";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/common/Button";
 import CheckIcon from "@/assets/check/check_black.svg?react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const CheckSquare = () => (
   <div className="bg-main flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
@@ -13,11 +14,13 @@ type Role = "police" | "thief";
 
 type LocationState = {
   role?: Role;
+  roomId?: number;
 };
 
 const GameStartPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const userId = useMemo(() => {
     const value = localStorage.getItem("userId");
@@ -37,10 +40,26 @@ const GameStartPage = () => {
   const role = ((location.state as LocationState | null)?.role ??
     "thief") as Role;
 
+  const roomId = useMemo(() => {
+    const stateRoomId = (location.state as LocationState | null)?.roomId;
+    if (stateRoomId) return stateRoomId;
+    const queryValue = searchParams.get("roomId");
+    if (queryValue) {
+      const parsed = Number(queryValue);
+      if (!Number.isNaN(parsed)) return parsed;
+    }
+    const storedValue = localStorage.getItem("roomId");
+    if (!storedValue) return null;
+    const parsed = Number(storedValue);
+    return Number.isNaN(parsed) ? null : parsed;
+  }, [location.state, searchParams]);
+
   const [gameStatus, setGameStatus] = useState<"idle" | "ready" | "action">(
     "idle",
   );
-  const [count, setCount] = useState(3);
+  const [count, setCount] = useState(0);
+  const [roomSeconds, setRoomSeconds] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (gameStatus === "idle") return;
@@ -51,16 +70,37 @@ const GameStartPage = () => {
     } else {
       if (gameStatus === "ready") {
         setGameStatus("action");
-        setCount(3);
+        setCount(roomSeconds);
       } else if (gameStatus === "action") {
         navigate("/game/playing", { replace: true });
       }
     }
-  }, [count, gameStatus, navigate]);
+  }, [count, gameStatus, navigate, roomSeconds]);
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
+    if (!roomId) {
+      setErrorMessage("방 정보를 찾을 수 없습니다.");
+      return;
+    }
+    setErrorMessage(null);
+    try {
+      const response = await getRoom(roomId);
+      const escapeSeconds =
+        typeof response.data.escapeTime === "number"
+          ? Math.max(1, response.data.escapeTime) * 60
+          : null;
+      const nextSeconds =
+        escapeSeconds ?? Math.max(1, response.data.countdownSeconds);
+      setRoomSeconds(nextSeconds);
+      if (escapeSeconds !== null) {
+        localStorage.setItem("gameSeconds", String(escapeSeconds));
+      }
+      setCount(nextSeconds);
+    } catch {
+      setErrorMessage("방 정보를 불러오지 못했습니다.");
+      return;
+    }
     setGameStatus("ready");
-    setCount(3);
   };
 
   if (gameStatus === "ready") {
@@ -164,6 +204,11 @@ const GameStartPage = () => {
           </p>
         )}
       </div>
+      {errorMessage && (
+        <p className="mt-3 text-center text-xs font-medium text-red-400">
+          * {errorMessage}
+        </p>
+      )}
     </div>
   );
 };
