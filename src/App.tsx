@@ -4,11 +4,13 @@ import MobileLayout from "./layouts/MobileLayout";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MobileLayout />}></Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MobileLayout />}></Route>
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
