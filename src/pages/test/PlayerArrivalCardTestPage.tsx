@@ -1,4 +1,3 @@
-import React from "react";
 import { PlayerArrivalCard } from "@/components/common/Card/PlayerArrivalCard/PlayerArrivalCard";
 
 export default function PlayerArrivalCardTestPage() {
