@@ -11,7 +11,7 @@ type Player = {
 };
 
 const mockPlayers: Player[] = [
-  { id: "1", name: "사요", role: "thief", status: "escaped" },
+  { id: "1", name: "사요", role: "thief", status: "caught" },
   { id: "2", name: "서리", role: "thief", status: "escaped", isHost: true },
   { id: "3", name: "구디", role: "thief", status: "escaped", isMe: true },
   {
