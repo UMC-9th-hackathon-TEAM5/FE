@@ -14,7 +14,7 @@ type RoleType = "police" | "thief" | "random" | null;
 const mockPartyInfo: PartyInfo = {
   date: "2024-07-20",
   location: "Central Park",
-  regroup: "Main Gate",
+
   playTime: "90분",
   people: {
     police: 5,
