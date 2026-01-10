@@ -11,6 +11,9 @@ import InputTestPage from "@/pages/test/InputTestPage";
 import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
 import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
 
+// 실제 페이지
+import PartyDetailPage from "./pages/party/PartyDetailPage";
+
 function App() {
   return (
     <>
@@ -28,6 +31,9 @@ function App() {
               path="/test/player-badge"
               element={<PlayerBadgeTestPage />}
             />
+
+            {/* 실제 페이지 */}
+            <Route path="party/detail" element={<PartyDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
