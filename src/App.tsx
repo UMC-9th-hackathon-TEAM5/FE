@@ -22,9 +22,6 @@ import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
-import GamePlayPage from "./pages/game/GamePlayPage";
-import GameResultPage from "./pages/game/GameResultPage";
-
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -57,6 +54,7 @@ function App() {
             PlayerResultCardTestPage
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
+            <Route path="home" element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
