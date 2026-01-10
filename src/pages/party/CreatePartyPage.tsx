@@ -1,4 +1,7 @@
-import { useState, useMemo } from "react";
+import { postRoom } from "@/apis/room";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import Header from "@/components/common/Header";
 import InputLabel from "@/components/common/Input/InputLabel";
@@ -11,6 +14,43 @@ export default function CreatePartyPage() {
   const [location, setLocation] = useState("");
   const [policeCount, setPoliceCount] = useState("");
   const [thiefCount, setThiefCount] = useState("");
+  const [countdownSecondsInput, setCountdownSecondsInput] = useState("60");
+  const [escapeMinutes, setEscapeMinutes] = useState("30");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  type Coordinates = {
+    lat: number;
+    lng: number;
+  };
+
+  const getCurrentPosition = (): Promise<Coordinates> =>
+    new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ lat: 0, lng: 0 });
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => resolve({ lat: 0, lng: 0 }),
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        },
+      );
+    });
+
+  const normalizeMeetingTime = (value: string) =>
+    value.includes(":") && value.length === 16 ? `${value}:00` : value;
 
   function isFutureDateTime(value: string): boolean {
     if (!value) return false;
@@ -40,9 +80,58 @@ export default function CreatePartyPage() {
       Number(policeCount) >= 0 &&
       thiefCount.trim().length > 0 &&
       Number(thiefCount) >= 0 &&
-      !isPeopleInvalid
+      !isPeopleInvalid &&
+      Number(countdownSecondsInput) > 0 &&
+      Number(escapeMinutes) > 0
     );
-  }, [title, dateTime, location, policeCount, thiefCount, isPeopleInvalid]);
+  }, [
+    title,
+    dateTime,
+    location,
+    policeCount,
+    thiefCount,
+    isPeopleInvalid,
+    countdownSecondsInput,
+    escapeMinutes,
+  ]);
+
+  const handleCreate = async () => {
+    if (!isFormValid || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const { lat, lng } = await getCurrentPosition();
+
+    try {
+      const response = await postRoom({
+        title: title.trim(),
+        placeName: location.trim(),
+        lat,
+        lng,
+        meetingTime: normalizeMeetingTime(dateTime),
+        police_capacity: Number(policeCount),
+        thief_capacity: Number(thiefCount),
+        countdownSeconds: Number(countdownSecondsInput),
+        escapeTime: Number(escapeMinutes),
+      });
+
+      navigate(`/party/waiting?roomId=${response.data.roomId}`, {
+        state: {
+          roomId: response.data.roomId,
+          hostId: response.data.hostId,
+        },
+      });
+    } catch (error) {
+      let message = "팟 생성에 실패했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -130,10 +219,21 @@ export default function CreatePartyPage() {
         <section className="mt-3 flex flex-col pt-3" role="게임 시간 정하기">
           <InputLabel label="시간 설정" className="mb-2" />
 
-          <InputLabel label="게임 진행 시간 (분)" className="mb-1" />
-          <Input defaultValue={60} type="number" className="mb-4" />
-          <InputLabel label="도망 갈 시간 (초)" className="mb-1" />
-          <Input defaultValue={60} type="number" />
+          <InputLabel label="카운트다운 (초)" className="mb-1" />
+          <Input
+            type="number"
+            className="mb-4"
+            min={1}
+            value={countdownSecondsInput}
+            onChange={(e) => setCountdownSecondsInput(e.target.value)}
+          />
+          <InputLabel label="도망 갈 시간 (분)" className="mb-1" />
+          <Input
+            type="number"
+            min={1}
+            value={escapeMinutes}
+            onChange={(e) => setEscapeMinutes(e.target.value)}
+          />
           <span className="text-main-variant mt-1 text-xs">
             게임 시작 직후 도둑들이 숨을 시간입니다
           </span>
@@ -148,10 +248,14 @@ export default function CreatePartyPage() {
           width="xl"
           state={isFormValid ? "active" : "default"}
           className="mt-6"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isSubmitting}
+          onClick={handleCreate}
         >
-          팟 생성하기
+          {isSubmitting ? "생성 중..." : "팟 생성하기"}
         </Button>
+        {errorMessage && (
+          <p className="mt-2 text-xs text-red-400">* {errorMessage}</p>
+        )}
       </main>
     </>
   );

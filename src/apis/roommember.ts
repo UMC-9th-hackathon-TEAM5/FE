@@ -155,12 +155,14 @@ export const captureThief = async (
 // 도착 상태 변경 (Arrival)
 export const updateArrivalStatus = async (
   roomId: number,
+  targetUserId: number,
 ): Promise<ApiResponse<ParticipantsData>> => {
   const { data } = await axiosInstance.patch<ApiResponse<ParticipantsData>>(
-    `/api/v1/rooms/${roomId}/participants/arrival`,
+    `/api/v1/rooms/${roomId}/participants/${targetUserId}/arrival`,
   );
   return data;
 };
+
 
 // 도착 여부 조회
 export type ParticipantsData = {

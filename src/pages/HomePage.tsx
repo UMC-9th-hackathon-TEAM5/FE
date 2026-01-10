@@ -1,3 +1,4 @@
+import { getNearbyRoom, type NearbyRoomItem } from "@/apis/room";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/common/Button";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +20,66 @@ interface ReverseGeocodeResponse {
   };
 }
 
-// Window 타입 확장 (TypeScript용)
+type MapsApi = {
+  LatLng: new (lat: number, lng: number) => unknown;
+  Map: new (
+    el: HTMLElement,
+    options: {
+      center: unknown;
+      zoom: number;
+      minZoom: number;
+      scaleControl: boolean;
+      mapDataControl: boolean;
+      logoControlOptions: { position: unknown };
+    },
+  ) => {
+    setCenter: (pos: unknown) => void;
+  };
+  Marker: new (options: {
+    position: unknown;
+    map: unknown;
+    zIndex?: number;
+    icon?: {
+      content: string;
+      anchor?: unknown;
+    };
+  }) => unknown;
+  Point: new (x: number, y: number) => unknown;
+  Position: {
+    BOTTOM_LEFT: unknown;
+  };
+  Event: {
+    addListener: (
+      target: unknown,
+      eventName: string,
+      handler: () => void,
+    ) => void;
+  };
+  Service: {
+    reverseGeocode: (
+      options: {
+        coords: unknown;
+        orders: string;
+      },
+      callback: (
+        status: GeocodeStatus,
+        response: ReverseGeocodeResponse,
+      ) => void,
+    ) => void;
+    OrderType: {
+      ADDR: string;
+      ROAD_ADDR: string;
+    };
+    Status: {
+      OK: GeocodeStatus;
+    };
+  };
+};
+
+type MapInstance = {
+  setCenter: (pos: unknown) => void;
+};
+
 declare global {
   interface Window {
     naver: {
@@ -28,34 +88,42 @@ declare global {
   }
 }
 
-// 📍 (임시) Mock Data: 실제로는 API로 받아올 데이터
-const dummyRooms = [
-  {
-    id: 1,
-    lat: 37.566,
-    lng: 126.977,
-    title: "광화문 경도팟",
-    current: 12,
-    max: 20,
-  },
-  {
-    id: 2,
-    lat: 37.567,
-    lng: 126.979,
-    title: "초보 환영",
-    current: 5,
-    max: 10,
-  },
-];
-
 const HomePage = () => {
   const mapElement = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapInstance | null>(null);
+  const mapsRef = useRef<MapsApi | null>(null);
+  const markersRef = useRef<unknown[]>([]);
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [rooms, setRooms] = useState<NearbyRoomItem[]>([]);
 
   const navigate = useNavigate();
 
-  // mock data moved to module scope
+  useEffect(() => {
+    const userIdValue = localStorage.getItem("userId");
+    if (!userIdValue) {
+      navigate("/login");
+      return;
+    }
+
+    const userId = Number(userIdValue);
+    if (Number.isNaN(userId)) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchRooms = async () => {
+      try {
+        const response = await getNearbyRoom(userId);
+        setRooms(response.data.rooms);
+      } catch (error) {
+        console.error("근처 방 조회 실패:", error);
+        setRooms([]);
+      }
+    };
+
+    fetchRooms();
+  }, [navigate]);
 
   useEffect(() => {
     const { naver } = window as {
@@ -64,65 +132,11 @@ const HomePage = () => {
       };
     };
 
-    const maps = naver.maps as {
-      LatLng: new (lat: number, lng: number) => unknown;
-      Map: new (
-        el: HTMLElement,
-        options: {
-          center: unknown;
-          zoom: number;
-          minZoom: number;
-          scaleControl: boolean;
-          mapDataControl: boolean;
-          logoControlOptions: { position: unknown };
-        },
-      ) => {
-        setCenter: (pos: unknown) => void;
-      };
-      Marker: new (options: {
-        position: unknown;
-        map: unknown;
-        zIndex?: number;
-        icon?: {
-          content: string;
-          anchor?: unknown;
-        };
-      }) => unknown;
-      Point: new (x: number, y: number) => unknown;
-      Position: {
-        BOTTOM_LEFT: unknown;
-      };
-      Event: {
-        addListener: (
-          target: unknown,
-          eventName: string,
-          handler: () => void,
-        ) => void;
-      };
-      Service: {
-        reverseGeocode: (
-          options: {
-            coords: unknown;
-            orders: string;
-          },
-          callback: (
-            status: GeocodeStatus,
-            response: ReverseGeocodeResponse,
-          ) => void,
-        ) => void;
-        OrderType: {
-          ADDR: string;
-          ROAD_ADDR: string;
-        };
-        Status: {
-          OK: GeocodeStatus;
-        };
-      };
-    };
+    const maps = naver.maps as MapsApi;
 
     if (!mapElement.current || !naver) return;
+    mapsRef.current = maps;
 
-    // 1. 지도 초기화 (기본값: 서울 시청)
     const defaultPosition = new maps.LatLng(37.5665, 126.978);
     const mapOptions = {
       center: defaultPosition,
@@ -134,57 +148,20 @@ const HomePage = () => {
     };
 
     const mapInstance = new maps.Map(mapElement.current, mapOptions);
+    mapRef.current = mapInstance;
 
-    // =========================================================
-    // 2. 방 목록 마커 생성 (CustomMarker -> HTML 변환)
-    // =========================================================
-    dummyRooms.forEach((room) => {
-      // 2-1. 리액트 컴포넌트를 HTML 문자열로 변환
-      const markerHtml = renderToStaticMarkup(
-        <CustomMarker
-          roomId={room.id}
-          title={room.title}
-          current={room.current}
-          max={room.max}
-        />,
-      );
-
-      // 2-2. 마커 생성
-      const marker = new maps.Marker({
-        position: new maps.LatLng(room.lat, room.lng),
-        map: mapInstance,
-        icon: {
-          content: markerHtml,
-          // 마커 디자인에 따라 중심점 조정 (x: 중앙, y: 하단)
-          anchor: new maps.Point(50, 60),
-        },
-      });
-
-      // 2-3. 마커 클릭 이벤트 리스너
-      maps.Event.addListener(marker, "click", () => {
-        console.log(`방 클릭됨: ID ${room.id}`);
-        // 상세 페이지로 이동하며 roomId 전달
-        navigate("/party/detail", { state: { roomId: room.id } });
-      });
-    });
-
-    // =========================================================
-    // 3. 내 현재 위치 가져오기 & 주소 변환
-    // =========================================================
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           const currentPosition = new maps.LatLng(latitude, longitude);
 
-          // 3-1. 지도 중심을 내 위치로 이동
           mapInstance.setCenter(currentPosition);
 
-          // 3-2. 내 위치 표시 마커 (단순 초록 원)
           new maps.Marker({
             position: currentPosition,
             map: mapInstance,
-            zIndex: 100, // 다른 마커보다 위에 표시
+            zIndex: 100,
             icon: {
               content:
                 '<div style="width: 14px; height: 14px; background: #00FD9E; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
@@ -192,8 +169,6 @@ const HomePage = () => {
             },
           });
 
-          // 3-3. 좌표 -> 주소 변환 (Reverse Geocoding)
-          // index.html에 &submodules=geocoder 필수!
           maps.Service.reverseGeocode(
             {
               coords: currentPosition,
@@ -239,11 +214,54 @@ const HomePage = () => {
     } else {
       setLocationText("GPS 미지원");
     }
-  }, [navigate]); // 마운트 시 1회 실행
+  }, [navigate]);
+
+  useEffect(() => {
+    const mapInstance = mapRef.current;
+    const maps = mapsRef.current;
+
+    if (!mapInstance || !maps) return;
+
+    markersRef.current.forEach((marker) => {
+      if (
+        marker &&
+        typeof (marker as { setMap?: (map: unknown) => void }).setMap ===
+          "function"
+      ) {
+        (marker as { setMap: (map: unknown) => void }).setMap(null);
+      }
+    });
+    markersRef.current = [];
+
+    rooms.forEach((room) => {
+      const markerHtml = renderToStaticMarkup(
+        <CustomMarker
+          roomId={room.roomId}
+          title={room.title}
+          current={room.currentParticipants}
+          max={room.maxParticipants}
+        />,
+      );
+
+      const marker = new maps.Marker({
+        position: new maps.LatLng(room.lat, room.lng),
+        map: mapInstance,
+        icon: {
+          content: markerHtml,
+          anchor: new maps.Point(50, 60),
+        },
+      });
+
+      maps.Event.addListener(marker, "click", () => {
+        navigate("/party/detail", { state: { roomId: room.roomId } });
+      });
+
+      markersRef.current.push(marker);
+    });
+  }, [rooms, navigate]);
 
   return (
     <div className="relative flex h-full w-full flex-col bg-[#111111]">
-      {/* 헤더 */}
       <header className="z-10 flex w-full shrink-0 items-center justify-start border-b border-white/10 bg-[#111] p-5">
         <div className="flex gap-2.5">
           <div className="border-main bg-main-dark2 flex h-15 w-15 items-center justify-center border-4 border-solid p-2.5">
@@ -256,19 +274,17 @@ const HomePage = () => {
               {locationText}
             </span>
             <span className="text-[16px] font-bold tracking-[-0.4px] text-white">
-              사용자 이름
+              {localStorage.getItem("nickname") ?? "사용자 이름"}
             </span>
           </div>
         </div>
       </header>
 
-      {/* 지도 영역 */}
       <div
         ref={mapElement}
         className="relative w-full flex-1 bg-gray-800 outline-none"
       />
 
-      {/* 플로팅 버튼 */}
       <div className="absolute bottom-8 left-1/2 z-50 flex w-full -translate-x-1/2 justify-center px-4">
         <Button
           state="active"
