@@ -34,6 +34,7 @@ export default function ButtonTestPage() {
         </section>
 
         {/* 2. Default Buttons */}
+        {/* 2. Default Buttons */}
         <section className="flex flex-col gap-3">
           <h2 className="border-b border-gray-700 pb-2 text-sm font-bold text-gray-400">
             Default (w-18)
@@ -53,6 +54,7 @@ export default function ButtonTestPage() {
         </section>
 
         {/* 3. Medium Buttons */}
+        {/* 3. Medium Buttons */}
         <section className="flex flex-col gap-3">
           <h2 className="border-b border-gray-700 pb-2 text-sm font-bold text-gray-400">
             Medium
@@ -66,6 +68,8 @@ export default function ButtonTestPage() {
             </Button>
           </div>
         </section>
+
+        {/* 4. XL Buttons */}
 
         {/* 4. XL Buttons */}
         <section className="flex flex-col gap-3">
