@@ -1,11 +1,16 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import BaseCard from "./BaseCard";
 
 export interface PartyInfo {
   date: string;
   location: string;
 =======
+=======
+import BaseCard from "./BaseCard";
+
+>>>>>>> abe19bb (refactor:BaseCard 재사용으로 교체)
 export interface PartyInfo {
   date: string;
   location: string;
@@ -24,12 +29,16 @@ interface PartyInfoCardProps {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
   const items = [
     { label: "일시", value: info.date },
     { label: "장소", value: info.location },
 =======
 export function PartyInfoCard({ info, className = "" }: PartyInfoCardProps) {
+=======
+export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
+>>>>>>> abe19bb (refactor:BaseCard 재사용으로 교체)
   const items = [
     { label: "일시", value: info.date },
     { label: "장소", value: info.location },
@@ -77,19 +86,18 @@ const PartyInfoCard = () => {
 =======
 >>>>>>> 39d70da (feat:PartyInfoCard 일부 구현)
   return (
-    <section
-      className={`bg-main-dark2 flex h-fit w-77.5 flex-col gap-5 px-3 py-4 ${className}`}
-    >
-      {items.map(({ label, value }, index) => (
-        <div key={index} className="flex gap-2 text-sm font-medium">
+    <BaseCard className={className}>
+      {items.map(({ label, value }) => (
+        <div key={label} className="flex gap-2 text-sm font-medium">
           <span className="text-main-variant">{label}</span>
           <span className="text-white">{value}</span>
         </div>
       ))}
-    </section>
+    </BaseCard>
   );
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export default PartyInfoCard;
 >>>>>>> 2d49d38 (feat:PartyInfoCard 컴포넌트 일부 구현)
@@ -97,15 +105,21 @@ export default PartyInfoCard;
 export default function PartyInfoCardWrapper(
   props: Partial<PartyInfoCardProps>,
 ) {
+=======
+interface PartyInfoCardWrapperProps {
+  info?: PartyInfo;
+  className?: string;
+}
+
+export default function PartyInfoCardWrapper(props: PartyInfoCardWrapperProps) {
+>>>>>>> abe19bb (refactor:BaseCard 재사용으로 교체)
   if (!props.info) {
     return (
-      <section
-        className={`bg-main-dark2 flex h-fit w-77.5 flex-col gap-5 px-3 py-4 ${props.className ?? ""}`}
-      >
+      <BaseCard className={props.className}>
         <div className="text-center text-sm font-medium text-white">
           파티 정보를 불러올 수 없습니다
         </div>
-      </section>
+      </BaseCard>
     );
   }
   return <PartyInfoCard info={props.info} className={props.className} />;
