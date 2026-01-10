@@ -1,19 +1,29 @@
 import { axiosInstance } from "./axios";
 
-type RequestUserDto = {
+// 공통 응답 타입 (api/roommember.ts와 동일)
+export type ApiResponse<T> = {
+  timestamp: string;
+  status: number;
+  code: string;
+  message: string;
+  path: string;
+  data: T;
+};
+
+export type RequestUserDto = {
   nickname: string;
   password: string;
   lat: number;
   lng: number;
 };
-type ResponseUserDto = {
-  timestamp: string;
-  status: number;
-};
 
+// [수정됨] Swagger 예시를 보면 data가 "string"입니다.
 export const postUser = async (
   body: RequestUserDto,
-): Promise<ResponseUserDto> => {
-  const { data } = await axiosInstance.post("/api/v1/user/session", body);
+): Promise<ApiResponse<string>> => {
+  const { data } = await axiosInstance.post<ApiResponse<string>>(
+    "/api/v1/user/session",
+    body,
+  );
   return data;
 };

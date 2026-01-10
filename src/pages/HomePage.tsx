@@ -3,8 +3,9 @@ import { Button } from "@/components/common/Button";
 import { useNavigate } from "react-router-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import CustomMarker from "@/components/map/CustomMarker";
+import { getNearbyRoom, NearbyRoomItem } from "@/apis/room"; // API import 경로 확인해주세요
 
-// Window 타입 확장 (TypeScript용)
+// Window 타입 확장
 declare global {
   interface Window {
     naver: any;
@@ -13,22 +14,25 @@ declare global {
 
 const HomePage = () => {
   const mapElement = useRef<HTMLDivElement | null>(null);
+  const markerInstances = useRef<any[]>([]); // 생성된 마커들을 관리하기 위한 Ref
+
   const [map, setMap] = useState<any | null>(null);
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
+  const [rooms, setRooms] = useState<NearbyRoomItem[]>([]); // API로 받아온 방 목록
+  const [nickname, setNickname] = useState("사용자");
 
   const navigate = useNavigate();
 
-  // 📍 (임시) Mock Data: 실제로는 API로 받아올 데이터
-  const dummyRooms = [
-    { id: 1, lat: 37.5660, lng: 126.9770, title: "광화문 경도팟", current: 12, max: 20 },
-    { id: 2, lat: 37.5670, lng: 126.9790, title: "초보 환영", current: 5, max: 10 },
-  ];
-
+  // 1. 초기화: 닉네임 로드 & 지도 생성 & 내 위치 파악
   useEffect(() => {
+    // 1-1. 닉네임 불러오기 (로그인 페이지에서 저장했다면)
+    const savedNickname = localStorage.getItem("nickname");
+    if (savedNickname) setNickname(savedNickname);
+
     const { naver } = window;
     if (!mapElement.current || !naver) return;
 
-    // 1. 지도 초기화 (기본값: 서울 시청)
+    // 1-2. 지도 생성 (기본값: 서울 시청)
     const defaultPosition = new naver.maps.LatLng(37.5665, 126.9780);
     const mapOptions = {
       center: defaultPosition,
@@ -42,101 +46,48 @@ const HomePage = () => {
     const mapInstance = new naver.maps.Map(mapElement.current, mapOptions);
     setMap(mapInstance);
 
-    // =========================================================
-    // 2. 방 목록 마커 생성 (CustomMarker -> HTML 변환)
-    // =========================================================
-    dummyRooms.forEach((room) => {
-      // 2-1. 리액트 컴포넌트를 HTML 문자열로 변환
-      const markerHtml = renderToStaticMarkup(
-        <CustomMarker 
-          roomId={room.id}
-          title={room.title} 
-          current={room.current} 
-          max={room.max} 
-        />
-      );
-
-      // 2-2. 마커 생성
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(room.lat, room.lng),
-        map: mapInstance,
-        icon: {
-          content: markerHtml,
-          // 마커 디자인에 따라 중심점 조정 (x: 중앙, y: 하단)
-          anchor: new naver.maps.Point(50, 60), 
-        },
-      });
-
-      // 2-3. 마커 클릭 이벤트 리스너
-      naver.maps.Event.addListener(marker, "click", () => {
-        console.log(`방 클릭됨: ID ${room.id}`);
-        // 상세 페이지로 이동하며 roomId 전달
-        navigate('/party/detail', { state: { roomId: room.id } });
-      });
-    });
-
-    // =========================================================
-    // 3. 내 현재 위치 가져오기 & 주소 변환
-    // =========================================================
+    // 1-3. 내 위치 가져오기
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           const currentPosition = new naver.maps.LatLng(latitude, longitude);
 
-          // 3-1. 지도 중심을 내 위치로 이동
+          // 지도 중심 이동
           mapInstance.setCenter(currentPosition);
 
-          // 3-2. 내 위치 표시 마커 (단순 초록 원)
+          // 내 위치 마커 (초록 원)
           new naver.maps.Marker({
             position: currentPosition,
             map: mapInstance,
-            zIndex: 100, // 다른 마커보다 위에 표시
+            zIndex: 100,
             icon: {
                 content: '<div style="width: 14px; height: 14px; background: #00FD9E; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
                 anchor: new naver.maps.Point(7, 7),
             }
           });
 
-          // 3-3. 좌표 -> 주소 변환 (Reverse Geocoding)
-          // index.html에 &submodules=geocoder 필수!
+          // 주소 변환 (Reverse Geocoding)
           naver.maps.Service.reverseGeocode(
             {
               coords: currentPosition,
-              orders: [
-                naver.maps.Service.OrderType.ADDR,
-                naver.maps.Service.OrderType.ROAD_ADDR,
-              ].join(","),
+              orders: [naver.maps.Service.OrderType.ADDR, naver.maps.Service.OrderType.ROAD_ADDR].join(","),
             },
             (status: any, response: any) => {
               if (status !== naver.maps.Service.Status.OK) {
                 setLocationText("주소 정보 없음");
                 return;
               }
-
               try {
                 const result = response.v2.results?.[0];
-
-                if (!result || !result.region) {
-                  setLocationText("주소 정보 없음");
-                  return;
-                }
-
-                const si = result.region.area1?.name ?? "";
-                const gu = result.region.area2?.name ?? "";
-
-                if (si && gu) {
-                  setLocationText(`${si} ${gu}`);
-                } else {
-                  setLocationText("주소 정보 없음");
-                }
+                const si = result?.region?.area1?.name ?? "";
+                const gu = result?.region?.area2?.name ?? "";
+                setLocationText(si && gu ? `${si} ${gu}` : "위치 확인 불가");
               } catch (e) {
-                console.error("주소 파싱 에러", e);
                 setLocationText("주소 정보 없음");
               }
             }
           );
-
         },
         (error) => {
           console.error("Geolocation Error:", error);
@@ -146,7 +97,63 @@ const HomePage = () => {
     } else {
       setLocationText("GPS 미지원");
     }
-  }, []); // 마운트 시 1회 실행
+  }, []);
+
+  // 2. 방 목록 API 호출 (지도가 로드된 후 실행)
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await getNearbyRoom();
+        console.log("주변 방 목록:", response.data.rooms);
+        setRooms(response.data.rooms);
+      } catch (error) {
+        console.error("방 목록 조회 실패:", error);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  // 3. 방 마커 그리기 (map이 있고, rooms 데이터가 변경될 때마다 실행)
+  useEffect(() => {
+    if (!map || rooms.length === 0) return;
+    const { naver } = window;
+
+    // 기존 마커 제거 (새로고침 시 중복 방지)
+    markerInstances.current.forEach((marker) => marker.setMap(null));
+    markerInstances.current = [];
+
+    rooms.forEach((room) => {
+      // API 데이터 매핑 (API 필드명에 맞춤)
+      const markerHtml = renderToStaticMarkup(
+        <CustomMarker 
+          roomId={room.roomId}
+          title={room.title} 
+          current={room.currentParticipants} // API 필드명 확인 필요
+          max={room.maxParticipants}         // API 필드명 확인 필요
+        />
+      );
+
+      const marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(room.lat, room.lng),
+        map: map,
+        icon: {
+          content: markerHtml,
+          anchor: new naver.maps.Point(50, 60), 
+        },
+      });
+
+      // 클릭 이벤트
+      naver.maps.Event.addListener(marker, "click", () => {
+        // 상세 페이지로 이동
+        navigate('/party/detail', { state: { roomId: room.roomId } });
+      });
+
+      // 마커 인스턴스 저장 (삭제용)
+      markerInstances.current.push(marker);
+    });
+
+  }, [map, rooms, navigate]);
 
   return (
     <div className="w-full h-full flex flex-col relative bg-[#111111]">
@@ -161,7 +168,7 @@ const HomePage = () => {
               {locationText}
             </span>
             <span className="text-white tracking-[-0.4px] text-[16px] font-bold">
-              사용자 이름
+              {nickname}
             </span>
           </div>
         </div>

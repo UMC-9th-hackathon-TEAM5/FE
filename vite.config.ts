@@ -18,4 +18,13 @@ export default defineConfig({
       "@types": path.resolve(__dirname, "src/types"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://15.164.92.116", // 백엔드 주소
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });
