@@ -11,6 +11,7 @@ const buttonStyles = cva(
     "flex items-center justify-center",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "text-white leading-[140%] tracking-[-0.4px] font-medium",
 =======
     "text-white text-medium leading-[140%] tracking-[-0.4px] font-medium",
@@ -18,10 +19,14 @@ const buttonStyles = cva(
 =======
     "text-white leading-[140%] tracking-[-0.4px] font-medium",
 >>>>>>> d3488f9 (feat : button들 구현)
+=======
+    "text-white text-medium leading-[140%] tracking-[-0.4px] font-medium",
+>>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
   ),
   {
     variants: {
       width: {
+<<<<<<< HEAD
 <<<<<<< HEAD
         default: "w-18",
         xl: "w-[310px]",
@@ -33,21 +38,26 @@ const buttonStyles = cva(
       // state == style?
 =======
         default : "w-18",
+=======
+        default: "w-18",
+>>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
         xl: "w-[310px]",
-        lg : "w-[300px]",
         md: "w-[149px]",
-        base: "w-[72px]",
         sm: "w-[60px]",
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 666d093 (feat : 버튼 컴포넌트 구현)
 =======
       // state == style?
 >>>>>>> d3488f9 (feat : button들 구현)
+=======
+>>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
       state: {
         // default : inactive
         default: "border border-main-dark1",
         active: "bg-main-dark1",
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         arrive: "bg-[#10B981]",
@@ -99,6 +109,26 @@ const buttonStyles = cva(
       // GameEnd Button
       {state : "active", width: "lg", className: "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]"},
 >>>>>>> d3488f9 (feat : button들 구현)
+=======
+      },
+    },
+    compoundVariants: [
+      // confirm button
+      {
+        state: "active",
+        width: "xl",
+        className:
+          "text-black bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold",
+      },
+      { state: "default", width: "xl", className: "h-11 rounded-none" },
+      // 참여자 목록 - 도착/미도착
+      { state: "active", width: "sm", className: "bg-[#10B981] text-sm" },
+      {
+        state: "default",
+        width: "sm",
+        className: "bg-[#E3E6EA] text-[#808080] text-sm",
+      },
+>>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
     ],
     defaultVariants: {
       state: "default",
@@ -110,6 +140,7 @@ const buttonStyles = cva(
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonStyles>;
 
+<<<<<<< HEAD
 export const Button = ({
   width,
   children,
@@ -136,6 +167,13 @@ export const Button = ({
 =======
       className={twMerge(buttonStyles({ width, state }), className)}
 >>>>>>> d3488f9 (feat : button들 구현)
+=======
+export const Button = ({ width, children, state, ...props }: ButtonProps) => {
+  return (
+    <button
+      type="button"
+      className={twMerge(buttonStyles({ width, state }))}
+>>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
       {...props}
     >
       {children}
