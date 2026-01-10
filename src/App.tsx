@@ -12,6 +12,7 @@ import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
 
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
+import CreatePartyPage from "./pages/party/CreatePartyPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
 
             {/* 실제 페이지 */}
             <Route path="party/detail" element={<PartyDetailPage />} />
+            <Route path="party/create" element={<CreatePartyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
