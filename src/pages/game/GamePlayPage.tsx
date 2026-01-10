@@ -22,18 +22,8 @@ const mockPlayers: Player[] = [
   { id: "5", name: "나호", role: "police", status: "none" },
 
   { id: "6", name: "미로", role: "thief", status: "jailed" },
-<<<<<<< HEAD
-<<<<<<< HEAD
-  { id: "7", name: "아진", role: "thief", status: "jailed" },
-  { id: "8", name: "나호", role: "thief", status: "jailed", isHost: true },
-=======
   { id: "7", name: "아진", role: "thief", status: "jailed", isHost: true },
   { id: "8", name: "나호", role: "thief", status: "jailed" },
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-  { id: "7", name: "아진", role: "thief", status: "jailed" },
-  { id: "8", name: "나호", role: "thief", status: "jailed", isHost: true },
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
 
   { id: "9", name: "사요", role: "police", status: "caught" },
   {
@@ -41,14 +31,6 @@ const mockPlayers: Player[] = [
     name: "서리",
     role: "police",
     status: "none",
-<<<<<<< HEAD
-<<<<<<< HEAD
-    isMe: true,
-=======
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-    isMe: true,
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
   },
   { id: "11", name: "구디", role: "police", status: "none" },
   { id: "12", name: "미로", role: "police", status: "caught" },
@@ -60,16 +42,8 @@ export default function GamePlayPage() {
 
   const isGuest = false;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const hasPoliceHost = players.some((p) => p.role === "police" && p.isHost);
-=======
   const me = players.find((p) => p.isMe);
   const isPoliceHost = me?.role === "police" && me?.isHost;
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-  const hasPoliceHost = players.some((p) => p.role === "police" && p.isHost);
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
 
   const thieves = players.filter((p) => p.role === "thief");
   const police = players.filter((p) => p.role === "police");
@@ -113,15 +87,7 @@ export default function GamePlayPage() {
 
           <ul
             className={`flex flex-col gap-3 overflow-y-auto pr-1 ${
-<<<<<<< HEAD
-<<<<<<< HEAD
-              hasPoliceHost
-=======
               isPoliceHost
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-              hasPoliceHost
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
                 ? "max-h-[27dvh]"
                 : isGuest
                   ? "max-h-[32dvh]"
@@ -163,15 +129,7 @@ export default function GamePlayPage() {
 
           <ul
             className={`flex flex-col gap-3 overflow-y-auto pr-1 ${
-<<<<<<< HEAD
-<<<<<<< HEAD
-              hasPoliceHost
-=======
               isPoliceHost
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-              hasPoliceHost
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
                 ? "max-h-[27dvh]"
                 : isGuest
                   ? "max-h-[32dvh]"
@@ -190,15 +148,7 @@ export default function GamePlayPage() {
             ))}
           </ul>
         </section>
-<<<<<<< HEAD
-<<<<<<< HEAD
-        {hasPoliceHost && (
-=======
         {isPoliceHost && (
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-        {hasPoliceHost && (
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
           <section className="bg-main-dark2 absolute bottom-0 z-10 flex w-full items-center justify-center pt-7 pb-10">
             <Button
               className="bg-main h-11 w-87.5 rounded-none border-none font-bold text-black shadow-[2px_2px_0_0_#008E58]"

@@ -15,10 +15,17 @@ const GameStartPage = () => {
 
   const isHost = true; // 호스트 여부
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [role, setRole] = useState<"police" | "thief">("thief"); // 역할
 =======
   const [role, setRole] = useState<"police" | "thief">("thief");
 >>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
+=======
+  type Role = "police" | "thief";
+
+  // TODO: 이후 서버 응답 또는 라우트 state로 교체 예정
+  const role = "thief" as Role;
+>>>>>>> 8dab5bb (fix:type 에러 수정)
 
   const [gameStatus, setGameStatus] = useState<"idle" | "ready" | "action">(
     "idle",

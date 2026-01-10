@@ -20,21 +20,6 @@ import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import GamePlayPage from "./pages/game/GamePlayPage";
-import GameResultPage from "./pages/game/GameResultPage";
-
->>>>>>> 7fa16a4 (feat:PlayerResultPage 구현)
-import HomePage from "./pages/HomePage";
-=======
-import GamePlayPage from "./pages/game/GamePlayPage";
-<<<<<<< HEAD
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-import HomePage from "./pages/HomePage";
->>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
 
 function App() {
   return (
@@ -69,17 +54,8 @@ function App() {
             <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
-<<<<<<< HEAD
-            <Route path="game" element={<GameStartPage />} />
-=======
             <Route path="party/waiting" element={<WaitingPartyPage />} />
-            <Route path="game/start" element={<GameStartPage />} />
-            <Route path="game/playing" element={<GamePlayPage />} />
-<<<<<<< HEAD
->>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
-=======
-            <Route path="game/result" element={<GameResultPage />} />
->>>>>>> 7fa16a4 (feat:PlayerResultPage 구현)
+            <Route path="game" element={<GameStartPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
