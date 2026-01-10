@@ -24,7 +24,11 @@ import GameStartPage from "./pages/game/GameStartPage";
 import HomePage from "./pages/HomePage";
 =======
 import GamePlayPage from "./pages/game/GamePlayPage";
+<<<<<<< HEAD
 >>>>>>> 68c0f39 (feat:PlayerPlayPage 구현)
+=======
+import HomePage from "./pages/HomePage";
+>>>>>>> a6d2e47 (fix:게임종료 버튼 보이는 로직 수정)
 
 function App() {
   return (
