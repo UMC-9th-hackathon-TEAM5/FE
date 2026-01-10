@@ -104,3 +104,5 @@ export const PlayerPlayingCard = ({
     </li>
   );
 };
+
+export default PlayerPlayingCard;
