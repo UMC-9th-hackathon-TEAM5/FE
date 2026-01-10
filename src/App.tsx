@@ -5,22 +5,15 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MobileLayout from "@/layouts/MobileLayout";
 
-// 테스트 페이지에 대한 라우팅
-import HeaderTestPage from "@/pages/test/HeaderTestPage";
-import InputTestPage from "@/pages/test/InputTestPage";
-import PartyInfoCardTestPage from "./pages/test/PartyInfoCardTestPage";
-import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
-import ButtonTestPage from "./pages/test/ButtonTestPage";
-import PlayerBadgeTestPage from "./pages/test/PlayerBadgeTestPage";
-import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
-import PlayerPlayingCardTestPage from "./pages/test/PlayerPlayingCardTestPage";
-import PlayerResultCardTestPage from "./pages/test/PlayerResultCardTestPage";
-
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
 import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
+<<<<<<< HEAD
 import ModalTestPage from "./pages/test/ModalTestPage";
+=======
+import WaitingPartyPage from "./pages/party/WaitingPartyPage";
+>>>>>>> f9efd57 (fix:타입 에러 수정)
 import GameStartPage from "./pages/game/GameStartPage";
 import HomePage from "./pages/HomePage";
 
@@ -31,6 +24,7 @@ function App() {
         <Routes>
           {/* 테스트 페이지에 대한 라우팅 */}
           <Route path="/" element={<MobileLayout />}>
+<<<<<<< HEAD
             <Route path="test/header" element={<HeaderTestPage />} />
             <Route path="test/input" element={<InputTestPage />} />
             <Route
@@ -52,6 +46,8 @@ function App() {
               element={<PlayerResultCardTestPage />}
             />
             PlayerResultCardTestPage
+=======
+>>>>>>> f9efd57 (fix:타입 에러 수정)
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
             <Route path="home" element={<HomePage />} />
