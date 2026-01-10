@@ -23,6 +23,7 @@ import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
 import GamePlayPage from "./pages/game/GamePlayPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
