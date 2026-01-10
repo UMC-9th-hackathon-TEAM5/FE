@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { Input } from "@/components/common/Input";
+import InputLabel from "@/components/common/InputLabel";
 
 export default function InputTestPage() {
   const [text, setText] = useState("");
   const [password, setPassword] = useState("");
 
   return (
-    <div className="flex min-h-full w-full flex-col gap-6 bg-[#1f1f1f] p-6 text-white">
-      <h1 className="text-xl font-bold">Input Component Test</h1>
+    <div className="flex min-h-full w-full flex-col bg-[#1f1f1f] p-6 text-white">
+      <h1 className="font-bol mb-4 text-xl">Input Component Test</h1>
 
       {/* TEXT INPUT */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-main-variant text-sm font-semibold">Text Input</h2>
+      <section className="flex flex-col">
+        <InputLabel label="팟 제목" isRequired={true} />
 
         <Input
           placeholder="기본 텍스트 입력"

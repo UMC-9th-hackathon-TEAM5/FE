@@ -1,6 +1,5 @@
 import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 
 const inputStyles = cva(
@@ -9,7 +8,7 @@ const inputStyles = cva(
     "flex items-center",
     "px-4 py-2 transition-opacity duration-300",
     "h-9 bg-main-dark2 rounded-lg",
-    "text-sm font-medium text-white placeholder:text-gray",
+    "text-sm font-medium text-white placeholder:text-main-variant",
   ],
   {
     variants: {
@@ -28,10 +27,42 @@ const inputStyles = cva(
 type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputStyles>;
 
+const PasswordInput = React.forwardRef<HTMLInputElement, BaseInputProps>(
+  ({ className, width, disabled, ...props }, ref) => {
+    const [isVisible, setIsVisible] = React.useState(false);
+    const toggleVisibility = () => setIsVisible((v) => !v);
+
+    return (
+      <div className={clsx("relative", inputStyles({ width }), className)}>
+        <input
+          ref={ref}
+          type={isVisible ? "text" : "password"}
+          disabled={disabled}
+          autoComplete="off"
+          className="flex-1 bg-transparent outline-none"
+          value={props.value}
+          onChange={props.onChange}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={toggleVisibility}
+          className="absolute right-3 flex items-center"
+          aria-label="비밀번호 보기 전환"
+        ></button>
+      </div>
+    );
+  },
+);
+
+PasswordInput.displayName = "PasswordInput";
+
 export const Input = React.forwardRef<HTMLInputElement, BaseInputProps>(
   (props, ref) => {
-    const { type = "text", placeholder, ...rest } = props;
-
+    const { type = "text", ...rest } = props;
+    if (type === "password") {
+      return <PasswordInput ref={ref} {...rest} />;
+    }
     return (
       <input
         ref={ref}
@@ -40,18 +71,17 @@ export const Input = React.forwardRef<HTMLInputElement, BaseInputProps>(
         autoComplete="off"
         value={props.value}
         onChange={props.onChange}
-        placeholder={placeholder}
-        {...rest}
-        className={twMerge(
-          clsx(
-            inputStyles({ width: props.width }),
-            type === "datetime-local" && "datetime-local-input pr-10",
-            props.className,
-          ),
+        className={clsx(
+          inputStyles({
+            width: props.width,
+          }),
+          props.className,
+          type === "date" && "date-input pr-10",
         )}
+        {...rest}
       />
     );
   },
 );
 
-export default Input;
+Input.displayName = "Input";
