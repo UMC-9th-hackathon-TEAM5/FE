@@ -21,6 +21,7 @@ import CreatePartyPage from "./pages/party/CreatePartyPage";
 import WaitingPartyPage from "./pages/party/WaitingPartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
+import GamePlayPage from "./pages/game/GamePlayPage";
 
 function App() {
   return (
@@ -57,7 +58,8 @@ function App() {
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
             <Route path="party/waiting" element={<WaitingPartyPage />} />
-            <Route path="game" element={<GameStartPage />} />
+            <Route path="game/start" element={<GameStartPage />} />
+            <Route path="game/playing" element={<GamePlayPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

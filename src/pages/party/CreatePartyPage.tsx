@@ -153,7 +153,6 @@ export default function CreatePartyPage() {
           팟 생성하기
         </Button>
       </main>
-      ;
     </>
   );
 }
