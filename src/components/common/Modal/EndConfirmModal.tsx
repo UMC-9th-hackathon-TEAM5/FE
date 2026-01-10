@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Button } from "../Button";
 import BaseModal from "./BaseModal";
 
@@ -31,3 +32,14 @@ const EndConfirmModal = ({
 };
 
 export default EndConfirmModal;
+=======
+const EndConfirmModal = () => {
+  return (
+    <div>
+      
+    </div>
+  )
+}
+
+export default EndConfirmModal
+>>>>>>> 6c422b7 (feat : GameRuleModal 구현)

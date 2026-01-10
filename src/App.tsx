@@ -46,11 +46,7 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
-<<<<<<< HEAD
-            <Route path="test/Button" element={<ButtonTestPage />} />
-=======
-            <Route path="test/modal" element={<ModalTestPage />} />
->>>>>>> b389011 (feat : BaseModal 구현)
+            <Route path="/test/modal" element={<ModalTestPage />} />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
