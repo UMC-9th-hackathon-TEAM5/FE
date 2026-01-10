@@ -18,6 +18,8 @@ interface PlayerArrivalCardProps {
   isHost?: boolean;
   isMe?: boolean;
   className?: string;
+  onToggleRole?: () => void;
+  onToggleArrival?: () => void;
 }
 
 const cardStyles = cva(
@@ -42,23 +44,11 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   isHost = false,
   isMe = false,
   className,
+  onToggleRole,
+  onToggleArrival,
 }) => {
-  const [currentRole, setCurrentRole] = React.useState<Role>(role);
-  const [currentArrival, setCurrentArrival] =
-    React.useState<ArrivalStatus>(arrivalStatus);
-  const isArrived = currentArrival === "arrived";
-
-  const roleLabel = currentRole === "police" ? "경찰" : "도둑";
-
-  const handleToggleRole = () => {
-    setCurrentRole((prev) => (prev === "police" ? "thief" : "police"));
-  };
-
-  const handleToggleArrival = () => {
-    setCurrentArrival((prev) =>
-      prev === "arrived" ? "notArrived" : "arrived",
-    );
-  };
+  const isArrived = arrivalStatus === "arrived";
+  const roleLabel = role === "police" ? "경찰" : "도둑";
 
   return (
     <article
@@ -66,7 +56,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
       role="group"
       aria-label={`참여자 카드: ${name}, 역할 ${roleLabel}, ${isArrived ? "도착" : "미도착"}`}
     >
-      <PlayerAvatar role={currentRole} />
+      <PlayerAvatar role={role} />
       <div className="flex flex-1 flex-col">
         <PlayerNameBadge name={name} isHost={isHost} isMe={isMe} />
         <span className="text-main-variant text-xs font-medium select-none">
@@ -78,14 +68,14 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
           type="button"
           aria-label={`역할 전환 (현재: ${roleLabel})`}
           className="absolute top-1/2 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
-          onClick={handleToggleRole}
+          onClick={onToggleRole}
         >
           <ChangeRoleIcon className="text-white" />
         </button>
       )}
       <ArrivalStatusButton
         isArrived={isArrived}
-        onClick={handleToggleArrival}
+        onClick={onToggleArrival}
         aria-pressed={isArrived}
       />
     </article>
