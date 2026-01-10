@@ -1,6 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
 
 const buttonStyles = cva(
   clsx(
@@ -48,23 +47,21 @@ interface RoleButtonProps
 }
 
 export const RoleButton = ({
+  className,
   state,
   roleType,
-  className,
   ...props
 }: RoleButtonProps) => {
   const content = ROLE_DATA[roleType];
+
   return (
     <button
       type="button"
-      className={twMerge(buttonStyles({ state, roleType }), className)}
+      className={buttonStyles({ state, roleType })}
       {...props}
     >
       <div className="flex w-full items-center justify-center gap-2 text-sm">
         <p className="">{content.icon}</p>
-        <p className="leading-[140%] font-normal tracking-[-0.4px] whitespace-nowrap">
-          {content.label}
-        </p>
         <p className="leading-[140%] font-normal tracking-[-0.4px] whitespace-nowrap">
           {content.label}
         </p>
