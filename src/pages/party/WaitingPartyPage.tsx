@@ -1,4 +1,3 @@
-import { useState } from "react";
 import PartyInfoCard, {
   PartyInfo,
 } from "@/components/common/Card/PartyInfoCard";
@@ -10,10 +9,6 @@ import { Button } from "@/components/common/Button";
 
 import ChangeRoleIcon from "@/assets/change/change.svg?react";
 import InfoIcon from "@/assets/info/info.svg?react";
-
-import { GameRuleModal } from "@/components/common/Modal/GameruleModal";
-
-import { validatePlayers } from "@/utils/validatePartyPlayers";
 
 const mockPartyInfo: PartyInfo = {
   date: "2026-01-11",
@@ -81,94 +76,48 @@ const mockPlayers = [
 ];
 
 export default function WaitingPartyPage() {
-  const [isRuleOpen, setIsRuleOpen] = useState(false);
-
-  const isGuest = !mockPlayers.some((p) => p.isMe);
-
   return (
     <>
       <Header title="대기방" />
-      <main className="relative h-full w-full px-9" role="main">
-        <section
-          className="flex flex-col py-5"
-          role="region"
-          aria-label="파티 정보"
-        >
+      <main className="relative h-full w-full px-9">
+        <section className="flex flex-col py-5" role="파티 제목 입력">
           <InputLabel
             label="수지구 경도팟 모임"
             className="text-main mb-2 text-[20px]"
           />
-          <InfoIcon aria-hidden="true" />
+          <InfoIcon />
 
           <PartyInfoCard info={mockPartyInfo} />
         </section>
-        <section
-          className="flex flex-col py-3"
-          role="region"
-          aria-label="파티 설명"
-        >
+        <section className="flex flex-col py-3" role="파티 제목 입력">
           <InputLabel label="설명" className="mb-2" />
           <div className="w-full px-2 text-[12px] font-medium tracking-[-0.025em] whitespace-pre-line text-white">
             수지생태공원 경도팟 모집합니다. 저희 그냥 심심한 대학생들입니다
             커몬커몬
           </div>
         </section>
-        <section
-          className="relative flex flex-col py-3"
-          role="region"
-          aria-label="참여자 목록"
-        >
+        <section className="relative flex flex-col py-3" role="파티 제목 입력">
           <InputLabel label="참여자 목록" className="mb-2" />
           <div className="text-gray absolute top-4 right-3 flex items-center gap-2 text-[12px] font-medium">
-            <ChangeRoleIcon aria-hidden="true" />
+            <ChangeRoleIcon />
             <span className="tracking-[-0.025em]">클릭하여 역할 변경</span>
           </div>
-          <div
-            className="flex max-h-[25vh] flex-col gap-3 overflow-y-auto"
-            role="list"
-          >
+          <div className="flex max-h-[25vh] flex-col gap-3 overflow-y-auto">
             {mockPlayers.map((player, index) => (
-              <div role="listitem" key={`${player.name}-${index}`}>
-                <PlayerArrivalCard {...player} />
-              </div>
+              <PlayerArrivalCard key={`${player.name}-${index}`} {...player} />
             ))}
           </div>
         </section>
-        <section
-          className="absolute right-0 bottom-4 left-0 flex flex-col items-center gap-1"
-          role="region"
-          aria-label="대기방 하단 액션"
-        >
-          <button
-            className="text-point flex h-14 w-full items-center justify-center gap-2 bg-[#FAA91633]"
-            onClick={() => setIsRuleOpen(true)}
-            aria-label="게임 규칙 확인하기"
-          >
-            <InfoIcon className="h-6 w-6" aria-hidden="true" />
+        <section className="absolute right-0 bottom-4 left-0 flex flex-col items-center gap-1">
+          <button className="text-point flex h-14 w-full items-center justify-center gap-2 bg-[#FAA91633]">
+            <InfoIcon className="h-6 w-6" />
             <span>게임 규칙 확인하기</span>
           </button>
-          {!isGuest && (
-            <Button
-              width="xl"
-              state="active"
-              className="my-4"
-              onClick={() => {
-                const result = validatePlayers(mockPlayers);
-
-                if (!result.isValid) {
-                  alert(result.message);
-                  return;
-                }
-
-                // TODO (예: 모달 열기 / 게임 시작)
-              }}
-            >
-              게임시작하기
-            </Button>
-          )}
+          <Button width="xl" state="active" className="my-4" onClick={() => {}}>
+            게임시작하기
+          </Button>
         </section>
       </main>
-      <GameRuleModal isOpen={isRuleOpen} onClose={() => setIsRuleOpen(false)} />
     </>
   );
 }

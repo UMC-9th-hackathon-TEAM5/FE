@@ -1,4 +1,31 @@
-const PartyInfoCard = () => {
+import BaseCard from "./BaseCard";
+
+export interface PartyInfo {
+  date: string;
+  location: string;
+  playTime: string;
+  people: {
+    police: number;
+    thief: number;
+  };
+}
+
+interface PartyInfoCardProps {
+  info: PartyInfo;
+  className?: string;
+}
+
+export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
+  const items = [
+    { label: "일시", value: info.date },
+    { label: "장소", value: info.location },
+    { label: "플레이", value: info.playTime },
+    {
+      label: "인원",
+      value: `경찰 ${info.people.police}명 / 도둑 ${info.people.thief}명`,
+    },
+  ];
+
   return (
     <section className="bg-main-dark2 flex h-fit w-77.5 flex-col gap-5 px-3 py-4">
       <div className="flex gap-2 text-sm font-medium">
@@ -23,6 +50,6 @@ const PartyInfoCard = () => {
       </div>
     </section>
   );
-};
+}
 
 export default PartyInfoCard;
