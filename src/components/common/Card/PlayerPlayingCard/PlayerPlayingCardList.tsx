@@ -16,10 +16,14 @@ const initialPlayers: Player[] = [
     name: "사요",
     role: "thief",
 <<<<<<< HEAD
+<<<<<<< HEAD
     status: "caught",
 =======
     status: "caught", // 🔴 기본 상태
 >>>>>>> 0e5ca16 (feat:PlayingPartyCard 구현 완료)
+=======
+    status: "caught",
+>>>>>>> 13ce834 (fix:주석 제거)
   },
   {
     id: "2",
@@ -45,12 +49,16 @@ export const PlayerPlayingCardList = () => {
     setPlayers((prev) =>
       prev.map((player) =>
 <<<<<<< HEAD
+<<<<<<< HEAD
         player.id === playerId ? { ...player, status: nextStatus } : player,
 =======
         player.id === playerId
           ? { ...player, status: nextStatus } // ⭐ 여기서 상태가 바뀜
           : player,
 >>>>>>> 0e5ca16 (feat:PlayingPartyCard 구현 완료)
+=======
+        player.id === playerId ? { ...player, status: nextStatus } : player,
+>>>>>>> 13ce834 (fix:주석 제거)
       ),
     );
   };
