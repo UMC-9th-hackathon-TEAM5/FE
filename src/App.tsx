@@ -37,7 +37,7 @@ function App() {
               path="/test/player-badge"
               element={<PlayerBadgeTestPage />}
             />
-            <Route path="test/modal" element={<ModalTestPage />} />
+            <Route path="/test/modal" element={<ModalTestPage />} />
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
