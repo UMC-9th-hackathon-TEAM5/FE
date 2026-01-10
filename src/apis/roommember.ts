@@ -9,6 +9,8 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+export type EmptyData = null;
+
 // 참가자 정보
 export type Member = {
   userId: number;
@@ -98,8 +100,8 @@ export const startGame = async (
 export const releaseThief = async (
   roomId: number,
   userId: number,
-): Promise<ApiResponse<{}>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<{}>>(
+): Promise<ApiResponse<EmptyData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
     `/api/v1/rooms/${roomId}/participants/${userId}/release`,
   );
   return data;
@@ -109,8 +111,8 @@ export const releaseThief = async (
 export const captureThief = async (
   roomId: number,
   userId: number, // 잡힌 도둑의 ID
-): Promise<ApiResponse<{}>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<{}>>(
+): Promise<ApiResponse<EmptyData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
     `/api/v1/rooms/${roomId}/participants/${userId}/capture`,
   );
   return data;
@@ -120,8 +122,8 @@ export const captureThief = async (
 export const updateArrivalStatus = async (
   roomId: number,
   userId: number, // 도착한 사람의 ID
-): Promise<ApiResponse<{}>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<{}>>(
+): Promise<ApiResponse<EmptyData>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<EmptyData>>(
     `/api/v1/rooms/${roomId}/participants/${userId}/arrival`,
   );
   return data;
