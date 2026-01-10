@@ -42,7 +42,6 @@ export type RequestRoomPostDto = {
   lat: number;
   lng: number;
   meetingTime: string;
-  maxParticipants: number;
   police_capacity: number;
   thief_capacity: number;
   countdownSeconds: number;
@@ -57,6 +56,7 @@ export type RequestRoomGameDto = {
 // 방 생성 후 응답 data
 type RoomIdData = {
   roomId: number;
+  hostId: number;
 };
 
 // 방 상세 조회 응답 data
