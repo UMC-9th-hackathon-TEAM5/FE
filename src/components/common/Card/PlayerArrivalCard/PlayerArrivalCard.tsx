@@ -79,7 +79,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
         className="absolute top-1/2 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
         onClick={handleToggleRole}
       >
-        <ChangeRoleIcon />
+        <ChangeRoleIcon className="text-white" />
       </button>
       <ArrivalStatusButton
         isArrived={isArrived}
