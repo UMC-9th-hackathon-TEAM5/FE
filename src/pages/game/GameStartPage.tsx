@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/common/Button";
 import CheckIcon from "@/assets/check/check_black.svg?react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-// 컴포넌트 외부로 분리 (성능 최적화)
 const CheckSquare = () => (
   <div className="bg-main flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
   <div className="bg-main flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
@@ -11,16 +10,44 @@ const CheckSquare = () => (
   </div>
 );
 
+type Role = "police" | "thief";
+
+type LocationState = {
+  role?: Role;
+};
+
 const GameStartPage = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
   const navigate = useNavigate();
 
   const isHost = true; // 호스트 여부
   const [role, setRole] = useState<"police" | "thief">("thief");
+=======
+  const location = useLocation();
+
+  const userId = useMemo(() => {
+    const value = localStorage.getItem("userId");
+    if (!value) return null;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }, []);
+
+  const hostId = useMemo(() => {
+    const value = localStorage.getItem("hostId");
+    if (!value) return null;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }, []);
+
+  const isHost = userId !== null && hostId !== null && userId === hostId;
+  const role = ((location.state as LocationState | null)?.role ??
+    "thief") as Role;
+>>>>>>> 2f06dd5 (wip:api 연결)
 
   const [gameStatus, setGameStatus] = useState<"idle" | "ready" | "action">(
     "idle",
-  ); // page steps
+  );
   const [count, setCount] = useState(3);
 
 
@@ -38,20 +65,23 @@ const GameStartPage = () => {
         setGameStatus("action");
         setCount(3);
       } else if (gameStatus === "action") {
+<<<<<<< HEAD
         navigate("/ongame", { replace: true });
       } else if (gameStatus === "action") {
         navigate("/ongame", { replace: true });
+=======
+        navigate("/game/playing", { replace: true });
+>>>>>>> 2f06dd5 (wip:api 연결)
       }
     }
   }, [count, gameStatus, navigate]);
-  // 게임 시작 버튼 핸들러
+
   const handleStartGame = () => {
     setGameStatus("ready");
     setGameStatus("ready");
     setCount(3);
   };
 
-  // 준비 화면
   if (gameStatus === "ready") {
   if (gameStatus === "ready") {
     return (
@@ -69,7 +99,6 @@ const GameStartPage = () => {
     );
   }
 
-  // 역할별 화면 (빨강/파랑)
   if (gameStatus === "action") {
     const isPolice = role === "police";
   if (gameStatus === "action") {
@@ -149,7 +178,6 @@ const GameStartPage = () => {
     );
   }
 
-  // 기본 체크리스트 화면 (Idle)
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center">
       <div className="text-main text-[24px] font-bold">시작 전 체크리스트</div>
@@ -185,7 +213,7 @@ const GameStartPage = () => {
             className="bg-main h-11 w-87.5 rounded-none border-none font-bold text-black shadow-[2px_2px_0_0_#008E58]"
             onClick={handleStartGame}
           >
-            게임 시작하기
+            {`게임 시작하기`}
           </Button>
         ) : (
           <p className="text-center text-[12px] font-medium tracking-[-0.3px] text-[#808080]">

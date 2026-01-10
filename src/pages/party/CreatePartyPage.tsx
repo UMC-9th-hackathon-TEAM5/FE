@@ -116,7 +116,7 @@ export default function CreatePartyPage() {
         escapeTime: Number(escapeSeconds),
       });
 
-      navigate("/party/waiting", {
+      navigate(`/party/waiting?roomId=${response.data.roomId}`, {
         state: {
           roomId: response.data.roomId,
           hostId: response.data.hostId,
