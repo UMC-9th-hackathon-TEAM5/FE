@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import MobileLayout from "./layouts/MobileLayout";
 import HeaderTestPage from "./pages/test/HeaderTestPage";
+import RoleButtonTestPage from "./pages/test/RoleButtonTestPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MobileLayout />}>
             <Route path="test/header" element={<HeaderTestPage />} />
+            <Route path="test/RoleButton" element={<RoleButtonTestPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
