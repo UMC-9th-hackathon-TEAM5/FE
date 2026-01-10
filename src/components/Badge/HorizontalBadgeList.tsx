@@ -12,6 +12,7 @@ export default function HorizontalBadgeList({
 }: HorizontalBadgeListProps) {
   return (
     <div
+      role="listitem"
       className={clsx(
         "scrollbar-hide flex items-center gap-3 overflow-x-auto py-2",
         className,
