@@ -15,8 +15,6 @@ import PlayerArrivalCardTestPage from "./pages/test/PlayerArrivalCardTestPage";
 // 실제 페이지
 import PartyDetailPage from "./pages/party/PartyDetailPage";
 import LoginPage from "./pages/LoginPage";
-import CreatePartyPage from "./pages/party/CreatePartyPage";
-import WaitingPartyPage from "./pages/party/WaitingPartyPage";
 
 function App() {
   return (
@@ -39,6 +37,7 @@ function App() {
             <Route path="test/Button" element={<ButtonTestPage />} />
 
             {/* 실제 페이지 */}
+            <Route path="login" element={<LoginPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
