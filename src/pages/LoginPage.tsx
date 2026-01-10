@@ -1,16 +1,30 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Button } from "@/components/common/Button";
 import Input from "@/components/common/Input/Input";
 =======
 import { Button } from "@/components/common/Button"
 import Input from "@/components/common/Input/Input"
 >>>>>>> 583fb23 (feat : 로그인 페이지 구현)
+=======
+import { postUser } from "@/apis/user";
+import { Button } from "@/components/common/Button";
+import Input from "@/components/common/Input/Input";
+import axios from "axios";
+>>>>>>> a203d3b (api/LoginPage 연결)
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+type Coordinates = {
+  lat: number;
+  lng: number;
+};
 
 const LoginPage = () => {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -54,6 +68,63 @@ const LoginPage = () => {
       password.trim().length === 4
     );
   }, [nickname, nicknameError, password]);
+
+  const getCurrentPosition = (): Promise<Coordinates> =>
+    new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ lat: 0, lng: 0 });
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => resolve({ lat: 0, lng: 0 }),
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        },
+      );
+    });
+
+  const handleLogin = async () => {
+    if (!isFormValid || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const { lat, lng } = await getCurrentPosition();
+
+    try {
+      const response = await postUser({
+        nickname,
+        password,
+        lat,
+        lng,
+      });
+      const { userId, accessToken, tokenType } = response.data;
+
+      localStorage.setItem("userId", String(userId));
+      localStorage.setItem("nickname", nickname);
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("tokenType", tokenType);
+
+      navigate("/home");
+    } catch (error) {
+      let message = "로그인에 실패했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
 <<<<<<< HEAD
@@ -114,6 +185,9 @@ const LoginPage = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {errorMessage && (
+          <p className="text-red-500 text-xs pl-1">* {errorMessage}</p>
+        )}
       </div>
 <<<<<<< HEAD
       <Button
@@ -131,9 +205,11 @@ export default LoginPage;
 =======
       <Button 
         className={`w-32.25 rounded-none ${isFormValid ? "bg-main text-black shadow-[2px_2px_0_0_#008E58]" : "border border-main-dark1 text-white"}`} 
-        onClick={() => navigate('/home')}
-        disabled={!isFormValid}
-      >START</Button>
+        onClick={handleLogin}
+        disabled={!isFormValid || isSubmitting}
+      >
+        {isSubmitting ? "LOADING..." : "START"}
+      </Button>
     </div>
   )
 }
