@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Input from "@/components/common/input/Input";
-import InputLabel from "@/components/common/input/InputLabel";
+import Input from "@/components/common/Input/Input";
+import InputLabel from "@/components/common/Input/InputLabel";
 
 export default function InputTestPage() {
   const [text, setText] = useState("");
