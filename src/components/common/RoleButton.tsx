@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> a6a7be4 (feat : RoleButton 컴포넌트 구현)
@@ -14,6 +15,8 @@ import { clsx } from "clsx";
 
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
 const buttonStyles = cva(
   clsx(
     // 기본 모양
@@ -45,6 +48,7 @@ const buttonStyles = cva(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   },
 =======
   }
@@ -58,6 +62,9 @@ const buttonStyles = cva(
   }
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+  },
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
 );
 
 // Role 정의
@@ -66,8 +73,11 @@ const ROLE_DATA = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
   thief: { icon: "🥷🏻", label: "도둑" },
   random: { icon: "🎲", label: "랜덤" },
 } as const;
@@ -75,6 +85,7 @@ const ROLE_DATA = {
 interface RoleButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
+<<<<<<< HEAD
 =======
   thief:  { icon: "🥷🏻", label: "도둑" },
   random: { icon: "🎲", label: "랜덤" },
@@ -96,10 +107,13 @@ interface RoleButtonProps
 =======
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
     VariantProps<typeof buttonStyles> {
   roleType: keyof typeof ROLE_DATA;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -133,6 +147,9 @@ export const RoleButton = ({
   
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+export const RoleButton = ({ state, roleType, ...props }: RoleButtonProps) => {
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
   const content = ROLE_DATA[roleType];
 <<<<<<< HEAD
 
@@ -148,8 +165,11 @@ export const RoleButton = ({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
       <div className="flex w-full items-center justify-center gap-2 text-sm">
         <p className="">{content.icon}</p>
         <p className="leading-[140%] font-normal tracking-[-0.4px] whitespace-nowrap">
@@ -159,6 +179,7 @@ export const RoleButton = ({
     </button>
   );
 };
+<<<<<<< HEAD
 =======
       <div className="w-full flex items-center justify-center gap-2 text-sm">
 <<<<<<< HEAD
@@ -185,3 +206,5 @@ export const RoleButton = ({
 =======
 >>>>>>> dfa6f9e (feat : RoleButton 컴포넌트 구현)
 >>>>>>> 9c38835 (feat : RoleButton 컴포넌트 구현)
+=======
+>>>>>>> bde1d8b (feat : RoleButton 컴포넌트 구현)
