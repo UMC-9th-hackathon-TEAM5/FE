@@ -18,6 +18,7 @@ import LoginPage from "./pages/LoginPage";
 import CreatePartyPage from "./pages/party/CreatePartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
+            <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />
             <Route path="party/create" element={<CreatePartyPage />} />
             <Route path="game" element={<GameStartPage />} />
