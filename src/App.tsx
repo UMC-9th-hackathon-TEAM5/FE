@@ -22,6 +22,7 @@ import WaitingPartyPage from "./pages/party/WaitingPartyPage";
 import ModalTestPage from "./pages/test/ModalTestPage";
 import GameStartPage from "./pages/game/GameStartPage";
 import GamePlayPage from "./pages/game/GamePlayPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
