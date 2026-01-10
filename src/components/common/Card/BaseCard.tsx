@@ -1,4 +1,3 @@
-// src/components/common/Card/BaseCard.tsx
 import React from "react";
 
 interface BaseCardProps {

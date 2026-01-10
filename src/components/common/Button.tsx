@@ -14,9 +14,9 @@ const buttonStyles = cva(
   {
     variants: {
       width: {
-        default : "w-18",
+        default: "w-18",
         xl: "w-[310px]",
-        lg : "w-[300px]",
+        lg: "w-[300px]",
         md: "w-[149px]",
         base: "w-[72px]",
         sm: "w-[60px]",
@@ -27,19 +27,30 @@ const buttonStyles = cva(
         default: "border border-main-dark1",
         active: "bg-main-dark1",
         arrive: "bg-[#10B981]",
-        non_arrive : "bg-[#E3E6EA]",
-        escape : "bg-[#EF4444]",
-        arrest : "bg-black border border-[#808080]",
-        prison : "bg-[#EF444433] border border-[#EF4444]",
-        instagram : "rounded-none border-2 border-transparent [background:linear-gradient(#1f1f1f,#1f1f1f)_padding-box,linear-gradient(to_right,#833AB4,#EE2A7B,#F9CE34)_border-box] h-11",
+        non_arrive: "bg-[#E3E6EA]",
+        escape: "bg-[#EF4444]",
+        arrest: "bg-black border border-[#808080]",
+        prison: "bg-[#EF444433] border border-[#EF4444]",
+        instagram:
+          "rounded-none border-2 border-transparent [background:linear-gradient(#1f1f1f,#1f1f1f)_padding-box,linear-gradient(to_right,#833AB4,#EE2A7B,#F9CE34)_border-box] h-11",
       },
     },
-    compoundVariants : [
+    compoundVariants: [
       // Confirm Button
-      {state : "active", width: "xl", className: "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]"},
-      {state : "default", width: "xl", className: "h-11 rounded-none"},
+      {
+        state: "active",
+        width: "xl",
+        className:
+          "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]",
+      },
+      { state: "default", width: "xl", className: "h-11 rounded-none" },
       // GameEnd Button
-      {state : "active", width: "lg", className: "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]"},
+      {
+        state: "active",
+        width: "lg",
+        className:
+          "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]",
+      },
     ],
     defaultVariants: {
       state: "default",
