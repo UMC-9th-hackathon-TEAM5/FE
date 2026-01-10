@@ -36,7 +36,11 @@ function App() {
               path="test/player-arrival-card"
               element={<PlayerArrivalCardTestPage />}
             />
+<<<<<<< HEAD
             <Route path="test/Button" element={<ButtonTestPage />} />
+=======
+            <Route path="/test/modal" element={<ModalTestPage />} />
+>>>>>>> 6c422b7 (feat : GameRuleModal 구현)
 
             {/* 실제 페이지 */}
             <Route path="login" element={<LoginPage />} />
