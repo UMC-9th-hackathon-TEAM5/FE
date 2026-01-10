@@ -12,6 +12,7 @@ const buttonStyles = cva(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "text-white leading-[140%] tracking-[-0.4px] font-medium",
 =======
     "text-white text-medium leading-[140%] tracking-[-0.4px] font-medium",
@@ -22,6 +23,9 @@ const buttonStyles = cva(
 =======
     "text-white text-medium leading-[140%] tracking-[-0.4px] font-medium",
 >>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
+=======
+    "text-white leading-[140%] tracking-[-0.4px] font-medium",
+>>>>>>> 969ab5e (feat : button들 구현)
   ),
   {
     variants: {
@@ -31,6 +35,7 @@ const buttonStyles = cva(
         default: "w-18",
         xl: "w-[310px]",
         lg: "w-[300px]",
+<<<<<<< HEAD
         md: "w-[149px]",
         base: "w-[72px]",
         sm: "w-[60px]",
@@ -42,9 +47,13 @@ const buttonStyles = cva(
         default: "w-18",
 >>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
         xl: "w-[310px]",
+=======
+>>>>>>> 969ab5e (feat : button들 구현)
         md: "w-[149px]",
+        base: "w-[72px]",
         sm: "w-[60px]",
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 666d093 (feat : 버튼 컴포넌트 구현)
@@ -53,6 +62,9 @@ const buttonStyles = cva(
 >>>>>>> d3488f9 (feat : button들 구현)
 =======
 >>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
+=======
+      // state == style?
+>>>>>>> 969ab5e (feat : button들 구현)
       state: {
         // default : inactive
         default: "border border-main-dark1",
@@ -60,6 +72,9 @@ const buttonStyles = cva(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 969ab5e (feat : button들 구현)
         arrive: "bg-[#10B981]",
         non_arrive: "bg-[#E3E6EA]",
         escape: "bg-[#EF4444]",
@@ -67,6 +82,7 @@ const buttonStyles = cva(
         prison: "bg-[#EF444433] border border-[#EF4444]",
         instagram:
           "rounded-none border-2 border-transparent [background:linear-gradient(#1f1f1f,#1f1f1f)_padding-box,linear-gradient(to_right,#833AB4,#EE2A7B,#F9CE34)_border-box] h-11",
+<<<<<<< HEAD
       },
     },
     compoundVariants: [
@@ -110,23 +126,25 @@ const buttonStyles = cva(
       {state : "active", width: "lg", className: "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]"},
 >>>>>>> d3488f9 (feat : button들 구현)
 =======
+=======
+>>>>>>> 969ab5e (feat : button들 구현)
       },
     },
     compoundVariants: [
-      // confirm button
+      // Confirm Button
       {
         state: "active",
         width: "xl",
         className:
-          "text-black bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold",
+          "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]",
       },
       { state: "default", width: "xl", className: "h-11 rounded-none" },
-      // 참여자 목록 - 도착/미도착
-      { state: "active", width: "sm", className: "bg-[#10B981] text-sm" },
+      // GameEnd Button
       {
-        state: "default",
-        width: "sm",
-        className: "bg-[#E3E6EA] text-[#808080] text-sm",
+        state: "active",
+        width: "lg",
+        className:
+          "bg-main rounded-none shadow-[2px_2px_0_0_#008E58] h-11 font-bold text-black text-[16px]",
       },
 >>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
     ],
@@ -141,10 +159,14 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonStyles>;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 969ab5e (feat : button들 구현)
 export const Button = ({
   width,
   children,
   state,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   className,
@@ -174,6 +196,15 @@ export const Button = ({ width, children, state, ...props }: ButtonProps) => {
       type="button"
       className={twMerge(buttonStyles({ width, state }))}
 >>>>>>> cb7c77f (feat : 버튼 컴포넌트 구현)
+=======
+  className,
+  ...props
+}: ButtonProps) => {
+  return (
+    <button
+      type="button"
+      className={twMerge(buttonStyles({ width, state }), className)}
+>>>>>>> 969ab5e (feat : button들 구현)
       {...props}
     >
       {children}
