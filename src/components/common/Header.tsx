@@ -8,7 +8,6 @@ const headerStyles = cva(
     "w-full h-15",
     "flex items-center px-5 py-2.5",
     "text-2xl font-bold text-main",
-    "border border-white",
   ),
 );
 
@@ -33,6 +32,7 @@ const Header = ({ title, onLeftClick, className }: HeaderProps) => {
       {title && (
         <div className="mx-2 line-clamp-2 flex-1 text-center">{title}</div>
       )}
+      <div className="h-6 w-6"></div>
     </header>
   );
 };
