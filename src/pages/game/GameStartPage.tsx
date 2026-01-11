@@ -58,7 +58,7 @@ const GameStartPage = () => {
     "idle",
   );
   const [count, setCount] = useState(0);
-  const [roomSeconds, setRoomSeconds] = useState(0);
+  const [roomSeconds, setRoomSeconds] = useState(10);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,9 +70,9 @@ const GameStartPage = () => {
     } else {
       if (gameStatus === "ready") {
         setGameStatus("action");
-        setCount(roomSeconds);
+        setCount(1);
       } else if (gameStatus === "action") {
-        navigate("/game/playing", { replace: true });
+        navigate("/game/result", { replace: true });
       }
     }
   }, [count, gameStatus, navigate, roomSeconds]);
@@ -83,23 +83,9 @@ const GameStartPage = () => {
       return;
     }
     setErrorMessage(null);
-    try {
-      const response = await getRoom(roomId);
-      const escapeSeconds =
-        typeof response.data.escapeTime === "number"
-          ? Math.max(1, response.data.escapeTime) * 60
-          : null;
-      const nextSeconds =
-        escapeSeconds ?? Math.max(1, response.data.countdownSeconds);
-      setRoomSeconds(nextSeconds);
-      if (escapeSeconds !== null) {
-        localStorage.setItem("gameSeconds", String(escapeSeconds));
-      }
-      setCount(nextSeconds);
-    } catch {
-      setErrorMessage("방 정보를 불러오지 못했습니다.");
-      return;
-    }
+    localStorage.setItem("gameSeconds", String(10));
+    setRoomSeconds(10);
+    setCount(10);
     setGameStatus("ready");
   };
 
