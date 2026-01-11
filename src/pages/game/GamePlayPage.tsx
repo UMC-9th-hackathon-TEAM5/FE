@@ -1,9 +1,5 @@
 import { postFinishgame } from "@/apis/room";
-import {
-  captureThief,
-  getParticipants,
-  releaseThief,
-} from "@/apis/roommember";
+import { captureThief, getParticipants, releaseThief } from "@/apis/roommember";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InputLabel from "@/components/common/Input/InputLabel";
 import { PlayerPlayingCard } from "@/components/common/Card/PlayerPlayingCard/PlayerPlayingCard";
@@ -187,7 +183,8 @@ export default function GamePlayPage() {
     setErrorMessage(null);
 
     const allThievesJailed =
-      thieves.length > 0 && thieves.every((player) => player.status === "jailed");
+      thieves.length > 0 &&
+      thieves.every((player) => player.status === "jailed");
     const winningTeam = allThievesJailed ? "POLICE" : "THIEF";
 
     try {
@@ -252,9 +249,8 @@ export default function GamePlayPage() {
                 status={player.status}
                 isHost={player.isHost}
                 isMe={player.isMe}
-                onChangeStatus={
-                  (nextStatus) =>
-                    handleChangeThiefStatus(player.id, nextStatus)
+                onChangeStatus={(nextStatus) =>
+                  handleChangeThiefStatus(player.id, nextStatus)
                 }
               />
             ))}

@@ -177,7 +177,10 @@ export default function GameResultPage() {
           id: String(participant.userId),
           name: participant.nickname,
           role,
-          result: participant.isAlive === false ? "jailed" : "survived",
+          result:
+            participant.isAlive === false
+              ? ("jailed" as const)
+              : ("survived" as const),
           isHost: hostId !== null && participant.userId === hostId,
           isMe: userId !== null && participant.userId === userId,
         };
