@@ -93,6 +93,12 @@ export default function WaitingPartyPage() {
     return Number.isNaN(parsed) ? null : parsed;
   }, [state?.roomId, searchParams]);
 
+  useEffect(() => {
+    if (!searchParams.get("roomId") && roomId) {
+      navigate(`/party/waiting?roomId=${roomId}`, { replace: true });
+    }
+  }, [roomId, navigate, searchParams]);
+
   const hostId = useMemo(() => {
     if (state?.hostId) return state.hostId;
     const value = localStorage.getItem("hostId");
