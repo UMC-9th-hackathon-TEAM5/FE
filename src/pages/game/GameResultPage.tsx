@@ -118,8 +118,8 @@ export default function GameResultPage() {
 
     const fetchRoom = async () => {
       try {
-        const response = await getRoom(roomId);
-        setRoomDetail(response.data);
+        const { data } = await getRoom(roomId);
+        setRoomDetail(data);
       } catch (error) {
         console.error("게임 결과 방 정보 조회 실패:", error);
       }
@@ -162,7 +162,9 @@ export default function GameResultPage() {
     () =>
       participants.map((participant) => {
         const role =
-          participant.role === "POLICE" ? ("police" as const) : ("thief" as const);
+          participant.role === "POLICE"
+            ? ("police" as const)
+            : ("thief" as const);
         if (role === "police") {
           return {
             id: String(participant.userId),
@@ -196,8 +198,7 @@ export default function GameResultPage() {
     [results],
   );
 
-  const titleText =
-    winningTeam === "POLICE" ? "경찰팀 승리!" : "도둑팀 승리!";
+  const titleText = winningTeam === "POLICE" ? "경찰팀 승리!" : "도둑팀 승리!";
   const descriptionText =
     winningTeam === "POLICE"
       ? "도둑들이 모두 잡혔습니다!"

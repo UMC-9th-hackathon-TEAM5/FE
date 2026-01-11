@@ -159,25 +159,19 @@ export default function WaitingPartyPage() {
 
     const fetchRoom = async () => {
       try {
-        const response = await getRoom(roomId);
-        setRoomDetail(response.data);
-        setPlayers(mapParticipants(response.data.participants));
+        const roomRes = await getRoom(roomId);
+        const roomData = roomRes.data;
+        setRoomDetail(roomData);
+        setPlayers(mapParticipants(roomData.participants));
 
-        const participantsResponse = await getParticipants(roomId);
+        const { data: participantsRes } = await getParticipants(roomId);
         const overrides = new Map<number, PlayerRole>(
-          response.data.participants.map((participant) => [
+          roomData.participants.map((participant) => [
             participant.userId,
             participant.role === "POLICE" ? "police" : "thief",
           ]),
         );
-        setPlayers(
-          mapParticipants(participantsResponse.data.participants, overrides),
-        );
-
-        const participantsResponseRetry = await getParticipants(roomId);
-        setPlayers(
-          mapParticipants(participantsResponseRetry.data.participants, overrides),
-        );
+        setPlayers(mapParticipants(participantsRes.participants, overrides));
       } catch (error) {
         console.error("대기방 조회 실패:", error);
         setErrorMessage("대기방 정보를 불러오지 못했습니다.");
@@ -229,13 +223,11 @@ export default function WaitingPartyPage() {
       if (!isHost && targetId !== userId) return;
       await updateArrivalStatus(roomId, targetId);
 
-      const participantsResponse = await getParticipants(roomId);
+      const { data: participantsRes } = await getParticipants(roomId);
       const overrides = new Map<number, PlayerRole>(
         players.map((player) => [player.userId, player.role]),
       );
-      setPlayers(
-        mapParticipants(participantsResponse.data.participants, overrides),
-      );
+      setPlayers(mapParticipants(participantsRes.participants, overrides));
     } catch (error) {
       let message = "도착 상태 변경에 실패했습니다.";
       if (axios.isAxiosError(error)) {

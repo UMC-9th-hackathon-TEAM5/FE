@@ -98,8 +98,8 @@ export default function GamePlayPage() {
 
     const fetchParticipants = async () => {
       try {
-        const response = await getParticipants(roomId);
-        setPlayers(mapParticipants(response.data.participants));
+        const { data: participantsRes } = await getParticipants(roomId);
+        setPlayers(mapParticipants(participantsRes.participants));
       } catch (error) {
         console.error("참여자 조회 실패:", error);
         setErrorMessage("참여자 정보를 불러오지 못했습니다.");
@@ -143,8 +143,8 @@ export default function GamePlayPage() {
 
   const refreshParticipants = async () => {
     if (!roomId) return;
-    const response = await getParticipants(roomId);
-    setPlayers(mapParticipants(response.data.participants));
+    const { data: participantsRes } = await getParticipants(roomId);
+    setPlayers(mapParticipants(participantsRes.participants));
   };
 
   const handleChangeThiefStatus = async (

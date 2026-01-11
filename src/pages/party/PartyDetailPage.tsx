@@ -79,8 +79,8 @@ export default function PartyDetailPage() {
 
     const fetchRoom = async () => {
       try {
-        const response = await getRoom(roomId);
-        setRoomDetail(response.data);
+        const { data } = await getRoom(roomId);
+        setRoomDetail(data);
       } catch (error) {
         console.error("팟 상세 조회 실패:", error);
         setErrorMessage("팟 정보를 불러오지 못했습니다.");

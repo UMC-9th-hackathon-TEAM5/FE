@@ -1,9 +1,11 @@
-import { getNearbyRoom, type NearbyRoomItem } from "@/apis/room";
-import { useEffect, useRef, useState } from "react";
+import { getNearbyRoom, getRoom, postRoom, type NearbyRoomItem } from "@/apis/room";
+import { joinRoom } from "@/apis/roommember";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/common/Button";
 import { useNavigate } from "react-router-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import CustomMarker from "@/components/map/CustomMarker";
+import axios from "axios";
 
 type GeocodeStatus = "OK" | string;
 
@@ -78,6 +80,25 @@ type MapInstance = {
   setCenter: (pos: unknown) => void;
 };
 
+type Coordinates = {
+  lat: number;
+  lng: number;
+};
+
+type RoomDetail = {
+  roomId: number;
+  title: string;
+  placeName: string;
+  meetingTime: string;
+  status: string;
+  countdownSeconds: number;
+  escapeTime?: number;
+  capacity: {
+    current: number;
+    total: number;
+  };
+};
+
 declare global {
   interface Window {
     naver: {
@@ -93,6 +114,11 @@ const HomePage = () => {
   const markersRef = useRef<unknown[]>([]);
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
   const [rooms, setRooms] = useState<NearbyRoomItem[]>([]);
+  const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -121,6 +147,105 @@ const HomePage = () => {
 
     fetchRooms();
   }, [navigate]);
+
+  const formatLocalDateTime = (date: Date) => {
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate(),
+    )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+      date.getSeconds(),
+    )}`;
+  };
+
+  const handleSelectRoom = useCallback(async (roomId: number) => {
+    setActionError(null);
+    try {
+      const response = await getRoom(roomId);
+      setSelectedRoom(response.data);
+      localStorage.setItem("roomId", String(roomId));
+    } catch (error) {
+      let message = "방 정보를 불러오지 못했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setActionError(message);
+    }
+  }, []);
+
+  const handleQuickJoin = async () => {
+    if (!selectedRoom) {
+      setActionError("참여할 방을 선택해 주세요.");
+      return;
+    }
+    const userIdValue = localStorage.getItem("userId");
+    if (!userIdValue) {
+      navigate("/login");
+      return;
+    }
+    const userId = Number(userIdValue);
+    if (Number.isNaN(userId)) {
+      navigate("/login");
+      return;
+    }
+
+    setIsJoining(true);
+    setActionError(null);
+
+    try {
+      await joinRoom(selectedRoom.roomId, userId, {
+        rolePreference: "ANY",
+      });
+      navigate(`/party/waiting?roomId=${selectedRoom.roomId}`, {
+        state: { roomId: selectedRoom.roomId },
+      });
+    } catch (error) {
+      let message = "참여 신청에 실패했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setActionError(message);
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const handleQuickCreate = async () => {
+    if (!currentCoords) {
+      setActionError("현재 위치 정보를 불러오지 못했습니다.");
+      return;
+    }
+    setIsCreating(true);
+    setActionError(null);
+
+    try {
+      const now = new Date();
+      const meetingDate = new Date(now.getTime() + 30 * 60 * 1000);
+      const response = await postRoom({
+        title: "빠른 경도팟",
+        placeName: locationText || "현재 위치",
+        lat: currentCoords.lat,
+        lng: currentCoords.lng,
+        meetingTime: formatLocalDateTime(meetingDate),
+        police_capacity: 2,
+        thief_capacity: 2,
+        countdownSeconds: 10,
+        escapeTime: 30,
+      });
+      localStorage.setItem("roomId", String(response.data.roomId));
+      localStorage.setItem("hostId", String(response.data.hostId));
+      navigate(`/party/waiting?roomId=${response.data.roomId}`, {
+        state: { roomId: response.data.roomId, hostId: response.data.hostId },
+      });
+    } catch (error) {
+      let message = "팟 생성에 실패했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setActionError(message);
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   useEffect(() => {
     const { naver } = window as {
@@ -152,6 +277,7 @@ const HomePage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           const currentPosition = new maps.LatLng(latitude, longitude);
+          setCurrentCoords({ lat: latitude, lng: longitude });
 
           mapInstance.setCenter(currentPosition);
 
@@ -250,12 +376,12 @@ const HomePage = () => {
       });
 
       maps.Event.addListener(marker, "click", () => {
-        navigate("/party/detail", { state: { roomId: room.roomId } });
+        handleSelectRoom(room.roomId);
       });
 
       markersRef.current.push(marker);
     });
-  }, [rooms, navigate]);
+  }, [rooms, navigate, handleSelectRoom]);
 
   return (
     <div className="relative flex h-full w-full flex-col bg-[#111111]">
@@ -282,7 +408,34 @@ const HomePage = () => {
         className="relative w-full flex-1 bg-gray-800 outline-none"
       />
 
-      <div className="absolute bottom-8 left-1/2 z-50 flex w-full -translate-x-1/2 justify-center px-4">
+      <div className="absolute bottom-8 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-2 px-4">
+        {selectedRoom && (
+          <div className="w-full max-w-[310px] rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3 text-white">
+            <div className="text-sm font-medium">{selectedRoom.title}</div>
+            <div className="text-xs text-white/70">{selectedRoom.placeName}</div>
+            <div className="mt-2 flex gap-2">
+              <Button
+                width="md"
+                state="default"
+                onClick={() =>
+                  navigate(`/party/detail?roomId=${selectedRoom.roomId}`, {
+                    state: { roomId: selectedRoom.roomId },
+                  })
+                }
+              >
+                상세 보기
+              </Button>
+              <Button
+                width="md"
+                state="active"
+                onClick={handleQuickJoin}
+                disabled={isJoining}
+              >
+                {isJoining ? "신청 중..." : "바로 참여"}
+              </Button>
+            </div>
+          </div>
+        )}
         <Button
           state="active"
           width="xl"
@@ -290,6 +443,17 @@ const HomePage = () => {
         >
           + 새로운 경도팟 만들기
         </Button>
+        <Button
+          state="default"
+          width="xl"
+          onClick={handleQuickCreate}
+          disabled={isCreating}
+        >
+          {isCreating ? "생성 중..." : "빠른 경도팟 만들기"}
+        </Button>
+        {actionError && (
+          <p className="text-xs text-red-400">* {actionError}</p>
+        )}
       </div>
     </div>
   );
