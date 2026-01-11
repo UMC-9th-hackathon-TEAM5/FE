@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import MobileLayout from "@/layouts/MobileLayout";
 
 // 실제 페이지
@@ -22,6 +22,7 @@ function App() {
           {/* 테스트 페이지에 대한 라우팅 */}
           <Route path="/" element={<MobileLayout />}>
             {/* 실제 페이지 */}
+            <Route index element={<Navigate to="login" replace />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="party/detail" element={<PartyDetailPage />} />

@@ -186,17 +186,21 @@ export default function GamePlayPage() {
     setIsEnding(true);
     setErrorMessage(null);
 
-    const allThievesJailed = thieves.length > 0 && thieves.every(
-      (player) => player.status === "jailed",
-    );
+    const allThievesJailed =
+      thieves.length > 0 && thieves.every((player) => player.status === "jailed");
+    const winningTeam = allThievesJailed ? "POLICE" : "THIEF";
 
     try {
-      await postFinishgame(roomId, {
+      const response = await postFinishgame(roomId, {
         finishReason: "GAME_END",
-        winningTeam: allThievesJailed ? "POLICE" : "THIEF",
+        winningTeam,
       });
+      localStorage.setItem("gameResult", JSON.stringify(response.data));
+      localStorage.setItem("gameResultWinningTeam", winningTeam);
       setIsEndConfirmOpen(false);
-      navigate("/game/result", { state: { roomId } });
+      navigate(`/game/result?roomId=${roomId}`, {
+        state: { roomId, result: response.data, winningTeam },
+      });
     } catch (error) {
       let message = "게임 종료에 실패했습니다.";
       if (axios.isAxiosError(error)) {
