@@ -220,7 +220,6 @@ export default function WaitingPartyPage() {
     setErrorMessage(null);
 
     try {
-      if (!isHost && targetId !== userId) return;
       await updateArrivalStatus(roomId, targetId);
 
       const { data: participantsRes } = await getParticipants(roomId);
@@ -325,11 +324,7 @@ export default function WaitingPartyPage() {
                       ? () => handleToggleRole(player.userId)
                       : undefined
                   }
-                  onToggleArrival={
-                    isHost || player.isMe
-                      ? () => handleToggleArrival(player.userId)
-                      : undefined
-                  }
+                  onToggleArrival={() => handleToggleArrival(player.userId)}
                 />
               </div>
             ))}

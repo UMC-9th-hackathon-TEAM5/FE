@@ -90,7 +90,10 @@ export default function PartyDetailPage() {
     fetchRoom();
   }, [roomId, navigate]);
 
-  const participants = roomDetail?.participants ?? [];
+  const participants = useMemo(
+    () => roomDetail?.participants ?? [],
+    [roomDetail?.participants],
+  );
   const currentCount = roomDetail?.capacity.current ?? participants.length;
   const maxCount = roomDetail?.capacity.total ?? 0;
 

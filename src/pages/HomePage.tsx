@@ -1,4 +1,9 @@
-import { getNearbyRoom, getRoom, postRoom, type NearbyRoomItem } from "@/apis/room";
+import {
+  getNearbyRoom,
+  getRoom,
+  postRoom,
+  type NearbyRoomItem,
+} from "@/apis/room";
 import { joinRoom } from "@/apis/roommember";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/common/Button";
@@ -249,14 +254,13 @@ const HomePage = () => {
 
   useEffect(() => {
     const { naver } = window as {
-      naver: {
+      naver?: {
         maps: unknown;
       };
     };
 
+    if (!mapElement.current || !naver?.maps) return;
     const maps = naver.maps as MapsApi;
-
-    if (!mapElement.current || !naver) return;
     mapsRef.current = maps;
 
     const defaultPosition = new maps.LatLng(37.5665, 126.978);
@@ -337,6 +341,13 @@ const HomePage = () => {
     } else {
       setLocationText("GPS 미지원");
     }
+    return () => {
+      markersRef.current.forEach((marker) => {
+        const typed = marker as { setMap?: (map: unknown) => void };
+        if (typed?.setMap) typed.setMap(null);
+      });
+      markersRef.current = [];
+    };
   }, [navigate]);
 
   useEffect(() => {
@@ -410,9 +421,11 @@ const HomePage = () => {
 
       <div className="absolute bottom-8 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-2 px-4">
         {selectedRoom && (
-          <div className="w-full max-w-[310px] rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3 text-white">
+          <div className="w-full max-w-77.5 rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-3 text-white">
             <div className="text-sm font-medium">{selectedRoom.title}</div>
-            <div className="text-xs text-white/70">{selectedRoom.placeName}</div>
+            <div className="text-xs text-white/70">
+              {selectedRoom.placeName}
+            </div>
             <div className="mt-2 flex gap-2">
               <Button
                 width="md"
@@ -451,9 +464,7 @@ const HomePage = () => {
         >
           {isCreating ? "생성 중..." : "빠른 경도팟 만들기"}
         </Button>
-        {actionError && (
-          <p className="text-xs text-red-400">* {actionError}</p>
-        )}
+        {actionError && <p className="text-xs text-red-400">* {actionError}</p>}
       </div>
     </div>
   );
