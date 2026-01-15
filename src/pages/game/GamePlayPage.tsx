@@ -1,5 +1,6 @@
 import { getRoom, postFinishgame } from "@/apis/room";
 import { captureThief, getParticipants, releaseThief } from "@/apis/roommember";
+import type { ParticipantInfo } from "@/apis/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InputLabel from "@/components/common/Input/InputLabel";
 import { PlayerPlayingCard } from "@/components/common/Card/PlayerPlayingCard/PlayerPlayingCard";
@@ -15,13 +16,6 @@ type Player = {
   status: "escaped" | "jailed" | "caught" | "none";
   isHost?: boolean;
   isMe?: boolean;
-};
-
-type Participant = {
-  userId: number;
-  nickname: string;
-  role: string;
-  isAlive?: "ALIVE" | "CAUGHT" | boolean;
 };
 
 type LocationState = {
@@ -81,7 +75,7 @@ export default function GamePlayPage() {
   const isHost = userId !== null && hostId !== null && userId === hostId;
 
   const mapParticipants = useCallback(
-    (participants: Participant[]): Player[] => {
+    (participants: ParticipantInfo[]): Player[] => {
       const viewerRole = participants.find(
         (participant) => participant.userId === userId,
       )?.role;
@@ -89,8 +83,9 @@ export default function GamePlayPage() {
       const nextEscapedIds = new Set(escapedThiefIdsRef.current);
       const nextPreviousCaught = new Map(previousCaughtRef.current);
 
-      const mapped = participants.map((participant) => {
-        const role = participant.role === "POLICE" ? "police" : "thief";
+      const mapped: Player[] = participants.map((participant): Player => {
+        const role: Player["role"] =
+          participant.role === "POLICE" ? "police" : "thief";
         const isCaught =
           participant.isAlive === "CAUGHT" || participant.isAlive === false;
 
@@ -107,7 +102,7 @@ export default function GamePlayPage() {
           }
         }
 
-        const status =
+        const status: Player["status"] =
           role === "thief"
             ? isCaught
               ? "jailed"

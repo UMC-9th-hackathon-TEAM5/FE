@@ -13,13 +13,14 @@ export type FinishReason = "TIME_OVER" | "GAME_END";
 export type WinningTeam = Role | "DRAW";
 export type RoomStatus = "WAITING" | "STARTING" | "PLAYING" | "FINISHED";
 export type GameParticipantStatus = "ALIVE" | "CAUGHT";
+export type GameParticipantAliveState = GameParticipantStatus | boolean;
 
 export type ParticipantInfo = {
   userId: number;
   nickname: string;
   role: Role;
   isArrived: boolean;
-  isAlive?: GameParticipantStatus;
+  isAlive?: GameParticipantAliveState;
   caughtCount?: number;
 };
 
@@ -27,7 +28,7 @@ export type GameParticipant = {
   userId: number;
   nickname: string;
   role: Role;
-  isAlive: GameParticipantStatus;
+  isAlive: GameParticipantAliveState;
   isArrived: boolean;
   caughtCount?: number;
 };
