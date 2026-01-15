@@ -72,31 +72,17 @@ describe("PartyDetailPage", () => {
         meetingTime: "2026-01-11T10:23:00",
         status: "WAITING",
         countdownSeconds: 60,
-        police_capacity: 1,
+        police_capacity: 2,
         thief_capacity: 1,
-        capacity: { current: 1, total: 2 },
-        participants: [
-          {
-            userId: 1,
-            nickname: "호스트",
-            role: "POLICE",
-            isArrived: true,
-          },
-        ],
+        capacity: { current: 0, total: 2 },
+        participants: [],
       }),
     );
 
     getParticipantsMock.mockResolvedValue(
       createApiResponse({
         roomId: 1,
-        participants: [
-          {
-            userId: 1,
-            nickname: "호스트",
-            role: "POLICE",
-            isArrived: true,
-          },
-        ],
+        participants: [],
       }),
     );
 
