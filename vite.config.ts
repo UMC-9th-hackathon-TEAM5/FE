@@ -33,6 +33,5 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/setupTests.ts"],
     css: true,
-    exclude: ["tests/e2e/**", "playwright.config.ts"],
   },
 });
