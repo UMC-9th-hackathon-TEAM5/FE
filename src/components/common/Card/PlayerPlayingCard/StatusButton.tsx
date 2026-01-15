@@ -6,6 +6,7 @@ export type ThiefStatus = "caught" | "jailed" | "escaped";
 interface StatusButtonProps {
   status: ThiefStatus;
   onChangeStatus: (nextStatus: ThiefStatus) => void;
+  disabled?: boolean;
 }
 
 const statusButtonVariants = cva(
@@ -30,12 +31,13 @@ const statusLabelMap: Record<ThiefStatus, string> = {
 const nextStatusMap: Record<ThiefStatus, ThiefStatus> = {
   caught: "jailed",
   jailed: "escaped",
-  escaped: "escaped",
+  escaped: "caught",
 };
 
-const StatusButton = ({ status, onChangeStatus }: StatusButtonProps) => {
+const StatusButton = ({ status, onChangeStatus, disabled }: StatusButtonProps) => {
   const label = statusLabelMap[status];
   const nextStatus = nextStatusMap[status];
+  const isDisabled = disabled ?? status === "escaped";
 
   return (
     <button
@@ -43,7 +45,7 @@ const StatusButton = ({ status, onChangeStatus }: StatusButtonProps) => {
       role="status"
       aria-label={`도둑 상태: ${label}`}
       className={statusButtonVariants({ status })}
-      disabled={status === "escaped"}
+      disabled={isDisabled}
       onClick={() => onChangeStatus(nextStatus)}
     >
       {(status === "caught" || status === "jailed") && (

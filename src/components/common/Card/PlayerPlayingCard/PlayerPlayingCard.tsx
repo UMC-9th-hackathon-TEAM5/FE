@@ -11,6 +11,7 @@ interface PlayerPlayingCardProps {
   status: "escaped" | "jailed" | "caught" | "none";
   isHost?: boolean;
   isMe?: boolean;
+  statusDisabled?: boolean;
   onChangeStatus?: (nextStatus: "escaped" | "jailed" | "caught") => void;
 }
 
@@ -58,6 +59,7 @@ export const PlayerPlayingCard = ({
   status,
   isHost,
   isMe,
+  statusDisabled,
   onChangeStatus,
 }: PlayerPlayingCardProps) => {
   let state: "thiefRed" | "thiefRun" | "police";
@@ -96,6 +98,7 @@ export const PlayerPlayingCard = ({
       {role === "thief" && status !== "none" && (
         <StatusButton
           status={status}
+          disabled={statusDisabled}
           onChangeStatus={(nextStatus) => {
             onChangeStatus?.(nextStatus);
           }}

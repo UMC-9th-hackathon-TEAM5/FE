@@ -278,7 +278,7 @@ export default function PartyDetailPage() {
           width="xl"
           state={isRoleSelected ? "active" : "default"}
           disabled={!isRoleSelected}
-          className="absolute bottom-10"
+          className="mt-6"
           onClick={handleJoin}
         >
           {isJoining ? "신청 중..." : "참여 신청하기"}

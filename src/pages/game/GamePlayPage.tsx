@@ -38,6 +38,8 @@ export default function GamePlayPage() {
   const [gameSeconds, setGameSeconds] = useState(0);
   const autoFinishTriggeredRef = useRef(false);
   const prevGameSecondsRef = useRef<number | null>(null);
+  const escapedThiefIdsRef = useRef<Set<number>>(new Set());
+  const previousCaughtRef = useRef<Map<number, boolean>>(new Map());
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,13 +81,42 @@ export default function GamePlayPage() {
   const isHost = userId !== null && hostId !== null && userId === hostId;
 
   const mapParticipants = useCallback(
-    (participants: Participant[]): Player[] =>
-      participants.map((participant) => {
+    (participants: Participant[]): Player[] => {
+      const viewerRole = participants.find(
+        (participant) => participant.userId === userId,
+      )?.role;
+      const isViewerPolice = viewerRole === "POLICE";
+      const nextEscapedIds = new Set(escapedThiefIdsRef.current);
+      const nextPreviousCaught = new Map(previousCaughtRef.current);
+
+      const mapped = participants.map((participant) => {
         const role = participant.role === "POLICE" ? "police" : "thief";
         const isCaught =
           participant.isAlive === "CAUGHT" || participant.isAlive === false;
+
+        if (role === "thief") {
+          const wasCaught = nextPreviousCaught.get(participant.userId) ?? false;
+          if (isCaught) {
+            nextEscapedIds.delete(participant.userId);
+            nextPreviousCaught.set(participant.userId, true);
+          } else {
+            if (wasCaught) {
+              nextEscapedIds.add(participant.userId);
+            }
+            nextPreviousCaught.set(participant.userId, false);
+          }
+        }
+
         const status =
-          role === "thief" ? (isCaught ? "jailed" : "caught") : "none";
+          role === "thief"
+            ? isCaught
+              ? "jailed"
+              : isViewerPolice
+                ? nextEscapedIds.has(participant.userId)
+                  ? "escaped"
+                  : "caught"
+                : "escaped"
+            : "none";
 
         return {
           id: participant.userId,
@@ -95,7 +126,12 @@ export default function GamePlayPage() {
           isHost: hostId !== null && participant.userId === hostId,
           isMe: userId !== null && participant.userId === userId,
         };
-      }),
+      });
+
+      escapedThiefIdsRef.current = nextEscapedIds;
+      previousCaughtRef.current = nextPreviousCaught;
+      return mapped;
+    },
     [hostId, userId],
   );
 
@@ -194,18 +230,23 @@ export default function GamePlayPage() {
     nextStatus: "jailed" | "escaped" | "caught",
   ) => {
     if (!roomId || !userId) return;
-    if (nextStatus === "caught") return;
     setErrorMessage(null);
 
     try {
-      if (currentUserRole === "police" && nextStatus === "jailed") {
-        await captureThief(roomId, targetId);
+      if (currentUserRole === "police") {
+        if (nextStatus === "jailed" || nextStatus === "caught") {
+          await captureThief(roomId, targetId);
+        } else {
+          return;
+        }
       } else if (
         currentUserRole === "thief" &&
         nextStatus === "escaped" &&
         targetId === userId
       ) {
         await releaseThief(roomId);
+      } else {
+        return;
       }
 
       await refreshParticipants();
@@ -337,6 +378,13 @@ export default function GamePlayPage() {
                 status={player.status}
                 isHost={player.isHost}
                 isMe={player.isMe}
+                statusDisabled={
+                  currentUserRole === "police"
+                    ? false
+                    : currentUserRole === "thief"
+                      ? !player.isMe
+                      : true
+                }
                 onChangeStatus={(nextStatus) =>
                   handleChangeThiefStatus(player.id, nextStatus)
                 }
@@ -374,7 +422,7 @@ export default function GamePlayPage() {
           </ul>
         </section>
         {hasPoliceHost && (
-          <section className="bg-main-dark2 absolute bottom-0 z-10 flex w-full items-center justify-center pt-7 pb-10">
+          <section className="bg-main-dark2 mt-6 flex w-full items-center justify-center pt-7 pb-10">
             <Button
               className="bg-main h-11 w-87.5 rounded-none border-none font-bold text-black shadow-[2px_2px_0_0_#008E58]"
               onClick={() => setIsEndConfirmOpen(true)}

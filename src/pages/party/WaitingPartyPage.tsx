@@ -395,7 +395,7 @@ export default function WaitingPartyPage() {
           </div>
         </section>
         <section
-          className="absolute right-0 bottom-4 left-0 flex flex-col items-center gap-1"
+          className="mt-6 flex w-full flex-col items-center gap-1 pb-6"
           role="region"
           aria-label="대기방 하단 액션"
         >
