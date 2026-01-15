@@ -1,11 +1,11 @@
-import { postFinishgame } from "@/apis/room";
+import { getRoom, postFinishgame } from "@/apis/room";
 import { captureThief, getParticipants, releaseThief } from "@/apis/roommember";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InputLabel from "@/components/common/Input/InputLabel";
 import { PlayerPlayingCard } from "@/components/common/Card/PlayerPlayingCard/PlayerPlayingCard";
 import { Button } from "@/components/common/Button";
 import EndConfirmModal from "@/components/common/Modal/EndConfirmModal";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 type Player = {
@@ -24,21 +24,44 @@ type Participant = {
   isAlive?: "ALIVE" | "CAUGHT" | boolean;
 };
 
+type LocationState = {
+  roomId?: number;
+};
+
+const POLL_INTERVAL_MS = 3000;
+
 export default function GamePlayPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [isEndConfirmOpen, setIsEndConfirmOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isEnding, setIsEnding] = useState(false);
   const [gameSeconds, setGameSeconds] = useState(0);
+  const autoFinishTriggeredRef = useRef(false);
+  const prevGameSecondsRef = useRef<number | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const state = (location.state as LocationState | null) ?? null;
 
   const roomId = useMemo(() => {
+    if (state?.roomId) return state.roomId;
+    const queryValue = searchParams.get("roomId");
+    if (queryValue) {
+      const parsed = Number(queryValue);
+      if (!Number.isNaN(parsed)) return parsed;
+    }
     const value = localStorage.getItem("roomId");
     if (!value) return null;
     const parsed = Number(value);
     return Number.isNaN(parsed) ? null : parsed;
-  }, []);
+  }, [searchParams, state?.roomId]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    localStorage.setItem("roomId", String(roomId));
+  }, [roomId]);
 
   const userId = useMemo(() => {
     const value = localStorage.getItem("userId");
@@ -53,6 +76,7 @@ export default function GamePlayPage() {
     const parsed = Number(value);
     return Number.isNaN(parsed) ? null : parsed;
   }, []);
+  const isHost = userId !== null && hostId !== null && userId === hostId;
 
   const mapParticipants = useCallback(
     (participants: Participant[]): Player[] =>
@@ -116,8 +140,28 @@ export default function GamePlayPage() {
         return;
       }
     }
-    setGameSeconds(0);
-  }, []);
+    if (!roomId) {
+      setGameSeconds(0);
+      return;
+    }
+
+    const fetchRoomSeconds = async () => {
+      try {
+        const { data } = await getRoom(roomId);
+        const escapeSeconds =
+          typeof data.escapeTime === "number" && data.escapeTime > 0
+            ? data.escapeTime
+            : 30 * 60;
+        setGameSeconds(escapeSeconds);
+        localStorage.setItem("gameSeconds", String(escapeSeconds));
+      } catch (error) {
+        console.error("게임 시간 조회 실패:", error);
+        setGameSeconds(0);
+      }
+    };
+
+    fetchRoomSeconds();
+  }, [roomId]);
 
   useEffect(() => {
     if (gameSeconds <= 0) return;
@@ -127,23 +171,23 @@ export default function GamePlayPage() {
     return () => clearInterval(timer);
   }, [gameSeconds]);
 
-  useEffect(() => {
-    if (thieves.length === 0) return;
-
-    const allThievesJailed = thieves.every(
-      (player) => player.status === "jailed",
-    );
-
-    if (allThievesJailed) {
-      setIsEndConfirmOpen(true);
-    }
-  }, [thieves]);
-
-  const refreshParticipants = async () => {
+  const refreshParticipants = useCallback(async () => {
     if (!roomId) return;
-    const { data: participantsRes } = await getParticipants(roomId);
-    setPlayers(mapParticipants(participantsRes.participants));
-  };
+    try {
+      const { data: participantsRes } = await getParticipants(roomId);
+      setPlayers(mapParticipants(participantsRes.participants));
+    } catch (error) {
+      console.error("참여자 갱신 실패:", error);
+    }
+  }, [roomId, mapParticipants]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const intervalId = window.setInterval(() => {
+      void refreshParticipants();
+    }, POLL_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, [roomId, refreshParticipants]);
 
   const handleChangeThiefStatus = async (
     targetId: number,
@@ -174,7 +218,7 @@ export default function GamePlayPage() {
     }
   };
 
-  const handleGameEnd = async () => {
+  const handleGameEnd = useCallback(async () => {
     if (!roomId) return;
 
     setIsEnding(true);
@@ -205,7 +249,53 @@ export default function GamePlayPage() {
     } finally {
       setIsEnding(false);
     }
-  };
+  }, [navigate, roomId, thieves]);
+
+  useEffect(() => {
+    if (prevGameSecondsRef.current === null) {
+      prevGameSecondsRef.current = gameSeconds;
+      return;
+    }
+
+    const prevSeconds = prevGameSecondsRef.current;
+    prevGameSecondsRef.current = gameSeconds;
+
+    if (prevSeconds <= 0 || gameSeconds !== 0) return;
+    if (autoFinishTriggeredRef.current) return;
+
+    autoFinishTriggeredRef.current = true;
+
+    if (isHost) {
+      void handleGameEnd();
+      return;
+    }
+
+    if (roomId) {
+      navigate(`/game/result?roomId=${roomId}`, { replace: true });
+    }
+  }, [gameSeconds, handleGameEnd, isHost, navigate, roomId]);
+
+  useEffect(() => {
+    if (thieves.length === 0) return;
+
+    const allThievesJailed = thieves.every(
+      (player) => player.status === "jailed",
+    );
+
+    if (!allThievesJailed || autoFinishTriggeredRef.current) return;
+
+    autoFinishTriggeredRef.current = true;
+
+    if (isHost) {
+      void handleGameEnd();
+      return;
+    }
+
+    if (roomId) {
+      localStorage.setItem("gameResultWinningTeam", "POLICE");
+      navigate(`/game/result?roomId=${roomId}`, { replace: true });
+    }
+  }, [handleGameEnd, isHost, navigate, roomId, thieves]);
 
   return (
     <>

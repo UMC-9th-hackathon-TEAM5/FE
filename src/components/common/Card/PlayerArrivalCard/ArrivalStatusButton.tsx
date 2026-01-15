@@ -15,7 +15,7 @@ export const ArrivalStatusButton: React.FC<ArrivalStatusButtonProps> = ({
     <button
       type="button"
       className={twMerge(
-        "flex h-9 w-15 items-center justify-center rounded-lg text-sm font-medium transition-colors select-none",
+        "flex h-9 w-15 items-center justify-center rounded-lg text-sm font-medium transition-colors select-none disabled:cursor-not-allowed disabled:opacity-60",
         isArrived
           ? "bg-[#10B981] pl-2 text-white"
           : "bg-[#E3E6EA] text-gray-700",

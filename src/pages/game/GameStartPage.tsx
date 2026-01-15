@@ -1,4 +1,5 @@
 import { getRoom } from "@/apis/room";
+import { getParticipants } from "@/apis/roommember";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/common/Button";
 import CheckIcon from "@/assets/check/check_black.svg?react";
@@ -37,8 +38,8 @@ const GameStartPage = () => {
   }, []);
 
   const isHost = userId !== null && hostId !== null && userId === hostId;
-  const role = ((location.state as LocationState | null)?.role ??
-    "thief") as Role;
+  const stateRole = (location.state as LocationState | null)?.role;
+  const [role, setRole] = useState<Role | null>(stateRole ?? null);
 
   const roomId = useMemo(() => {
     const stateRoomId = (location.state as LocationState | null)?.roomId;
@@ -73,10 +74,10 @@ const GameStartPage = () => {
         setGameStatus("action");
         setCount(roomSeconds);
       } else if (gameStatus === "action") {
-        navigate("/game/result", { replace: true });
+        navigate(`/game/playing?roomId=${roomId ?? ""}`, { replace: true });
       }
     }
-  }, [count, gameStatus, navigate, roomSeconds]);
+  }, [count, gameStatus, navigate, roomId, roomSeconds]);
 
   const handleStartGame = async () => {
     if (!roomId) {
@@ -86,20 +87,50 @@ const GameStartPage = () => {
     setErrorMessage(null);
     try {
       const response = await getRoom(roomId);
-      const countdownSeconds = Math.max(1, response.data.countdownSeconds);
+      const countdownSeconds =
+        typeof response.data.countdownSeconds === "number" &&
+        response.data.countdownSeconds > 0
+          ? response.data.countdownSeconds
+          : 60;
+      const escapeSeconds =
+        typeof response.data.escapeTime === "number" &&
+        response.data.escapeTime > 0
+          ? response.data.escapeTime
+          : 30 * 60;
       setRoomSeconds(countdownSeconds);
-      if (typeof response.data.escapeTime === "number") {
-        localStorage.setItem(
-          "gameSeconds",
-          String(Math.max(1, response.data.escapeTime)),
-        );
-      }
+      localStorage.setItem("gameSeconds", String(escapeSeconds));
       setCount(readySeconds);
       setGameStatus("ready");
     } catch {
       setErrorMessage("방 정보를 불러오지 못했습니다.");
     }
   };
+
+  useEffect(() => {
+    if (stateRole) {
+      if (role !== stateRole) {
+        setRole(stateRole);
+      }
+      return;
+    }
+    if (!roomId || userId === null) return;
+    if (role !== null) return;
+
+    const fetchRole = async () => {
+      try {
+        const { data } = await getParticipants(roomId);
+        const me = data.participants.find(
+          (participant) => participant.userId === userId,
+        );
+        if (me?.role === "POLICE") setRole("police");
+        if (me?.role === "THIEF") setRole("thief");
+      } catch {
+        // ignore role fetch errors and keep default
+      }
+    };
+
+    fetchRole();
+  }, [role, roomId, stateRole, userId]);
 
   if (gameStatus === "ready") {
     return (
@@ -115,6 +146,14 @@ const GameStartPage = () => {
   }
 
   if (gameStatus === "action") {
+    if (!role) {
+      return (
+        <div className="animate-fade-in flex h-full w-full flex-col items-center justify-center bg-black text-white">
+          역할 정보를 불러오는 중입니다...
+        </div>
+      );
+    }
+
     const isPolice = role === "police";
     const mainColor = isPolice ? "text-[#3B82F6]" : "text-[#EF4444]";
     const title = isPolice ? "대기하세요" : "도망가세요";
@@ -150,13 +189,13 @@ const GameStartPage = () => {
         </div>
 
         <div className="flex flex-col items-center">
-          <span
-            className={`${mainColor} text-[100px] leading-[140%] font-bold tracking-[-2.5px]`}
-          >
-            {count}
-          </span>
-          <span className="text-[24px] leading-[140%] font-medium tracking-[-0.6px] text-white">
-            초 남음
+          <span className="text-center text-[24px] leading-[140%] font-medium tracking-[-0.6px] whitespace-pre-line text-white">
+            <span
+              className={`${mainColor} mr-2 text-[100px] leading-[140%] font-bold tracking-[-2.5px]`}
+            >
+              {count}
+            </span>
+            {`초 \n 남음`}
           </span>
         </div>
       </div>

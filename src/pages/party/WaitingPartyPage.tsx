@@ -22,6 +22,7 @@ import { GameRuleModal } from "@/components/common/Modal/GameruleModal";
 import { validatePlayers } from "@/utils/validatePartyPlayers";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import clsx from "clsx";
 
 type PlayerRole = "police" | "thief";
 type ArrivalStatus = "arrived" | "notArrived";
@@ -38,6 +39,7 @@ type PlayerState = {
 type RoomDetail = {
   roomId: number;
   title: string;
+  description?: string;
   placeName: string;
   meetingTime: string;
   status: string;
@@ -61,6 +63,15 @@ type Participant = {
   isArrived?: boolean;
 };
 
+const POLL_INTERVAL_MS = 3000;
+
+const readStoredNumber = (key: string) => {
+  const value = localStorage.getItem(key);
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
 export default function WaitingPartyPage() {
   const [isRuleOpen, setIsRuleOpen] = useState(false);
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
@@ -73,12 +84,9 @@ export default function WaitingPartyPage() {
   const [searchParams] = useSearchParams();
 
   const state = (location.state as LocationState | null) ?? null;
-  const userId = useMemo(() => {
-    const value = localStorage.getItem("userId");
-    if (!value) return null;
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? null : parsed;
-  }, []);
+  const [userId, setUserId] = useState<number | null>(() =>
+    readStoredNumber("userId"),
+  );
 
   const roomId = useMemo(() => {
     if (state?.roomId) return state.roomId;
@@ -99,21 +107,31 @@ export default function WaitingPartyPage() {
     }
   }, [roomId, navigate, searchParams]);
 
-  const hostId = useMemo(() => {
+  const [hostId, setHostId] = useState<number | null>(() => {
     if (state?.hostId) return state.hostId;
-    const value = localStorage.getItem("hostId");
-    if (!value) return null;
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? null : parsed;
-  }, [state?.hostId]);
+    return readStoredNumber("hostId");
+  });
 
   const isHost = userId !== null && hostId !== null && userId === hostId;
+
+  useEffect(() => {
+    if (import.meta.env.VITE_MOCK_API !== "true") return;
+    const queryRoomId = searchParams.get("roomId");
+    if (queryRoomId !== "65") return;
+    const mockId = 2;
+    localStorage.setItem("userId", String(mockId));
+    localStorage.setItem("hostId", String(mockId));
+    localStorage.setItem("nickname", "Officer");
+    setUserId(mockId);
+    setHostId(mockId);
+  }, [searchParams]);
   useEffect(() => {
     if (state?.roomId) {
       localStorage.setItem("roomId", String(state.roomId));
     }
     if (state?.hostId) {
       localStorage.setItem("hostId", String(state.hostId));
+      setHostId(state.hostId);
     }
   }, [state?.roomId, state?.hostId]);
 
@@ -179,19 +197,48 @@ export default function WaitingPartyPage() {
     fetchRoom();
   }, [roomId, navigate, mapParticipants]);
 
+  const refreshParticipants = useCallback(async () => {
+    if (!roomId) return;
+    try {
+      const { data: participantsRes } = await getParticipants(roomId);
+      const overrides = new Map<number, PlayerRole>(
+        players.map((player) => [player.userId, player.role]),
+      );
+      setPlayers(mapParticipants(participantsRes.participants, overrides));
+    } catch (error) {
+      console.error("대기방 참여자 갱신 실패:", error);
+    }
+  }, [roomId, players, mapParticipants]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const intervalId = window.setInterval(() => {
+      void refreshParticipants();
+    }, POLL_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [roomId, refreshParticipants]);
+
   const partyInfo: PartyInfo | undefined = useMemo(() => {
     if (!roomDetail) return undefined;
     const formattedTime = roomDetail.meetingTime.replace("T", " ").slice(0, 16);
-    const playMinutes = Math.max(
-      1,
-      Math.round(roomDetail.countdownSeconds / 60),
-    );
+    const countdownSeconds =
+      typeof roomDetail.countdownSeconds === "number" &&
+      roomDetail.countdownSeconds > 0
+        ? roomDetail.countdownSeconds
+        : 60;
+    const escapeSeconds =
+      typeof roomDetail.escapeTime === "number" && roomDetail.escapeTime > 0
+        ? roomDetail.escapeTime
+        : 30 * 60;
+    const playMinutes = Math.max(1, Math.round(escapeSeconds / 60));
     const policeCount = players.filter((p) => p.role === "police").length;
     const thiefCount = players.filter((p) => p.role === "thief").length;
 
     return {
       date: formattedTime,
       location: roomDetail.placeName,
+      countdownTime: `${Math.max(1, Math.round(countdownSeconds))}초`,
       playTime: `${playMinutes}분`,
       people: {
         police: policeCount,
@@ -199,6 +246,14 @@ export default function WaitingPartyPage() {
       },
     };
   }, [roomDetail, players]);
+
+  const descriptionText = useMemo(() => {
+    if (!roomDetail) return "설명을 불러올 수 없습니다.";
+    if (roomDetail.description && roomDetail.description.trim().length > 0) {
+      return roomDetail.description;
+    }
+    return "설명이 없습니다.";
+  }, [roomDetail]);
 
   const handleToggleRole = (targetId: number) => {
     setPlayers((prev) =>
@@ -214,7 +269,7 @@ export default function WaitingPartyPage() {
   };
 
   const handleToggleArrival = async (targetId: number) => {
-    if (!roomId || !userId) return;
+    if (!roomId || !userId || !isHost) return;
     setErrorMessage(null);
 
     try {
@@ -253,7 +308,11 @@ export default function WaitingPartyPage() {
           role: player.role === "police" ? "POLICE" : "THIEF",
         })),
       });
-      navigate("/game/start", { state: { roomId } });
+      const currentUserRole =
+        players.find((player) => player.isMe)?.role ?? "thief";
+      navigate("/game/start", {
+        state: { roomId, role: currentUserRole },
+      });
     } catch (error) {
       let message = "게임 시작에 실패했습니다.";
       if (axios.isAxiosError(error)) {
@@ -267,7 +326,7 @@ export default function WaitingPartyPage() {
 
   return (
     <>
-      <Header title="대기방" />
+      <Header title="대기방" onClick={() => navigate("/home")} />
       <main className="relative h-full w-full px-9" role="main">
         <section
           className="flex flex-col py-5"
@@ -278,7 +337,6 @@ export default function WaitingPartyPage() {
             label={roomDetail?.title ?? "대기방"}
             className="text-main mb-2 text-[20px]"
           />
-          {isHost && <InfoIcon aria-hidden="true" />}
 
           <PartyInfoCard info={partyInfo} />
         </section>
@@ -289,7 +347,7 @@ export default function WaitingPartyPage() {
         >
           <InputLabel label="설명" className="mb-2" />
           <div className="w-full px-2 text-[12px] font-medium tracking-[-0.025em] whitespace-pre-line text-white">
-            {roomDetail ? "설명이 없습니다." : "설명을 불러올 수 없습니다."}
+            {descriptionText}
           </div>
         </section>
         <section
@@ -305,7 +363,10 @@ export default function WaitingPartyPage() {
             </div>
           )}
           <div
-            className="flex max-h-[25vh] flex-col gap-3 overflow-y-auto"
+            className={clsx(
+              "flex flex-col gap-3 overflow-y-auto",
+              isHost ? "max-h-[25vh]" : "max-h-[35vh]",
+            )}
             role="list"
           >
             {players.map((player) => (
@@ -318,12 +379,15 @@ export default function WaitingPartyPage() {
                   isMe={player.isMe}
                   avatarClassName="mb-2"
                   canEditRole={isHost}
+                  canToggleArrival={isHost}
                   onToggleRole={
                     isHost || player.isMe
                       ? () => handleToggleRole(player.userId)
                       : undefined
                   }
-                  onToggleArrival={() => handleToggleArrival(player.userId)}
+                  onToggleArrival={
+                    isHost ? () => handleToggleArrival(player.userId) : undefined
+                  }
                 />
               </div>
             ))}

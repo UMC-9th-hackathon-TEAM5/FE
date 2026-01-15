@@ -88,6 +88,7 @@ type RoomDetail = {
   status: string;
   countdownSeconds: number;
   escapeTime?: number;
+  description?: string;
   capacity: {
     current: number;
     total: number;
@@ -151,7 +152,10 @@ const HomePage = () => {
       try {
         const response = await getNearbyRoom();
         const now = new Date();
+        const visibleStatuses = new Set(["WAITING", "STARTING", "PLAYING"]);
         const filteredRooms = response.data.rooms.filter((room) => {
+          if (!visibleStatuses.has(room.status)) return false;
+          if (room.status === "PLAYING") return true;
           const meetingDate = parseLocalDateTime(room.meetingTime);
           if (!meetingDate) return true;
           return meetingDate.getTime() >= now.getTime();
@@ -423,6 +427,15 @@ const HomePage = () => {
         </Button>
         {actionError && <p className="text-xs text-red-400">* {actionError}</p>}
       </div>
+
+      <button
+        type="button"
+        aria-label="새로운 경도팟 만들기"
+        className="absolute right-5 bottom-24 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-main text-2xl font-bold text-black shadow-[2px_2px_0_0_#008E58]"
+        onClick={() => navigate("/party/create")}
+      >
+        +
+      </button>
     </div>
   );
 };

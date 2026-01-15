@@ -4,12 +4,18 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import GameStartPage from "./GameStartPage";
 import { getRoom } from "@/apis/room";
+import { getParticipants } from "@/apis/roommember";
 
 vi.mock("@/apis/room", () => ({
   getRoom: vi.fn(),
 }));
 
+vi.mock("@/apis/roommember", () => ({
+  getParticipants: vi.fn(),
+}));
+
 const getRoomMock = vi.mocked(getRoom);
+const getParticipantsMock = vi.mocked(getParticipants);
 
 describe("GameStartPage", () => {
   beforeEach(() => {
@@ -17,6 +23,20 @@ describe("GameStartPage", () => {
     localStorage.setItem("userId", "1");
     localStorage.setItem("hostId", "1");
     getRoomMock.mockReset();
+    getParticipantsMock.mockReset();
+    getParticipantsMock.mockResolvedValue({
+      data: {
+        roomId: 1,
+        participants: [
+          {
+            userId: 1,
+            nickname: "호스트",
+            role: "POLICE",
+            isArrived: true,
+          },
+        ],
+      },
+    } as any);
   });
 
   it("renders the host start button", () => {

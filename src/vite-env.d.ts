@@ -10,3 +10,7 @@ declare module "*.svg?react" {
 
   export default ReactComponent;
 }
+
+interface ImportMetaEnv {
+  readonly VITE_MOCK_API?: string;
+}

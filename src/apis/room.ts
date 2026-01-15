@@ -29,6 +29,7 @@ export type NearbyRoomData = {
 
 export type CreateRoomRequestDto = {
   title?: string;
+  description?: string;
   placeName?: string;
   lat: number;
   lng: number;
@@ -54,6 +55,7 @@ type CreateRoomResponseDto = {
 type RoomDetailResponseDto = {
   roomId: number;
   title: string;
+  description?: string;
   placeName: string;
   meetingTime: string;
   status: RoomStatus;

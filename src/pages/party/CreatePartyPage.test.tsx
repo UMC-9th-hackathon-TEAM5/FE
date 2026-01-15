@@ -62,6 +62,10 @@ describe("CreatePartyPage", () => {
       screen.getByPlaceholderText("예 : 수지생태공원 분수대 앞"),
       "서울",
     );
+    await user.type(
+      screen.getByPlaceholderText("경도팟에 대한 설명을 적어주세요"),
+      "설명",
+    );
 
     const dateInput = container.querySelector(
       'input[type="datetime-local"]',
@@ -75,8 +79,8 @@ describe("CreatePartyPage", () => {
     ) as HTMLInputElement[];
     fireEvent.change(numberInputs[0], { target: { value: "1" } });
     fireEvent.change(numberInputs[1], { target: { value: "1" } });
-    fireEvent.change(numberInputs[2], { target: { value: "60" } });
-    fireEvent.change(numberInputs[3], { target: { value: "5" } });
+    fireEvent.change(numberInputs[2], { target: { value: "30" } });
+    fireEvent.change(numberInputs[3], { target: { value: "60" } });
 
     await user.click(screen.getByRole("button", { name: "팟 생성하기" }));
 

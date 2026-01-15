@@ -24,7 +24,6 @@ describe("GameResultPage", () => {
     localStorage.setItem("roomId", "1");
     localStorage.setItem("userId", "1");
     localStorage.setItem("hostId", "1");
-    localStorage.setItem("gameResultWinningTeam", "POLICE");
 
     getRoomMock.mockResolvedValue({
       data: {
@@ -64,7 +63,7 @@ describe("GameResultPage", () => {
     } as any);
   });
 
-  it("shows the police victory title when stored", async () => {
+  it("shows the police victory title when all thieves are caught", async () => {
     render(
       <MemoryRouter initialEntries={["/game/result?roomId=1"]}>
         <GameResultPage />

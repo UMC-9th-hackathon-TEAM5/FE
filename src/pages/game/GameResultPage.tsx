@@ -1,6 +1,6 @@
 import { getRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import PartyInfoCard, {
@@ -21,15 +21,10 @@ type ParticipantResult = {
   caughtCount?: number;
 };
 
-type GameResultData = {
-  startTime: string;
-  endTime: string;
-  participants: ParticipantResult[];
-};
-
 type RoomDetail = {
   roomId: number;
   title: string;
+  description?: string;
   placeName: string;
   meetingTime: string;
   status: string;
@@ -44,8 +39,6 @@ type RoomDetail = {
 
 type LocationState = {
   roomId?: number;
-  result?: GameResultData;
-  winningTeam?: "POLICE" | "THIEF";
 };
 
 export default function GameResultPage() {
@@ -55,13 +48,10 @@ export default function GameResultPage() {
 
   const state = (location.state as LocationState | null) ?? null;
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
-  const [resultData, setResultData] = useState<GameResultData | null>(null);
   const [participantsData, setParticipantsData] = useState<
     ParticipantResult[] | null
   >(null);
-  const [winningTeam, setWinningTeam] = useState<"POLICE" | "THIEF" | null>(
-    null,
-  );
+  const [isCardBusy, setIsCardBusy] = useState(false);
 
   const roomId = useMemo(() => {
     if (state?.roomId) return state.roomId;
@@ -91,30 +81,6 @@ export default function GameResultPage() {
   }, []);
 
   useEffect(() => {
-    if (state?.result) {
-      setResultData(state.result);
-    } else {
-      const storedResult = localStorage.getItem("gameResult");
-      if (storedResult) {
-        try {
-          setResultData(JSON.parse(storedResult));
-        } catch {
-          setResultData(null);
-        }
-      }
-    }
-
-    if (state?.winningTeam) {
-      setWinningTeam(state.winningTeam);
-    } else {
-      const storedTeam = localStorage.getItem("gameResultWinningTeam");
-      if (storedTeam === "POLICE" || storedTeam === "THIEF") {
-        setWinningTeam(storedTeam);
-      }
-    }
-  }, [state?.result, state?.winningTeam]);
-
-  useEffect(() => {
     if (!roomId) {
       navigate("/home");
       return;
@@ -134,7 +100,6 @@ export default function GameResultPage() {
 
   useEffect(() => {
     if (!roomId) return;
-    if (resultData?.participants?.length) return;
 
     const fetchParticipants = async () => {
       try {
@@ -146,16 +111,24 @@ export default function GameResultPage() {
     };
 
     fetchParticipants();
-  }, [roomId, resultData]);
+  }, [roomId]);
 
   const participants = useMemo(
-    () =>
-      resultData?.participants ??
-      participantsData ??
-      roomDetail?.participants ??
-      [],
-    [resultData, participantsData, roomDetail],
+    () => participantsData ?? roomDetail?.participants ?? [],
+    [participantsData, roomDetail],
   );
+
+  const winningTeam = useMemo(() => {
+    const thieves = participants.filter(
+      (participant) => participant.role === "THIEF",
+    );
+    if (thieves.length === 0) return null;
+    const anyThiefAlive = thieves.some(
+      (participant) =>
+        participant.isAlive !== "CAUGHT" && participant.isAlive !== false,
+    );
+    return anyThiefAlive ? "THIEF" : "POLICE";
+  }, [participants]);
 
   const partyInfo: PartyInfo | undefined = useMemo(() => {
     if (!roomDetail) return undefined;
@@ -166,14 +139,21 @@ export default function GameResultPage() {
     const thiefCount = participants.filter(
       (participant) => participant.role === "THIEF",
     ).length;
-    const playMinutes =
-      typeof roomDetail.escapeTime === "number"
-        ? Math.max(1, Math.round(roomDetail.escapeTime / 60))
-        : Math.max(1, Math.round(roomDetail.countdownSeconds / 60));
+    const countdownSeconds =
+      typeof roomDetail.countdownSeconds === "number" &&
+      roomDetail.countdownSeconds > 0
+        ? roomDetail.countdownSeconds
+        : 60;
+    const escapeSeconds =
+      typeof roomDetail.escapeTime === "number" && roomDetail.escapeTime > 0
+        ? roomDetail.escapeTime
+        : 30 * 60;
+    const playMinutes = Math.max(1, Math.round(escapeSeconds / 60));
 
     return {
       date: formattedTime,
       location: roomDetail.placeName,
+      countdownTime: `${Math.max(1, Math.round(countdownSeconds))}초`,
       playTime: `${playMinutes}분`,
       people: {
         police: policeCount,
@@ -222,11 +202,132 @@ export default function GameResultPage() {
     [results],
   );
 
-  const titleText = winningTeam === "POLICE" ? "경찰팀 승리!" : "도둑팀 승리!";
+  const titleText =
+    winningTeam === null
+      ? "결과 집계 중..."
+      : winningTeam === "POLICE"
+        ? "경찰팀 승리!"
+        : "도둑팀 승리!";
   const descriptionText =
-    winningTeam === "POLICE"
-      ? "도둑들이 모두 잡혔습니다!"
-      : "도둑들이 시간 내에 살아남았습니다!";
+    winningTeam === null
+      ? "결과를 불러오는 중입니다."
+      : winningTeam === "POLICE"
+        ? "도둑들이 모두 잡혔습니다!"
+        : "도둑들이 시간 내에 살아남았습니다!";
+
+  const downloadBlob = useCallback((blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "game-result-card.png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const buildResultCardBlob = useCallback(async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    const background = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    background.addColorStop(0, "#111111");
+    background.addColorStop(1, "#0c2620");
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const mainColor =
+      winningTeam === "POLICE"
+        ? "#3B82F6"
+        : winningTeam === "THIEF"
+          ? "#EF4444"
+          : "#00FD9E";
+
+    ctx.fillStyle = "#00FD9E";
+    ctx.font = "bold 48px Pretendard, sans-serif";
+    ctx.fillText("경도팟", 80, 120);
+
+    ctx.fillStyle = mainColor;
+    ctx.font = "bold 96px Pretendard, sans-serif";
+    ctx.fillText(titleText, 80, 240, 920);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "32px Pretendard, sans-serif";
+    ctx.fillText(descriptionText, 80, 320, 920);
+
+    const infoLines = [
+      `일시 ${partyInfo?.date ?? "-"}`,
+      `장소 ${partyInfo?.location ?? "-"}`,
+      `카운트다운 ${partyInfo?.countdownTime ?? "-"}`,
+      `플레이 ${partyInfo?.playTime ?? "-"}`,
+      `인원 경찰 ${partyInfo?.people.police ?? 0}명 / 도둑 ${partyInfo?.people.thief ?? 0}명`,
+    ];
+
+    ctx.font = "bold 36px Pretendard, sans-serif";
+    let y = 460;
+    infoLines.forEach((line) => {
+      ctx.fillText(line, 80, y, 920);
+      y += 56;
+    });
+
+    return await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+  }, [descriptionText, partyInfo, titleText, winningTeam]);
+
+  const handleShareCard = useCallback(async () => {
+    if (isCardBusy) return;
+    setIsCardBusy(true);
+    try {
+      const blob = await buildResultCardBlob();
+      if (!blob) return;
+
+      const file = new File([blob], "game-result-card.png", {
+        type: "image/png",
+      });
+
+      const shareTitle = roomDetail?.title ?? "경도팟 모임";
+      const shareText = titleText;
+      const canShareFiles =
+        typeof navigator.canShare === "function"
+          ? navigator.canShare({ files: [file] })
+          : null;
+
+      const isAbortError = (error: unknown) =>
+        error instanceof DOMException && error.name === "AbortError";
+
+      if (navigator.share) {
+        if (canShareFiles !== false) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: shareTitle,
+              text: shareText,
+            });
+            return;
+          } catch (error) {
+            if (isAbortError(error)) return;
+          }
+        }
+
+        try {
+          await navigator.share({ title: shareTitle, text: shareText });
+          return;
+        } catch (error) {
+          if (isAbortError(error)) return;
+        }
+      }
+
+      downloadBlob(blob);
+    } catch (error) {
+      console.error("결과 카드 공유 실패:", error);
+    } finally {
+      setIsCardBusy(false);
+    }
+  }, [buildResultCardBlob, downloadBlob, isCardBusy, roomDetail, titleText]);
   return (
     <>
       <main className="relative flex h-full w-full flex-col items-center overflow-y-auto px-7">
@@ -254,19 +355,13 @@ export default function GameResultPage() {
         </section>
         <section className="flex w-full flex-col items-center justify-center gap-4 pt-3 pb-10">
           <InputLabel label="공유" className="ml-7 text-[20px]" />
-          <div className="ml-7 w-full text-sm font-medium">
-            <span>
-              <span className="text-main">
-                {roomDetail?.title ?? "경도팟 모임"}
-              </span>
-              <span className="text-white"> 어떠셨나요?</span>
-              <br />
-            </span>
-            <span className="text-white">
-              추억을 인스타그램 스토리로 공유해보세요!
-            </span>
-          </div>
-          <Button width="xl" state="instagram">
+
+          <Button
+            width="xl"
+            state="instagram"
+            onClick={handleShareCard}
+            disabled={isCardBusy}
+          >
             <div className="flex items-center gap-2">
               <ShareIcon /> Instargram 스토리로 공유하기
             </div>

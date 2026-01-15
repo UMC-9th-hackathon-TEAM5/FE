@@ -4,6 +4,7 @@ export interface PartyInfo {
   date: string;
   location: string;
   playTime: string;
+  countdownTime?: string;
   people: {
     police: number;
     thief: number;
@@ -19,6 +20,9 @@ export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
   const items = [
     { label: "일시", value: info.date },
     { label: "장소", value: info.location },
+    ...(info.countdownTime
+      ? [{ label: "카운트다운", value: info.countdownTime }]
+      : []),
     { label: "플레이", value: info.playTime },
     {
       label: "인원",

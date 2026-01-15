@@ -19,6 +19,7 @@ interface PlayerArrivalCardProps {
   isMe?: boolean;
   className?: string;
   avatarClassName?: string;
+  canToggleArrival?: boolean;
   onToggleRole?: () => void;
   onToggleArrival?: () => void;
   canEditRole?: boolean;
@@ -47,6 +48,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   isMe = false,
   className,
   avatarClassName,
+  canToggleArrival = true,
   onToggleRole,
   onToggleArrival,
   canEditRole = false,
@@ -71,7 +73,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
         <button
           type="button"
           aria-label={`역할 전환 (현재: ${roleLabel})`}
-          className="absolute top-1/2 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
+          className="absolute top-3/5 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
           onClick={onToggleRole}
         >
           <ChangeRoleIcon className="text-white" />
@@ -80,6 +82,8 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
       <ArrivalStatusButton
         isArrived={isArrived}
         onClick={onToggleArrival}
+        disabled={!canToggleArrival}
+        aria-disabled={!canToggleArrival}
         aria-pressed={isArrived}
       />
     </article>
