@@ -142,7 +142,7 @@ const HomePage = () => {
 
     const fetchRooms = async () => {
       try {
-        const response = await getNearbyRoom(userId);
+        const response = await getNearbyRoom();
         setRooms(response.data.rooms);
       } catch (error) {
         console.error("근처 방 조회 실패:", error);
@@ -197,8 +197,8 @@ const HomePage = () => {
     setActionError(null);
 
     try {
-      await joinRoom(selectedRoom.roomId, userId, {
-        rolePreference: "ANY",
+      await joinRoom(selectedRoom.roomId, {
+        rolePreference: "RANDOM",
       });
       navigate(`/party/waiting?roomId=${selectedRoom.roomId}`, {
         state: { roomId: selectedRoom.roomId },
@@ -234,7 +234,7 @@ const HomePage = () => {
         police_capacity: 2,
         thief_capacity: 2,
         countdownSeconds: 10,
-        escapeTime: 30,
+        escapeTime: 30 * 60,
       });
       localStorage.setItem("roomId", String(response.data.roomId));
       localStorage.setItem("hostId", String(response.data.hostId));

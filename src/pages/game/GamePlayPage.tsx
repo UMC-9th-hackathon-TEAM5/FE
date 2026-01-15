@@ -21,7 +21,7 @@ type Participant = {
   userId: number;
   nickname: string;
   role: string;
-  isAlive?: boolean;
+  isAlive?: "ALIVE" | "CAUGHT" | boolean;
 };
 
 export default function GamePlayPage() {
@@ -58,12 +58,10 @@ export default function GamePlayPage() {
     (participants: Participant[]): Player[] =>
       participants.map((participant) => {
         const role = participant.role === "POLICE" ? "police" : "thief";
+        const isCaught =
+          participant.isAlive === "CAUGHT" || participant.isAlive === false;
         const status =
-          role === "thief"
-            ? participant.isAlive === false
-              ? "jailed"
-              : "caught"
-            : "none";
+          role === "thief" ? (isCaught ? "jailed" : "caught") : "none";
 
         return {
           id: participant.userId,
@@ -157,13 +155,13 @@ export default function GamePlayPage() {
 
     try {
       if (currentUserRole === "police" && nextStatus === "jailed") {
-        await captureThief(roomId, targetId, userId);
+        await captureThief(roomId, targetId);
       } else if (
         currentUserRole === "thief" &&
         nextStatus === "escaped" &&
         targetId === userId
       ) {
-        await releaseThief(roomId, userId);
+        await releaseThief(roomId);
       }
 
       await refreshParticipants();

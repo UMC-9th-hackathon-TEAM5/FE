@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
@@ -27,5 +27,12 @@ export default defineConfig({
       "@apis": path.resolve(__dirname, "src/apis"),
       "@types": path.resolve(__dirname, "src/types"),
     },
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./src/setupTests.ts"],
+    css: true,
+    exclude: ["tests/e2e/**", "playwright.config.ts"],
   },
 });

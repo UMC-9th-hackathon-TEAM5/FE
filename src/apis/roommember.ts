@@ -1,22 +1,21 @@
 import { axiosInstance } from "./axios";
+import type {
+  ApiResponse,
+  EmptyObject,
+  ParticipantInfo,
+  Role,
+  RolePreference,
+  TeamStats,
+} from "./types";
 
-export type ApiResponse<T> = {
-  timestamp: string;
-  status: number;
-  code: string;
-  message: string;
-  path: string;
-  data: T;
-};
-
-export type EmptyData = null;
-export type ReleaseThiefData = {
+export type ReleaseThiefResponseDto = {
   thiefUserId: number;
   thiefNickname: string;
   remainingThieves: number;
   message: string;
 };
-export type CaptureThiefData = {
+
+export type CaptureThiefResponseDto = {
   thiefUserId: number;
   thiefNickname: string;
   policeUserId: number;
@@ -25,67 +24,24 @@ export type CaptureThiefData = {
   message: string;
 };
 
-// 참가자 정보
-export type Member = {
-  userId: number;
-  nickname: string;
-  role: string; // "POLICE" | "THIEF"
-  isArrived?: boolean;
-  isAlive?: boolean; // 필요 시 사용
-  caughtCount?: number;
+export type JoinRoomRequestDto = {
+  rolePreference: RolePreference;
 };
 
-// 사진 업로드
-
-export type RequestRoomPhotoDto = {
-  photo: File | Blob;
-};
-
-export type RoomPhotoData = {
-  imageUrl: string;
-};
-
-export const uploadRoomPhoto = async (
-  roomId: number,
-  body: RequestRoomPhotoDto,
-): Promise<ApiResponse<RoomPhotoData>> => {
-  const formData = new FormData();
-  formData.append("photo", body.photo);
-  const { data } = await axiosInstance.post<ApiResponse<RoomPhotoData>>(
-    `/api/v1/rooms/${roomId}/photo`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
-  );
-  return data;
-};
-
-// 방 참가 (기존 코드 유지)
-type RequestRoomJoinDto = {
-  rolePreference: string;
-};
-
-type JoinRoomData = {
+type JoinRoomResponseDto = {
   roomId: number;
   userId: number;
-  rolePreference: string;
+  rolePreference: RolePreference;
   message: string;
 };
 
 export const joinRoom = async (
   roomId: number,
-  userId: number,
-  body: RequestRoomJoinDto,
-): Promise<ApiResponse<JoinRoomData>> => {
-  const { data } = await axiosInstance.post<ApiResponse<JoinRoomData>>(
+  body: JoinRoomRequestDto,
+): Promise<ApiResponse<JoinRoomResponseDto>> => {
+  const { data } = await axiosInstance.post<ApiResponse<JoinRoomResponseDto>>(
     `/api/v1/rooms/${roomId}/join`,
     body,
-    {
-      params: { userId },
-    },
   );
   return data;
 };
@@ -94,33 +50,26 @@ export const joinRoom = async (
 // Request Body: { "roles": [ { "userId": 1, "role": "POLICE" } ] }
 export type RoleAssignment = {
   userId: number;
-  role: "POLICE" | "THIEF"; // 구체적인 문자열 타입 권장
+  role: Role;
 };
 
-export type RequestGameStartDto = {
+export type AssignRolesRequestDto = {
   roles: RoleAssignment[];
 };
 
-export type GameStartData = {
+type AssignRolesResponseDto = {
   roomId: number;
-  stats: {
-    totalPolice: number;
-    totalThieves: number;
-  };
-  participants: Member[];
+  stats: TeamStats;
+  participants: ParticipantInfo[];
 };
 
 export const startGame = async (
   roomId: number,
-  hostUserId: number,
-  body: RequestGameStartDto,
-): Promise<ApiResponse<GameStartData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<GameStartData>>(
+  body: AssignRolesRequestDto,
+): Promise<ApiResponse<AssignRolesResponseDto>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<AssignRolesResponseDto>>(
     `/api/v1/rooms/${roomId}/roles`,
     body, // Body에 roles 배열을 담아 보냅니다.
-    {
-      params: { hostUserId },
-    },
   );
   return data;
 };
@@ -128,27 +77,27 @@ export const startGame = async (
 // 탈옥 (Thief Release)
 export const releaseThief = async (
   roomId: number,
-  userId: number,
-): Promise<ApiResponse<ReleaseThiefData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<ReleaseThiefData>>(
-    `/api/v1/rooms/${roomId}/participants/${userId}/release`,
-  );
+): Promise<ApiResponse<ReleaseThiefResponseDto>> => {
+  const { data } = await axiosInstance.patch<
+    ApiResponse<ReleaseThiefResponseDto>
+  >(`/api/v1/rooms/${roomId}/participants/release`);
   return data;
+};
+
+// 도착 여부 조회
+export type ParticipantsData = {
+  roomId: number;
+  participants: ParticipantInfo[];
 };
 
 // 도둑 검거 (Capture)
 export const captureThief = async (
   roomId: number,
   thiefId: number, // 잡힌 도둑의 ID
-  currentPoliceId: number,
-): Promise<ApiResponse<CaptureThiefData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<CaptureThiefData>>(
-    `/api/v1/rooms/${roomId}/participants/${thiefId}/capture`,
-    undefined,
-    {
-      params: { currentPoliceId },
-    },
-  );
+): Promise<ApiResponse<CaptureThiefResponseDto>> => {
+  const { data } = await axiosInstance.patch<
+    ApiResponse<CaptureThiefResponseDto>
+  >(`/api/v1/rooms/${roomId}/participants/${thiefId}/capture`);
   return data;
 };
 
@@ -156,18 +105,11 @@ export const captureThief = async (
 export const updateArrivalStatus = async (
   roomId: number,
   targetUserId: number,
-): Promise<ApiResponse<ParticipantsData>> => {
-  const { data } = await axiosInstance.patch<ApiResponse<ParticipantsData>>(
+): Promise<ApiResponse<EmptyObject>> => {
+  const { data } = await axiosInstance.patch<ApiResponse<EmptyObject>>(
     `/api/v1/rooms/${roomId}/participants/${targetUserId}/arrival`,
   );
   return data;
-};
-
-
-// 도착 여부 조회
-export type ParticipantsData = {
-  roomId: number;
-  participants: Member[];
 };
 
 export const getParticipants = async (

@@ -1,4 +1,5 @@
 import { getRoom } from "@/apis/room";
+import { getParticipants } from "@/apis/roommember";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -16,7 +17,7 @@ type ParticipantResult = {
   userId: number;
   nickname: string;
   role: string;
-  isAlive?: boolean;
+  isAlive?: "ALIVE" | "CAUGHT" | boolean;
   caughtCount?: number;
 };
 
@@ -55,6 +56,9 @@ export default function GameResultPage() {
   const state = (location.state as LocationState | null) ?? null;
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
   const [resultData, setResultData] = useState<GameResultData | null>(null);
+  const [participantsData, setParticipantsData] = useState<
+    ParticipantResult[] | null
+  >(null);
   const [winningTeam, setWinningTeam] = useState<"POLICE" | "THIEF" | null>(
     null,
   );
@@ -128,9 +132,29 @@ export default function GameResultPage() {
     fetchRoom();
   }, [roomId, navigate]);
 
+  useEffect(() => {
+    if (!roomId) return;
+    if (resultData?.participants?.length) return;
+
+    const fetchParticipants = async () => {
+      try {
+        const { data } = await getParticipants(roomId);
+        setParticipantsData(data.participants);
+      } catch (error) {
+        console.error("게임 결과 참여자 조회 실패:", error);
+      }
+    };
+
+    fetchParticipants();
+  }, [roomId, resultData]);
+
   const participants = useMemo(
-    () => resultData?.participants ?? roomDetail?.participants ?? [],
-    [resultData, roomDetail],
+    () =>
+      resultData?.participants ??
+      participantsData ??
+      roomDetail?.participants ??
+      [],
+    [resultData, participantsData, roomDetail],
   );
 
   const partyInfo: PartyInfo | undefined = useMemo(() => {
@@ -144,7 +168,7 @@ export default function GameResultPage() {
     ).length;
     const playMinutes =
       typeof roomDetail.escapeTime === "number"
-        ? Math.max(1, roomDetail.escapeTime)
+        ? Math.max(1, Math.round(roomDetail.escapeTime / 60))
         : Math.max(1, Math.round(roomDetail.countdownSeconds / 60));
 
     return {
@@ -180,7 +204,7 @@ export default function GameResultPage() {
           name: participant.nickname,
           role,
           result:
-            participant.isAlive === false
+            participant.isAlive === "CAUGHT" || participant.isAlive === false
               ? ("jailed" as const)
               : ("survived" as const),
           isHost: hostId !== null && participant.userId === hostId,

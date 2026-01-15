@@ -1,21 +1,14 @@
 import { axiosInstance } from "./axios";
+import type { ApiResponse } from "./types";
 
-export type ApiResponse<T> = {
-  timestamp: string;
-  status: number;
-  code: string;
-  message: string;
-  path: string;
-  data: T;
-};
-
-type RequestUserDto = {
-  nickname: string;
-  password: string;
+type SessionRequestDto = {
+  nickname?: string;
+  password?: string;
   lat: number;
   lng: number;
 };
-type ResponseUserData = {
+
+type SessionResponseDto = {
   userId: number;
   nickname: string;
   accessToken: string;
@@ -23,9 +16,9 @@ type ResponseUserData = {
 };
 
 export const postUser = async (
-  body: RequestUserDto,
-): Promise<ApiResponse<ResponseUserData>> => {
-  const { data } = await axiosInstance.post<ApiResponse<ResponseUserData>>(
+  body: SessionRequestDto,
+): Promise<ApiResponse<SessionResponseDto>> => {
+  const { data } = await axiosInstance.post<ApiResponse<SessionResponseDto>>(
     "/api/v1/user/session",
     body,
   );

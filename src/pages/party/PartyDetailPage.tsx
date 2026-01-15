@@ -1,5 +1,6 @@
 import { getRoom } from "@/apis/room";
-import { joinRoom } from "@/apis/roommember";
+import { getParticipants, joinRoom } from "@/apis/roommember";
+import type { RolePreference } from "@/apis/types";
 import Header from "@/components/common/Header";
 import PartyInfoCard, {
   PartyInfo,
@@ -28,6 +29,8 @@ type RoomDetail = {
   meetingTime: string;
   status: string;
   countdownSeconds: number;
+  police_capacity?: number;
+  thief_capacity?: number;
   capacity: {
     current: number;
     total: number;
@@ -42,6 +45,9 @@ type LocationState = {
 export default function PartyDetailPage() {
   const [selectedRole, setSelectedRole] = useState<RoleType>(null);
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
+  const [participantsData, setParticipantsData] = useState<Participant[] | null>(
+    null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 
@@ -90,22 +96,54 @@ export default function PartyDetailPage() {
     fetchRoom();
   }, [roomId, navigate]);
 
+  useEffect(() => {
+    if (!roomId) return;
+    setParticipantsData(null);
+
+    const fetchParticipants = async () => {
+      try {
+        const { data } = await getParticipants(roomId);
+        setParticipantsData(data.participants);
+      } catch (error) {
+        console.error("참여자 조회 실패:", error);
+      }
+    };
+
+    fetchParticipants();
+  }, [roomId]);
+
   const participants = useMemo(
-    () => roomDetail?.participants ?? [],
-    [roomDetail?.participants],
+    () => participantsData ?? roomDetail?.participants ?? [],
+    [participantsData, roomDetail?.participants],
   );
   const currentCount = roomDetail?.capacity.current ?? participants.length;
   const maxCount = roomDetail?.capacity.total ?? 0;
+  const { policeCount, thiefCount } = useMemo(() => {
+    if (
+      typeof roomDetail?.police_capacity === "number" &&
+      typeof roomDetail?.thief_capacity === "number"
+    ) {
+      return {
+        policeCount: roomDetail.police_capacity,
+        thiefCount: roomDetail.thief_capacity,
+      };
+    }
+    let police = 0;
+    let thief = 0;
+    participants.forEach((participant) => {
+      const normalizedRole = participant.role?.trim().toUpperCase();
+      if (normalizedRole === "POLICE") {
+        police += 1;
+      } else if (normalizedRole === "THIEF") {
+        thief += 1;
+      }
+    });
+    return { policeCount: police, thiefCount: thief };
+  }, [participants, roomDetail?.police_capacity, roomDetail?.thief_capacity]);
 
   const partyInfo = useMemo<PartyInfo | undefined>(() => {
     if (!roomDetail) return undefined;
     const formattedTime = roomDetail.meetingTime.replace("T", " ").slice(0, 16);
-    const policeCount = participants.filter(
-      (participant) => participant.role === "POLICE",
-    ).length;
-    const thiefCount = participants.filter(
-      (participant) => participant.role === "THIEF",
-    ).length;
 
     return {
       date: formattedTime,
@@ -116,13 +154,20 @@ export default function PartyDetailPage() {
         thief: thiefCount,
       },
     };
-  }, [roomDetail, participants]);
+  }, [roomDetail, policeCount, thiefCount]);
 
   const getButtonState = (role: RoleType) =>
     selectedRole === role ? "active" : "default";
 
   const isRoleSelected = selectedRole !== null;
-  const rolePreference = selectedRole === "random" ? "ANY" : selectedRole;
+  const rolePreference: RolePreference | null =
+    selectedRole === "random"
+      ? "RANDOM"
+      : selectedRole === "police"
+        ? "POLICE"
+        : selectedRole === "thief"
+          ? "THIEF"
+          : null;
 
   const handleJoin = async () => {
     if (!roomId || !userId || !rolePreference) return;
@@ -130,8 +175,8 @@ export default function PartyDetailPage() {
     setErrorMessage(null);
 
     try {
-      await joinRoom(roomId, userId, {
-        rolePreference: rolePreference.toUpperCase(),
+      await joinRoom(roomId, {
+        rolePreference,
       });
       navigate(`/party/waiting?roomId=${roomId}`, { state: { roomId } });
     } catch (error) {

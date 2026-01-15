@@ -91,7 +91,7 @@ const GameStartPage = () => {
       if (typeof response.data.escapeTime === "number") {
         localStorage.setItem(
           "gameSeconds",
-          String(Math.max(1, response.data.escapeTime) * 60),
+          String(Math.max(1, response.data.escapeTime)),
         );
       }
       setCount(readySeconds);

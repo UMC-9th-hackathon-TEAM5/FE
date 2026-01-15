@@ -113,7 +113,7 @@ export default function CreatePartyPage() {
         police_capacity: Number(policeCount),
         thief_capacity: Number(thiefCount),
         countdownSeconds: Number(countdownSecondsInput),
-        escapeTime: Number(escapeMinutes),
+        escapeTime: Number(escapeMinutes) * 60,
       });
 
       navigate(`/party/waiting?roomId=${response.data.roomId}`, {

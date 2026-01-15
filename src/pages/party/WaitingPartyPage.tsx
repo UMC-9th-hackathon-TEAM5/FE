@@ -108,8 +108,6 @@ export default function WaitingPartyPage() {
   }, [state?.hostId]);
 
   const isHost = userId !== null && hostId !== null && userId === hostId;
-  const isGuest = !players.some((p) => p.isMe);
-
   useEffect(() => {
     if (state?.roomId) {
       localStorage.setItem("roomId", String(state.roomId));
@@ -249,7 +247,7 @@ export default function WaitingPartyPage() {
     setErrorMessage(null);
 
     try {
-      await startGame(roomId, hostId, {
+      await startGame(roomId, {
         roles: players.map((player) => ({
           userId: player.userId,
           role: player.role === "police" ? "POLICE" : "THIEF",
@@ -318,6 +316,7 @@ export default function WaitingPartyPage() {
                   arrivalStatus={player.arrivalStatus}
                   isHost={player.isHost}
                   isMe={player.isMe}
+                  avatarClassName="mb-2"
                   canEditRole={isHost}
                   onToggleRole={
                     isHost || player.isMe
@@ -343,13 +342,13 @@ export default function WaitingPartyPage() {
             <InfoIcon className="h-6 w-6" aria-hidden="true" />
             <span>게임 규칙 확인하기</span>
           </button>
-          {!isGuest && (
+          {isHost && (
             <Button
               width="xl"
               state="active"
               className="my-4"
               onClick={handleStartGame}
-              disabled={!isHost || isStarting}
+              disabled={isStarting}
             >
               {isStarting ? "시작 중..." : "게임시작하기"}
             </Button>

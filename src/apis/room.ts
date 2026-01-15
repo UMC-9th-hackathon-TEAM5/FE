@@ -1,22 +1,13 @@
 import { axiosInstance } from "./axios";
-
-export type ApiResponse<T> = {
-  timestamp: string;
-  status: number;
-  code: string;
-  message: string;
-  path: string;
-  data: T;
-};
-
-export type Member = {
-  userId: number;
-  nickname: string;
-  role: string;
-  isArrived: boolean;
-  isAlive?: boolean;
-  caughtCount?: number;
-};
+import type {
+  ApiResponse,
+  CapacityInfo,
+  FinishReason,
+  GameParticipant,
+  ParticipantInfo,
+  RoomStatus,
+  WinningTeam,
+} from "./types";
 
 export type NearbyRoomItem = {
   roomId: number;
@@ -28,7 +19,7 @@ export type NearbyRoomItem = {
   currentParticipants: number; // 상세 조회와 달리 숫자만 옵니다.
   maxParticipants: number;
   distance: number; // 내 위치로부터의 거리
-  status: string; // "WAITING"
+  status: RoomStatus;
 };
 
 export type NearbyRoomData = {
@@ -36,9 +27,9 @@ export type NearbyRoomData = {
   totalCount: number;
 };
 
-export type RequestRoomPostDto = {
-  title: string;
-  placeName: string;
+export type CreateRoomRequestDto = {
+  title?: string;
+  placeName?: string;
   lat: number;
   lng: number;
   meetingTime: string;
@@ -48,45 +39,44 @@ export type RequestRoomPostDto = {
   escapeTime: number;
 };
 
-export type RequestRoomGameDto = {
-  finishReason: string;
-  winningTeam: string;
+export type FinishGameRequestDto = {
+  finishReason: FinishReason;
+  winningTeam: WinningTeam;
 };
 
 // 방 생성 후 응답 data
-type RoomIdData = {
+type CreateRoomResponseDto = {
   roomId: number;
   hostId: number;
 };
 
 // 방 상세 조회 응답 data
-type RoomDetailData = {
+type RoomDetailResponseDto = {
   roomId: number;
   title: string;
   placeName: string;
   meetingTime: string;
-  status: string;
+  status: RoomStatus;
   countdownSeconds: number;
   escapeTime?: number;
-  capacity: {
-    current: number;
-    total: number;
-  };
-  participants: Member[];
+  police_capacity?: number;
+  thief_capacity?: number;
+  capacity: CapacityInfo;
+  participants: ParticipantInfo[];
 };
 
 // 게임 종료 응답 data
-type GameResultData = {
+type GameStatusResponseDto = {
   startTime: string;
   endTime: string;
-  participants: Member[];
+  participants: GameParticipant[];
 };
 
 // 방 생성
 export const postRoom = async (
-  body: RequestRoomPostDto,
-): Promise<ApiResponse<RoomIdData>> => {
-  const { data } = await axiosInstance.post<ApiResponse<RoomIdData>>(
+  body: CreateRoomRequestDto,
+): Promise<ApiResponse<CreateRoomResponseDto>> => {
+  const { data } = await axiosInstance.post<ApiResponse<CreateRoomResponseDto>>(
     "/api/v1/rooms",
     body,
   );
@@ -96,22 +86,17 @@ export const postRoom = async (
 // 방 상세 조회
 export const getRoom = async (
   roomId: number,
-): Promise<ApiResponse<RoomDetailData>> => {
-  const { data } = await axiosInstance.get<ApiResponse<RoomDetailData>>(
+): Promise<ApiResponse<RoomDetailResponseDto>> => {
+  const { data } = await axiosInstance.get<ApiResponse<RoomDetailResponseDto>>(
     `/api/v1/rooms/${roomId}`,
   );
   return data;
 };
 
 // 근처 방 조회
-export const getNearbyRoom = async (
-  userId: number,
-): Promise<ApiResponse<NearbyRoomData>> => {
+export const getNearbyRoom = async (): Promise<ApiResponse<NearbyRoomData>> => {
   const { data } = await axiosInstance.get<ApiResponse<NearbyRoomData>>(
     "/api/v1/rooms/nearby",
-    {
-      params: { userId },
-    },
   );
   return data;
 };
@@ -119,9 +104,9 @@ export const getNearbyRoom = async (
 // 게임 종료
 export const postFinishgame = async (
   roomId: number,
-  body: RequestRoomGameDto,
-): Promise<ApiResponse<GameResultData>> => {
-  const { data } = await axiosInstance.post<ApiResponse<GameResultData>>(
+  body: FinishGameRequestDto,
+): Promise<ApiResponse<GameStatusResponseDto>> => {
+  const { data } = await axiosInstance.post<ApiResponse<GameStatusResponseDto>>(
     `/api/v1/rooms/${roomId}/game/finish`,
     body,
   );
