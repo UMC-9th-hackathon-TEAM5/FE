@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import GameResultPage from "./GameResultPage";
 import { getRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   getRoom: vi.fn(),
@@ -25,8 +26,8 @@ describe("GameResultPage", () => {
     localStorage.setItem("userId", "1");
     localStorage.setItem("hostId", "1");
 
-    getRoomMock.mockResolvedValue({
-      data: {
+    getRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         title: "테스트",
         placeName: "서울",
@@ -36,11 +37,11 @@ describe("GameResultPage", () => {
         escapeTime: 300,
         capacity: { current: 2, total: 4 },
         participants: [],
-      },
-    } as any);
+      }),
+    );
 
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         participants: [
           {
@@ -59,8 +60,8 @@ describe("GameResultPage", () => {
             isAlive: "CAUGHT",
           },
         ],
-      },
-    } as any);
+      }),
+    );
   });
 
   it("shows the police victory title when all thieves are caught", async () => {

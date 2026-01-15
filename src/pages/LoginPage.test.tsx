@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import LoginPage from "@/pages/LoginPage";
 import { postUser } from "@/apis/user";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/user", () => ({
   postUser: vi.fn(),
@@ -39,14 +40,14 @@ describe("LoginPage", () => {
   });
 
   it("submits and navigates to home when login succeeds", async () => {
-    postUserMock.mockResolvedValue({
-      data: {
+    postUserMock.mockResolvedValue(
+      createApiResponse({
         userId: 1,
         nickname: "테스트",
         accessToken: "token",
         tokenType: "Bearer",
-      },
-    } as any);
+      }),
+    );
 
     Object.defineProperty(navigator, "geolocation", {
       value: {

@@ -30,6 +30,7 @@ type RoomDetail = {
   meetingTime: string;
   status: string;
   countdownSeconds: number;
+  escapeTime?: number;
   police_capacity?: number;
   thief_capacity?: number;
   capacity: {

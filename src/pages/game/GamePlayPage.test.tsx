@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import GamePlayPage from "./GamePlayPage";
 import { getParticipants } from "@/apis/roommember";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/roommember", () => ({
   getParticipants: vi.fn(),
@@ -26,8 +27,8 @@ describe("GamePlayPage", () => {
     localStorage.setItem("hostId", "1");
     localStorage.setItem("gameSeconds", "0");
 
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         participants: [
           {
@@ -45,8 +46,8 @@ describe("GamePlayPage", () => {
             isAlive: "ALIVE",
           },
         ],
-      },
-    } as any);
+      }),
+    );
   });
 
   it("renders the timer label", async () => {

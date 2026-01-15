@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import WaitingPartyPage from "./WaitingPartyPage";
 import { getRoom } from "@/apis/room";
 import { getParticipants, startGame } from "@/apis/roommember";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   getRoom: vi.fn(),
@@ -30,8 +31,8 @@ describe("WaitingPartyPage", () => {
     localStorage.setItem("hostId", "1");
     localStorage.setItem("roomId", "1");
 
-    getRoomMock.mockResolvedValue({
-      data: {
+    getRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         title: "테스트",
         placeName: "서울",
@@ -43,18 +44,18 @@ describe("WaitingPartyPage", () => {
           { userId: 1, nickname: "호스트", role: "POLICE", isArrived: true },
           { userId: 2, nickname: "참가자", role: "THIEF", isArrived: false },
         ],
-      },
-    } as any);
+      }),
+    );
 
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         participants: [
           { userId: 1, nickname: "호스트", role: "POLICE", isArrived: true },
           { userId: 2, nickname: "참가자", role: "THIEF", isArrived: false },
         ],
-      },
-    } as any);
+      }),
+    );
   });
 
   it("shows the start button for the host", async () => {
@@ -74,13 +75,13 @@ describe("WaitingPartyPage", () => {
   });
 
   it("starts the game and navigates when the host clicks start", async () => {
-    startGameMock.mockResolvedValue({
-      data: {
+    startGameMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         stats: { totalPolice: 1, totalThieves: 1 },
         participants: [],
-      },
-    } as any);
+      }),
+    );
 
     render(
       <MemoryRouter initialEntries={["/party/waiting?roomId=1"]}>

@@ -2,9 +2,9 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import CheckIcon from "@/assets/check/check.svg?react";
 
-interface ArrivalStatusButtonProps {
+interface ArrivalStatusButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isArrived: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const ArrivalStatusButton: React.FC<ArrivalStatusButtonProps> = ({

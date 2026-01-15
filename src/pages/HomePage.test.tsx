@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "@/pages/HomePage";
 import { getNearbyRoom } from "@/apis/room";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   getNearbyRoom: vi.fn(),
@@ -23,9 +24,9 @@ describe("HomePage", () => {
     getNearbyRoomMock.mockReset();
     localStorage.setItem("userId", "1");
     localStorage.setItem("nickname", "테스터");
-    getNearbyRoomMock.mockResolvedValue({
-      data: { rooms: [], totalCount: 0 },
-    } as any);
+    getNearbyRoomMock.mockResolvedValue(
+      createApiResponse({ rooms: [], totalCount: 0 }),
+    );
   });
 
   it("renders action buttons", async () => {

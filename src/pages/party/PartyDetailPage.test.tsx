@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import PartyDetailPage from "./PartyDetailPage";
 import { getRoom } from "@/apis/room";
 import { getParticipants, joinRoom } from "@/apis/roommember";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   getRoom: vi.fn(),
@@ -29,8 +30,8 @@ describe("PartyDetailPage", () => {
   });
 
   it("shows police/thief capacity when provided by room detail", async () => {
-    getRoomMock.mockResolvedValue({
-      data: {
+    getRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 52,
         title: "테스트",
         placeName: "서울특별시 강남구",
@@ -41,15 +42,15 @@ describe("PartyDetailPage", () => {
         thief_capacity: 5,
         capacity: { current: 2, total: 8 },
         participants: [],
-      },
-    } as any);
+      }),
+    );
 
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 52,
         participants: [],
-      },
-    } as any);
+      }),
+    );
 
     render(
       <MemoryRouter initialEntries={["/party/detail?roomId=52"]}>
@@ -63,8 +64,8 @@ describe("PartyDetailPage", () => {
   });
 
   it("joins the room after selecting a role", async () => {
-    getRoomMock.mockResolvedValue({
-      data: {
+    getRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         title: "테스트",
         placeName: "서울",
@@ -74,25 +75,39 @@ describe("PartyDetailPage", () => {
         police_capacity: 1,
         thief_capacity: 1,
         capacity: { current: 1, total: 2 },
-        participants: [{ userId: 1, nickname: "호스트", role: "POLICE" }],
-      },
-    } as any);
+        participants: [
+          {
+            userId: 1,
+            nickname: "호스트",
+            role: "POLICE",
+            isArrived: true,
+          },
+        ],
+      }),
+    );
 
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
-        participants: [{ userId: 1, nickname: "호스트", role: "POLICE" }],
-      },
-    } as any);
+        participants: [
+          {
+            userId: 1,
+            nickname: "호스트",
+            role: "POLICE",
+            isArrived: true,
+          },
+        ],
+      }),
+    );
 
-    joinRoomMock.mockResolvedValue({
-      data: {
+    joinRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         userId: 1,
         rolePreference: "POLICE",
         message: "ok",
-      },
-    } as any);
+      }),
+    );
 
     render(
       <MemoryRouter initialEntries={["/party/detail?roomId=1"]}>

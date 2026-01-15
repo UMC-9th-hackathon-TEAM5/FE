@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import GameStartPage from "./GameStartPage";
 import { getRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   getRoom: vi.fn(),
@@ -24,8 +25,8 @@ describe("GameStartPage", () => {
     localStorage.setItem("hostId", "1");
     getRoomMock.mockReset();
     getParticipantsMock.mockReset();
-    getParticipantsMock.mockResolvedValue({
-      data: {
+    getParticipantsMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         participants: [
           {
@@ -35,8 +36,8 @@ describe("GameStartPage", () => {
             isArrived: true,
           },
         ],
-      },
-    } as any);
+      }),
+    );
   });
 
   it("renders the host start button", () => {
@@ -52,8 +53,8 @@ describe("GameStartPage", () => {
   });
 
   it("starts the countdown after clicking the start button", async () => {
-    getRoomMock.mockResolvedValue({
-      data: {
+    getRoomMock.mockResolvedValue(
+      createApiResponse({
         roomId: 1,
         title: "테스트",
         placeName: "서울",
@@ -63,8 +64,8 @@ describe("GameStartPage", () => {
         escapeTime: 300,
         capacity: { current: 2, total: 4 },
         participants: [],
-      },
-    } as any);
+      }),
+    );
 
     render(
       <MemoryRouter initialEntries={["/game/start?roomId=1"]}>

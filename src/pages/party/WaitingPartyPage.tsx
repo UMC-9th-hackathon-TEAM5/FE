@@ -44,6 +44,7 @@ type RoomDetail = {
   meetingTime: string;
   status: string;
   countdownSeconds: number;
+  escapeTime?: number;
   capacity: {
     current: number;
     total: number;

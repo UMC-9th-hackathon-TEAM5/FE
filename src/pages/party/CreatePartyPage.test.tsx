@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreatePartyPage from "@/pages/party/CreatePartyPage";
 import { postRoom } from "@/apis/room";
+import { createApiResponse } from "@/testUtils/apiResponse";
 
 vi.mock("@/apis/room", () => ({
   postRoom: vi.fn(),
@@ -30,9 +31,9 @@ describe("CreatePartyPage", () => {
   });
 
   it("submits when the form is valid", async () => {
-    postRoomMock.mockResolvedValue({
-      data: { roomId: 1, hostId: 1 },
-    } as any);
+    postRoomMock.mockResolvedValue(
+      createApiResponse({ roomId: 1, hostId: 1 }),
+    );
 
     Object.defineProperty(navigator, "geolocation", {
       value: {
