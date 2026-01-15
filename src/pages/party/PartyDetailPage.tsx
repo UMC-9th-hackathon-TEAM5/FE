@@ -1,5 +1,6 @@
 import { getRoom } from "@/apis/room";
-import { joinRoom } from "@/apis/roommember";
+import { getParticipants, joinRoom } from "@/apis/roommember";
+import type { RolePreference } from "@/apis/types";
 import Header from "@/components/common/Header";
 import PartyInfoCard, {
   PartyInfo,
@@ -24,10 +25,13 @@ type Participant = {
 type RoomDetail = {
   roomId: number;
   title: string;
+  description?: string;
   placeName: string;
   meetingTime: string;
   status: string;
   countdownSeconds: number;
+  police_capacity?: number;
+  thief_capacity?: number;
   capacity: {
     current: number;
     total: number;
@@ -42,6 +46,9 @@ type LocationState = {
 export default function PartyDetailPage() {
   const [selectedRole, setSelectedRole] = useState<RoleType>(null);
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
+  const [participantsData, setParticipantsData] = useState<Participant[] | null>(
+    null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 
@@ -90,39 +97,106 @@ export default function PartyDetailPage() {
     fetchRoom();
   }, [roomId, navigate]);
 
+  useEffect(() => {
+    if (!roomId) return;
+    setParticipantsData(null);
+
+    const fetchParticipants = async () => {
+      try {
+        const { data } = await getParticipants(roomId);
+        setParticipantsData(data.participants);
+      } catch (error) {
+        console.error("참여자 조회 실패:", error);
+      }
+    };
+
+    fetchParticipants();
+  }, [roomId]);
+
   const participants = useMemo(
-    () => roomDetail?.participants ?? [],
-    [roomDetail?.participants],
+    () => participantsData ?? roomDetail?.participants ?? [],
+    [participantsData, roomDetail?.participants],
   );
   const currentCount = roomDetail?.capacity.current ?? participants.length;
   const maxCount = roomDetail?.capacity.total ?? 0;
+  const roleCounts = useMemo(() => {
+    let police = 0;
+    let thief = 0;
+    participants.forEach((participant) => {
+      const normalizedRole = participant.role?.trim().toUpperCase();
+      if (normalizedRole === "POLICE") {
+        police += 1;
+      } else if (normalizedRole === "THIEF") {
+        thief += 1;
+      }
+    });
+    return { policeCount: police, thiefCount: thief };
+  }, [participants]);
+  const policeCapacity = roomDetail?.police_capacity;
+  const thiefCapacity = roomDetail?.thief_capacity;
+  const displayPoliceCount =
+    typeof policeCapacity === "number" ? policeCapacity : roleCounts.policeCount;
+  const displayThiefCount =
+    typeof thiefCapacity === "number" ? thiefCapacity : roleCounts.thiefCount;
+  const isPoliceFull =
+    typeof policeCapacity === "number"
+      ? roleCounts.policeCount >= policeCapacity
+      : false;
+  const isThiefFull =
+    typeof thiefCapacity === "number"
+      ? roleCounts.thiefCount >= thiefCapacity
+      : false;
+  const isTotalFull =
+    typeof maxCount === "number" && maxCount > 0
+      ? currentCount >= maxCount
+      : false;
+  const isRandomDisabled = isTotalFull || (isPoliceFull && isThiefFull);
 
   const partyInfo = useMemo<PartyInfo | undefined>(() => {
     if (!roomDetail) return undefined;
     const formattedTime = roomDetail.meetingTime.replace("T", " ").slice(0, 16);
-    const policeCount = participants.filter(
-      (participant) => participant.role === "POLICE",
-    ).length;
-    const thiefCount = participants.filter(
-      (participant) => participant.role === "THIEF",
-    ).length;
+    const countdownSeconds =
+      typeof roomDetail.countdownSeconds === "number" &&
+      roomDetail.countdownSeconds > 0
+        ? roomDetail.countdownSeconds
+        : 60;
+    const escapeSeconds =
+      typeof roomDetail.escapeTime === "number" && roomDetail.escapeTime > 0
+        ? roomDetail.escapeTime
+        : 30 * 60;
 
     return {
       date: formattedTime,
       location: roomDetail.placeName,
-      playTime: `${Math.max(1, Math.round(roomDetail.countdownSeconds / 60))}분`,
+      countdownTime: `${Math.max(1, Math.round(countdownSeconds))}초`,
+      playTime: `${Math.max(1, Math.round(escapeSeconds / 60))}분`,
       people: {
-        police: policeCount,
-        thief: thiefCount,
+        police: displayPoliceCount,
+        thief: displayThiefCount,
       },
     };
-  }, [roomDetail, participants]);
+  }, [roomDetail, displayPoliceCount, displayThiefCount]);
+
+  const descriptionText = useMemo(() => {
+    if (!roomDetail) return "설명을 불러올 수 없습니다.";
+    if (roomDetail.description && roomDetail.description.trim().length > 0) {
+      return roomDetail.description;
+    }
+    return "설명이 없습니다.";
+  }, [roomDetail]);
 
   const getButtonState = (role: RoleType) =>
     selectedRole === role ? "active" : "default";
 
   const isRoleSelected = selectedRole !== null;
-  const rolePreference = selectedRole === "random" ? "ANY" : selectedRole;
+  const rolePreference: RolePreference | null =
+    selectedRole === "random"
+      ? "RANDOM"
+      : selectedRole === "police"
+        ? "POLICE"
+        : selectedRole === "thief"
+          ? "THIEF"
+          : null;
 
   const handleJoin = async () => {
     if (!roomId || !userId || !rolePreference) return;
@@ -130,8 +204,8 @@ export default function PartyDetailPage() {
     setErrorMessage(null);
 
     try {
-      await joinRoom(roomId, userId, {
-        rolePreference: rolePreference.toUpperCase(),
+      await joinRoom(roomId, {
+        rolePreference,
       });
       navigate(`/party/waiting?roomId=${roomId}`, { state: { roomId } });
     } catch (error) {
@@ -164,7 +238,7 @@ export default function PartyDetailPage() {
         <section className="flex flex-col py-3" aria-label="파티 설명">
           <InputLabel label="설명" className="mb-2" />
           <div className="px-1 text-xs font-medium text-white">
-            {roomDetail ? "설명이 없습니다." : "설명을 불러올 수 없습니다."}
+            {descriptionText}
           </div>
         </section>
         <section className="flex flex-col py-3" aria-label="파티 설명">
@@ -180,18 +254,21 @@ export default function PartyDetailPage() {
               roleType="police"
               state={getButtonState("police")}
               className="w-24"
+              disabled={isPoliceFull || isTotalFull}
               onClick={() => setSelectedRole("police")}
             />
             <RoleButton
               roleType="thief"
               className="w-24"
               state={getButtonState("thief")}
+              disabled={isThiefFull || isTotalFull}
               onClick={() => setSelectedRole("thief")}
             />
             <RoleButton
               roleType="random"
               className="w-24"
               state={getButtonState("random")}
+              disabled={isRandomDisabled}
               onClick={() => setSelectedRole("random")}
             />
           </div>

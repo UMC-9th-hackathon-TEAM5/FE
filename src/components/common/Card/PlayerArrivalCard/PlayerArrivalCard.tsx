@@ -18,6 +18,8 @@ interface PlayerArrivalCardProps {
   isHost?: boolean;
   isMe?: boolean;
   className?: string;
+  avatarClassName?: string;
+  canToggleArrival?: boolean;
   onToggleRole?: () => void;
   onToggleArrival?: () => void;
   canEditRole?: boolean;
@@ -45,6 +47,8 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
   isHost = false,
   isMe = false,
   className,
+  avatarClassName,
+  canToggleArrival = true,
   onToggleRole,
   onToggleArrival,
   canEditRole = false,
@@ -58,7 +62,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
       role="group"
       aria-label={`참여자 카드: ${name}, 역할 ${roleLabel}, ${isArrived ? "도착" : "미도착"}`}
     >
-      <PlayerAvatar role={role} />
+      <PlayerAvatar role={role} className={avatarClassName} />
       <div className="flex flex-1 flex-col">
         <PlayerNameBadge name={name} isHost={isHost} isMe={isMe} />
         <span className="text-main-variant text-xs font-medium select-none">
@@ -69,7 +73,7 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
         <button
           type="button"
           aria-label={`역할 전환 (현재: ${roleLabel})`}
-          className="absolute top-1/2 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
+          className="absolute top-3/5 left-3/5 -translate-x-1/2 -translate-y-1/2 p-2 text-sm"
           onClick={onToggleRole}
         >
           <ChangeRoleIcon className="text-white" />
@@ -78,6 +82,8 @@ export const PlayerArrivalCard: React.FC<PlayerArrivalCardProps> = ({
       <ArrivalStatusButton
         isArrived={isArrived}
         onClick={onToggleArrival}
+        disabled={!canToggleArrival}
+        aria-disabled={!canToggleArrival}
         aria-pressed={isArrived}
       />
     </article>

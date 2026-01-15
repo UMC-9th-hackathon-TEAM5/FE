@@ -1,9 +1,4 @@
-import {
-  getNearbyRoom,
-  getRoom,
-  postRoom,
-  type NearbyRoomItem,
-} from "@/apis/room";
+import { getNearbyRoom, getRoom, type NearbyRoomItem } from "@/apis/room";
 import { joinRoom } from "@/apis/roommember";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/common/Button";
@@ -85,11 +80,6 @@ type MapInstance = {
   setCenter: (pos: unknown) => void;
 };
 
-type Coordinates = {
-  lat: number;
-  lng: number;
-};
-
 type RoomDetail = {
   roomId: number;
   title: string;
@@ -98,10 +88,30 @@ type RoomDetail = {
   status: string;
   countdownSeconds: number;
   escapeTime?: number;
+  description?: string;
   capacity: {
     current: number;
     total: number;
   };
+};
+
+const parseLocalDateTime = (value: string) => {
+  const [datePart, timePart] = value.split("T");
+  if (!datePart || !timePart) return null;
+  const [year, month, day] = datePart.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const [hour, minute, second = "0"] = timePart.split(":");
+  const parsedHour = Number(hour);
+  const parsedMinute = Number(minute);
+  const parsedSecond = Number(second);
+  if (
+    Number.isNaN(parsedHour) ||
+    Number.isNaN(parsedMinute) ||
+    Number.isNaN(parsedSecond)
+  ) {
+    return null;
+  }
+  return new Date(year, month - 1, day, parsedHour, parsedMinute, parsedSecond);
 };
 
 declare global {
@@ -119,11 +129,9 @@ const HomePage = () => {
   const markersRef = useRef<unknown[]>([]);
   const [locationText, setLocationText] = useState("위치 불러오는 중...");
   const [rooms, setRooms] = useState<NearbyRoomItem[]>([]);
-  const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -142,8 +150,17 @@ const HomePage = () => {
 
     const fetchRooms = async () => {
       try {
-        const response = await getNearbyRoom(userId);
-        setRooms(response.data.rooms);
+        const response = await getNearbyRoom();
+        const now = new Date();
+        const visibleStatuses = new Set(["WAITING", "STARTING", "PLAYING"]);
+        const filteredRooms = response.data.rooms.filter((room) => {
+          if (!visibleStatuses.has(room.status)) return false;
+          if (room.status === "PLAYING") return true;
+          const meetingDate = parseLocalDateTime(room.meetingTime);
+          if (!meetingDate) return true;
+          return meetingDate.getTime() >= now.getTime();
+        });
+        setRooms(filteredRooms);
       } catch (error) {
         console.error("근처 방 조회 실패:", error);
         setRooms([]);
@@ -152,15 +169,6 @@ const HomePage = () => {
 
     fetchRooms();
   }, [navigate]);
-
-  const formatLocalDateTime = (date: Date) => {
-    const pad = (value: number) => String(value).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-      date.getDate(),
-    )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-      date.getSeconds(),
-    )}`;
-  };
 
   const handleSelectRoom = useCallback(async (roomId: number) => {
     setActionError(null);
@@ -197,8 +205,8 @@ const HomePage = () => {
     setActionError(null);
 
     try {
-      await joinRoom(selectedRoom.roomId, userId, {
-        rolePreference: "ANY",
+      await joinRoom(selectedRoom.roomId, {
+        rolePreference: "RANDOM",
       });
       navigate(`/party/waiting?roomId=${selectedRoom.roomId}`, {
         state: { roomId: selectedRoom.roomId },
@@ -211,44 +219,6 @@ const HomePage = () => {
       setActionError(message);
     } finally {
       setIsJoining(false);
-    }
-  };
-
-  const handleQuickCreate = async () => {
-    if (!currentCoords) {
-      setActionError("현재 위치 정보를 불러오지 못했습니다.");
-      return;
-    }
-    setIsCreating(true);
-    setActionError(null);
-
-    try {
-      const now = new Date();
-      const meetingDate = new Date(now.getTime() + 30 * 60 * 1000);
-      const response = await postRoom({
-        title: "빠른 경도팟",
-        placeName: locationText || "현재 위치",
-        lat: currentCoords.lat,
-        lng: currentCoords.lng,
-        meetingTime: formatLocalDateTime(meetingDate),
-        police_capacity: 2,
-        thief_capacity: 2,
-        countdownSeconds: 10,
-        escapeTime: 30,
-      });
-      localStorage.setItem("roomId", String(response.data.roomId));
-      localStorage.setItem("hostId", String(response.data.hostId));
-      navigate(`/party/waiting?roomId=${response.data.roomId}`, {
-        state: { roomId: response.data.roomId, hostId: response.data.hostId },
-      });
-    } catch (error) {
-      let message = "팟 생성에 실패했습니다.";
-      if (axios.isAxiosError(error)) {
-        message = error.response?.data?.message ?? message;
-      }
-      setActionError(message);
-    } finally {
-      setIsCreating(false);
     }
   };
 
@@ -281,7 +251,6 @@ const HomePage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           const currentPosition = new maps.LatLng(latitude, longitude);
-          setCurrentCoords({ lat: latitude, lng: longitude });
 
           mapInstance.setCenter(currentPosition);
 
@@ -456,16 +425,17 @@ const HomePage = () => {
         >
           + 새로운 경도팟 만들기
         </Button>
-        <Button
-          state="default"
-          width="xl"
-          onClick={handleQuickCreate}
-          disabled={isCreating}
-        >
-          {isCreating ? "생성 중..." : "빠른 경도팟 만들기"}
-        </Button>
         {actionError && <p className="text-xs text-red-400">* {actionError}</p>}
       </div>
+
+      <button
+        type="button"
+        aria-label="새로운 경도팟 만들기"
+        className="absolute right-5 bottom-24 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-main text-2xl font-bold text-black shadow-[2px_2px_0_0_#008E58]"
+        onClick={() => navigate("/party/create")}
+      >
+        +
+      </button>
     </div>
   );
 };

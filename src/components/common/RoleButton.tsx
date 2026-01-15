@@ -7,7 +7,7 @@ const buttonStyles = cva(
     // 기본 모양
     "w-18 h-9.5 py-3 gap-2",
     "flex flex-col items-center justify-center",
-    "rounded-lg cursor-pointer",
+    "rounded-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
     "text-white",
   ),
   {

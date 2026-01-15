@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const isMockEnabled = import.meta.env.VITE_MOCK_API === "true";
+
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_API_URL,
+  baseURL: isMockEnabled ? "/api" : import.meta.env.VITE_SERVER_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

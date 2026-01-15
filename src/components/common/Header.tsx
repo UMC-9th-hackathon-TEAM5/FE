@@ -17,16 +17,16 @@ type HeaderStyleProps = VariantProps<typeof headerStyles>;
 type HeaderProps = {
   title?: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 } & HeaderStyleProps;
 
-const Header = ({ title, className }: HeaderProps) => {
-
+const Header = ({ title, onClick, className }: HeaderProps) => {
   const navigate = useNavigate();
   return (
     <header className={clsx(headerStyles(), "justify-between", className)}>
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={onClick ? onClick : () => navigate(-1)}
         className="flex shrink-0 items-center justify-start gap-2"
       >
         <HeaderArrowIcon />

@@ -12,10 +12,11 @@ export default function CreatePartyPage() {
   const [title, setTitle] = useState("");
   const [dateTime, setDateTime] = useState("");
   const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
   const [policeCount, setPoliceCount] = useState("");
   const [thiefCount, setThiefCount] = useState("");
-  const [countdownSecondsInput, setCountdownSecondsInput] = useState("60");
-  const [escapeMinutes, setEscapeMinutes] = useState("30");
+  const [gameMinutes, setGameMinutes] = useState("30");
+  const [escapeSeconds, setEscapeSeconds] = useState("60");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -76,23 +77,25 @@ export default function CreatePartyPage() {
       dateTime.trim().length > 0 &&
       isFutureDateTime(dateTime) &&
       location.trim().length > 0 &&
+      description.trim().length > 0 &&
       policeCount.trim().length > 0 &&
       Number(policeCount) >= 0 &&
       thiefCount.trim().length > 0 &&
       Number(thiefCount) >= 0 &&
       !isPeopleInvalid &&
-      Number(countdownSecondsInput) > 0 &&
-      Number(escapeMinutes) > 0
+      Number(gameMinutes) > 0 &&
+      Number(escapeSeconds) > 0
     );
   }, [
     title,
     dateTime,
     location,
+    description,
     policeCount,
     thiefCount,
     isPeopleInvalid,
-    countdownSecondsInput,
-    escapeMinutes,
+    gameMinutes,
+    escapeSeconds,
   ]);
 
   const handleCreate = async () => {
@@ -106,14 +109,15 @@ export default function CreatePartyPage() {
     try {
       const response = await postRoom({
         title: title.trim(),
+        description: description.trim(),
         placeName: location.trim(),
         lat,
         lng,
         meetingTime: normalizeMeetingTime(dateTime),
         police_capacity: Number(policeCount),
         thief_capacity: Number(thiefCount),
-        countdownSeconds: Number(countdownSecondsInput),
-        escapeTime: Number(escapeMinutes),
+        countdownSeconds: Number(escapeSeconds),
+        escapeTime: Number(gameMinutes) * 60,
       });
 
       navigate(`/party/waiting?roomId=${response.data.roomId}`, {
@@ -172,6 +176,16 @@ export default function CreatePartyPage() {
           />
         </section>
 
+        <section className="mt-2 flex flex-col pt-3" role="파티 설명 정하기">
+          <InputLabel label="설명" className="mb-2" isRequired={true} />
+          <Input
+            placeholder="경도팟에 대한 설명을 적어주세요"
+            required
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </section>
+
         <section className="mt-2 flex flex-col py-3">
           <InputLabel label="모집 인원" className="mb-2" isRequired={true} />
           <div className="flex justify-center gap-2">
@@ -219,29 +233,24 @@ export default function CreatePartyPage() {
         <section className="mt-3 flex flex-col pt-3" role="게임 시간 정하기">
           <InputLabel label="시간 설정" className="mb-2" />
 
-          <InputLabel label="카운트다운 (초)" className="mb-1" />
+          <InputLabel label="게임 진행 시간 (분)" className="mb-1" />
           <Input
             type="number"
             className="mb-4"
             min={1}
-            value={countdownSecondsInput}
-            onChange={(e) => setCountdownSecondsInput(e.target.value)}
+            value={gameMinutes}
+            onChange={(e) => setGameMinutes(e.target.value)}
           />
-          <InputLabel label="도망 갈 시간 (분)" className="mb-1" />
+          <InputLabel label="도망갈 시간 (초)" className="mb-1" />
           <Input
             type="number"
             min={1}
-            value={escapeMinutes}
-            onChange={(e) => setEscapeMinutes(e.target.value)}
+            value={escapeSeconds}
+            onChange={(e) => setEscapeSeconds(e.target.value)}
           />
           <span className="text-main-variant mt-1 text-xs">
-            게임 시작 직후 도둑들이 숨을 시간입니다
+            게임 시작 직후 도둑들이 숨을 시간입니다.
           </span>
-        </section>
-
-        <section className="mt-2 flex flex-col pt-3" role="게임 시간 정하기">
-          <InputLabel label="설명" className="mb-2" />
-          <Input placeholder="경도팟에 대한 설명을 적어주세요" />
         </section>
 
         <Button

@@ -3,7 +3,15 @@ import { twMerge } from "tailwind-merge";
 
 type Role = "police" | "thief";
 
-export const PlayerAvatar: React.FC<{ role: Role }> = ({ role }) => {
+type PlayerAvatarProps = {
+  role: Role;
+  className?: string;
+};
+
+export const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
+  role,
+  className,
+}) => {
   const roleColors = {
     police: "bg-[#3B82F6]",
     thief: "bg-[#1E293B]",
@@ -17,6 +25,7 @@ export const PlayerAvatar: React.FC<{ role: Role }> = ({ role }) => {
       className={twMerge(
         "flex h-12 w-12 items-center justify-center rounded-full text-xl text-white select-none",
         roleColors[role],
+        className,
       )}
       role="img"
       aria-label={role === "police" ? "Police avatar" : "Thief avatar"}
