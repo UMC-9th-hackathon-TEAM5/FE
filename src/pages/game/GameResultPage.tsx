@@ -1,6 +1,7 @@
 import { getRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { toBlob } from "html-to-image";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import PartyInfoCard, {
@@ -52,6 +53,7 @@ export default function GameResultPage() {
     ParticipantResult[] | null
   >(null);
   const [isCardBusy, setIsCardBusy] = useState(false);
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
   const roomId = useMemo(() => {
     if (state?.roomId) return state.roomId;
@@ -278,15 +280,42 @@ export default function GameResultPage() {
     });
   }, [descriptionText, partyInfo, titleText, winningTeam]);
 
+  const buildResultCaptureBlob = useCallback(async () => {
+    if (!resultRef.current) return null;
+    const pixelRatio =
+      typeof window !== "undefined" ? window.devicePixelRatio : 1;
+    const filter = (node: HTMLElement) =>
+      !(node instanceof HTMLElement) ||
+      !node.closest('[data-share-ignore="true"]');
+    try {
+      return await toBlob(resultRef.current, {
+        cacheBust: true,
+        pixelRatio: Math.min(2, pixelRatio || 1),
+        backgroundColor: "#111111",
+        filter,
+      });
+    } catch (error) {
+      console.error("결과 화면 캡처 실패:", error);
+      return null;
+    }
+  }, []);
+
   const handleShareCard = useCallback(async () => {
     if (isCardBusy) return;
     setIsCardBusy(true);
     try {
-      const blob = await buildResultCardBlob();
+      const captureTimeout = new Promise<null>((resolve) => {
+        window.setTimeout(() => resolve(null), 2000);
+      });
+      const captureBlob = await Promise.race([
+        buildResultCaptureBlob(),
+        captureTimeout,
+      ]);
+      const blob = captureBlob ?? (await buildResultCardBlob());
       if (!blob) return;
 
-      const file = new File([blob], "game-result-card.png", {
-        type: "image/png",
+      const file = new File([blob], "game-result.png", {
+        type: blob.type || "image/png",
       });
 
       const shareTitle = roomDetail?.title ?? "경도팟 모임";
@@ -327,32 +356,42 @@ export default function GameResultPage() {
     } finally {
       setIsCardBusy(false);
     }
-  }, [buildResultCardBlob, downloadBlob, isCardBusy, roomDetail, titleText]);
+  }, [
+    buildResultCaptureBlob,
+    buildResultCardBlob,
+    downloadBlob,
+    isCardBusy,
+    roomDetail,
+    titleText,
+  ]);
   return (
     <>
-      <main className="relative flex h-full w-full flex-col items-center overflow-y-auto px-7">
-        <section className="flex w-full flex-col items-center justify-center py-5">
-          <ThrophyIcon className="" />
-          <span className="text-main text-[40px] font-bold">{titleText}</span>
-          <span className="text-base font-medium text-white">
-            {descriptionText}
-          </span>
-        </section>
-        <section className="flex w-full flex-col items-center justify-center px-3 py-5">
-          <InputLabel
-            label={roomDetail?.title ?? "팟 결과"}
-            className="mb-2 text-[20px]"
-          />
-          <PartyInfoCard info={partyInfo} />
-        </section>
-        <section className="flex w-full flex-col items-center justify-center py-5">
-          <InputLabel label="참여자 기록" className="mb-2 text-[20px]" />
-          <ul className="flex w-full flex-col items-center justify-center gap-3">
-            {sortedResults.map((player) => (
-              <PlayerResultCard key={player.id} {...player} />
-            ))}
-          </ul>
-        </section>
+      <main className="relative flex min-h-full w-full flex-col items-center px-7">
+        <div ref={resultRef} className="flex w-full flex-col">
+          <section className="flex w-full flex-col items-center justify-center py-5">
+            <ThrophyIcon className="" />
+            <span
+              className="text-main text-[40px] font-bold"
+              data-share-ignore="true"
+            >
+              {titleText}
+            </span>
+            <span className="text-base font-medium text-white">
+              {descriptionText}
+            </span>
+          </section>
+          <section className="flex w-full flex-col items-center justify-center px-3 py-5">
+            <PartyInfoCard info={partyInfo} />
+          </section>
+          <section className="flex w-full flex-col items-center justify-center py-5">
+            <InputLabel label="참여자 기록" className="mb-2 text-[20px]" />
+            <ul className="flex w-full flex-col items-center justify-center gap-3">
+              {sortedResults.map((player) => (
+                <PlayerResultCard key={player.id} {...player} />
+              ))}
+            </ul>
+          </section>
+        </div>
         <section className="flex w-full flex-col items-center justify-center gap-4 pt-3 pb-10">
           <InputLabel label="공유" className="ml-7 text-[20px]" />
 

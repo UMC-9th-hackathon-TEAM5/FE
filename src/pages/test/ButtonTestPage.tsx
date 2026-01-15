@@ -5,7 +5,7 @@ import ShareIcon from "../../assets/share/share.svg?react";
 
 export default function ButtonTestPage() {
   return (
-    <div className="h-full w-full overflow-y-auto bg-[#111] p-4 text-white">
+    <div className="min-h-full w-full overflow-y-auto bg-[#111] p-4 text-white">
       {/* 타이틀 영역 */}
       <div className="mb-8 text-center">
         <h1 className="text-main-dark1 text-xl font-bold">Button System</h1>

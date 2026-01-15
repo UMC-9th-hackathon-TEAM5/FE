@@ -13,7 +13,7 @@ const ModalTestPage = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-8 bg-gray-100 p-4">
+    <div className="flex min-h-full w-full flex-col items-center justify-center gap-8 bg-gray-100 p-4">
       <h1 className="text-3xl font-bold text-gray-900">컴포넌트 분리 테스트</h1>
 
       <div className="flex gap-4">

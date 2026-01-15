@@ -223,7 +223,7 @@ export default function PartyDetailPage() {
   return (
     <>
       <Header title="팟 상세" />
-      <main className="relative h-full w-full px-10">
+      <main className="relative min-h-full w-full px-10 pb-28">
         <section className="flex flex-col py-5" aria-label="파티 상세 정보">
           <div className="mb-3 flex w-full flex-col">
             <div className="text-main text-[20px] font-bold">

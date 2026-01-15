@@ -134,7 +134,7 @@ const GameStartPage = () => {
 
   if (gameStatus === "ready") {
     return (
-      <div className="animate-fade-in flex h-full w-full flex-col items-center justify-center bg-black">
+      <div className="animate-fade-in flex min-h-full w-full flex-col items-center justify-center bg-black">
         <span className="text-main text-[100px] leading-[140%] font-bold tracking-[-2.5px]">
           {count}
         </span>
@@ -148,7 +148,7 @@ const GameStartPage = () => {
   if (gameStatus === "action") {
     if (!role) {
       return (
-        <div className="animate-fade-in flex h-full w-full flex-col items-center justify-center bg-black text-white">
+        <div className="animate-fade-in flex min-h-full w-full flex-col items-center justify-center bg-black text-white">
           역할 정보를 불러오는 중입니다...
         </div>
       );
@@ -173,7 +173,7 @@ const GameStartPage = () => {
     );
 
     return (
-      <div className="animate-pulse-once flex h-full w-full flex-col items-center justify-center bg-black">
+      <div className="animate-pulse-once flex min-h-full w-full flex-col items-center justify-center bg-black">
         <div className="mb-6.5 flex flex-col items-center gap-3">
           <h1
             className={`${mainColor} text-[60px] leading-[140%] font-bold tracking-[-1.5px]`}
@@ -203,7 +203,7 @@ const GameStartPage = () => {
   }
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
+    <div className="relative flex min-h-full w-full flex-col items-center justify-center">
       <div className="text-main text-[24px] font-bold">시작 전 체크리스트</div>
 
       <div className="flex w-full flex-col gap-2.75 p-5 text-[14px] font-normal tracking-[-0.35px] text-white">

@@ -312,7 +312,7 @@ export default function GamePlayPage() {
         </div>
       </section>
 
-      <main className="relative flex h-full w-full flex-col items-center px-7">
+      <main className="relative flex min-h-full w-full flex-col items-center px-7 pb-32">
         {/* 도둑 섹션 */}
         <section className="py-5">
           <InputLabel

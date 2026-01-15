@@ -98,7 +98,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center px-6">
+    <div className="relative flex min-h-full w-full flex-col items-center justify-center px-6">
       <div className="flex w-full flex-col items-center gap-8">
         <h1 className="text-main text-[28px] leading-[140%] font-bold tracking-[-0.7px] whitespace-nowrap">
           경도팟

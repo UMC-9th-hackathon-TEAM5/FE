@@ -364,7 +364,7 @@ const HomePage = () => {
   }, [rooms, navigate, handleSelectRoom]);
 
   return (
-    <div className="relative flex h-full w-full flex-col bg-[#111111]">
+    <div className="relative flex min-h-full w-full flex-col bg-[#111111]">
       <header className="z-10 flex w-full shrink-0 items-center justify-start border-b border-white/10 bg-[#111] p-5">
         <div className="flex gap-2.5">
           <div className="border-main bg-main-dark2 flex h-15 w-15 items-center justify-center border-4 border-solid p-2.5">

@@ -328,7 +328,7 @@ export default function WaitingPartyPage() {
   return (
     <>
       <Header title="대기방" onClick={() => navigate("/home")} />
-      <main className="relative h-full w-full px-9" role="main">
+      <main className="relative min-h-full w-full px-9 pb-32" role="main">
         <section
           className="flex flex-col py-5"
           role="region"
