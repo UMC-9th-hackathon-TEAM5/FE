@@ -114,9 +114,16 @@ const parseLocalDateTime = (value: string) => {
   return new Date(year, month - 1, day, parsedHour, parsedMinute, parsedSecond);
 };
 
-const parseServerTimestamp = (value: string) => {
+const parseServerDateTime = (value: string) => {
   if (!value) return null;
   const normalized = value.trim().replace(/(\.\d{3})\d+/, "$1");
+  if (/^\d+$/.test(normalized)) {
+    const numeric = Number(normalized);
+    if (!Number.isFinite(numeric)) return null;
+    const ms = normalized.length <= 10 ? numeric * 1000 : numeric;
+    const parsed = new Date(ms);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
   const hasTimeZone = /[zZ]|[+-]\d{2}:\d{2}$/.test(normalized);
   if (hasTimeZone) {
     const parsed = new Date(normalized);
@@ -169,11 +176,11 @@ const HomePage = () => {
     const fetchRooms = async (): Promise<boolean> => {
       try {
         const response = await getNearbyRoom();
-        const now = parseServerTimestamp(response.timestamp) ?? new Date();
+        const now = parseServerDateTime(response.timestamp) ?? new Date();
         const visibleStatuses = new Set(["WAITING", "STARTING", "PLAYING"]);
         const filteredRooms = response.data.rooms.filter((room) => {
           if (!visibleStatuses.has(room.status)) return false;
-          const meetingDate = parseLocalDateTime(room.meetingTime);
+          const meetingDate = parseServerDateTime(room.meetingTime);
           if (meetingDate && meetingDate.getTime() < now.getTime())
             return false;
           return true;
