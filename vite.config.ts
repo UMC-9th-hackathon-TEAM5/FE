@@ -18,18 +18,18 @@ export default defineConfig({
       manifest: {
         name: "경도팟",
         short_name: "경도팟",
-        start_url: "/",
+        start_url: "/?source=pwa",
         display: "standalone",
         background_color: "#00FD9E",
         theme_color: "#00FD9E",
         icons: [
           {
-            src: "/icons/logo-192.png",
+            src: "/icons/icon-192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/icons/logo-512.png",
+            src: "/icons/icon-512.png",
             sizes: "512x512",
             type: "image/png",
           },
@@ -52,12 +52,11 @@ export default defineConfig({
               networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60, // 1시간
+                maxAgeSeconds: 60 * 60,
               },
             },
           },
 
-          // 2. 이미지 (Cache First)
           {
             urlPattern: ({ request }) => request.destination === "image",
             handler: "CacheFirst",
@@ -65,7 +64,7 @@ export default defineConfig({
               cacheName: "image-cache",
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30일
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },
           },
