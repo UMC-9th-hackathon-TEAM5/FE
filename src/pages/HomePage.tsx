@@ -114,6 +114,17 @@ const parseLocalDateTime = (value: string) => {
   return new Date(year, month - 1, day, parsedHour, parsedMinute, parsedSecond);
 };
 
+const parseServerTimestamp = (value: string) => {
+  if (!value) return null;
+  const normalized = value.trim().replace(/(\.\d{3})\d+/, "$1");
+  const hasTimeZone = /[zZ]|[+-]\d{2}:\d{2}$/.test(normalized);
+  if (hasTimeZone) {
+    const parsed = new Date(normalized);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return parseLocalDateTime(normalized);
+};
+
 declare global {
   interface Window {
     naver: {
@@ -158,12 +169,13 @@ const HomePage = () => {
     const fetchRooms = async (): Promise<boolean> => {
       try {
         const response = await getNearbyRoom();
-        const now = new Date();
+        const now = parseServerTimestamp(response.timestamp) ?? new Date();
         const visibleStatuses = new Set(["WAITING", "STARTING", "PLAYING"]);
         const filteredRooms = response.data.rooms.filter((room) => {
           if (!visibleStatuses.has(room.status)) return false;
           const meetingDate = parseLocalDateTime(room.meetingTime);
-          if (meetingDate && meetingDate.getTime() < now.getTime()) return false;
+          if (meetingDate && meetingDate.getTime() < now.getTime())
+            return false;
           return true;
         });
         if (isMounted) setRooms(filteredRooms);
@@ -191,9 +203,7 @@ const HomePage = () => {
         isFetching = false;
         return;
       }
-      currentPollMs = ok
-        ? basePollMs
-        : Math.min(currentPollMs * 2, maxPollMs);
+      currentPollMs = ok ? basePollMs : Math.min(currentPollMs * 2, maxPollMs);
       isFetching = false;
       scheduleNextPoll();
     };
