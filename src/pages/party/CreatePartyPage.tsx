@@ -69,7 +69,11 @@ export default function CreatePartyPage() {
   const isPeopleEmpty = policeCount === "" && thiefCount === "";
   const isPeopleInvalid =
     !isPeopleEmpty &&
-    (totalPeople <= 0 || police > thief * 2 || totalPeople > 20);
+    (totalPeople <= 0 ||
+      police > thief * 2 ||
+      totalPeople > 20 ||
+      police > 10 ||
+      thief > 10);
 
   const isFormValid = useMemo(() => {
     return (
@@ -196,6 +200,7 @@ export default function CreatePartyPage() {
                 width="sm"
                 type="number"
                 min={0}
+                max={10}
                 value={policeCount}
                 onChange={(e) => setPoliceCount(e.target.value)}
               />
@@ -208,6 +213,7 @@ export default function CreatePartyPage() {
                 width="sm"
                 type="number"
                 min={0}
+                max={10}
                 value={thiefCount}
                 onChange={(e) => setThiefCount(e.target.value)}
               />
@@ -226,6 +232,16 @@ export default function CreatePartyPage() {
           {police > thief * 2 && (
             <span className="mt-1 ml-2 text-xs text-red-400">
               경찰 인원이 너무 많습니다.
+            </span>
+          )}
+          {police > 10 && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              경찰 인원은 최대 10명까지 가능합니다.
+            </span>
+          )}
+          {thief > 10 && (
+            <span className="mt-1 ml-2 text-xs text-red-400">
+              도둑 인원은 최대 10명까지 가능합니다.
             </span>
           )}
         </section>
