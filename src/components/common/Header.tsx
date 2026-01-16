@@ -23,9 +23,7 @@ type HeaderProps = {
 const Header = ({ title, onClick, className }: HeaderProps) => {
   const navigate = useNavigate();
   return (
-    <header
-      className={clsx(headerStyles(), "mt-20 justify-between", className)}
-    >
+    <header className={clsx(headerStyles(), "justify-between", className)}>
       <button
         type="button"
         onClick={onClick ? onClick : () => navigate(-1)}
