@@ -140,7 +140,7 @@ export default function CreatePartyPage() {
   return (
     <>
       <Header title="팟 만들기" />
-      <main className="min-h-full w-full px-10">
+      <main className="mb-14 min-h-full w-full px-10">
         <section className="flex flex-col py-3" role="파티 제목 입력">
           <InputLabel label="팟 제목" isRequired={true} />
           <Input
