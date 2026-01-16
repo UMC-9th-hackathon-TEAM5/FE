@@ -149,40 +149,72 @@ const HomePage = () => {
     }
 
     let isMounted = true;
-    let intervalId: number | null = null;
-    const fetchRooms = async () => {
+    let isPollingActive = false;
+    let isFetching = false;
+    let pollTimeoutId: number | null = null;
+    const basePollMs = 10000;
+    const maxPollMs = 60000;
+    let currentPollMs = basePollMs;
+    const fetchRooms = async (): Promise<boolean> => {
       try {
         const response = await getNearbyRoom();
         const now = new Date();
         const visibleStatuses = new Set(["WAITING", "STARTING", "PLAYING"]);
         const filteredRooms = response.data.rooms.filter((room) => {
           if (!visibleStatuses.has(room.status)) return false;
-          if (room.status === "PLAYING") return true;
           const meetingDate = parseLocalDateTime(room.meetingTime);
-          if (!meetingDate) return true;
-          return meetingDate.getTime() >= now.getTime();
+          if (meetingDate && meetingDate.getTime() < now.getTime()) return false;
+          return true;
         });
         if (isMounted) setRooms(filteredRooms);
+        return true;
       } catch (error) {
         console.error("근처 방 조회 실패:", error);
         if (isMounted) setRooms([]);
+        return false;
       }
     };
 
+    const scheduleNextPoll = () => {
+      if (!isPollingActive || pollTimeoutId !== null) return;
+      pollTimeoutId = window.setTimeout(() => {
+        pollTimeoutId = null;
+        void pollRooms();
+      }, currentPollMs);
+    };
+
+    const pollRooms = async () => {
+      if (!isPollingActive || isFetching) return;
+      isFetching = true;
+      const ok = await fetchRooms();
+      if (!isPollingActive) {
+        isFetching = false;
+        return;
+      }
+      currentPollMs = ok
+        ? basePollMs
+        : Math.min(currentPollMs * 2, maxPollMs);
+      isFetching = false;
+      scheduleNextPoll();
+    };
+
     const startPolling = () => {
-      if (intervalId !== null) return;
-      intervalId = window.setInterval(fetchRooms, 10000);
+      if (isPollingActive) return;
+      isPollingActive = true;
+      void pollRooms();
     };
 
     const stopPolling = () => {
-      if (intervalId === null) return;
-      window.clearInterval(intervalId);
-      intervalId = null;
+      isPollingActive = false;
+      currentPollMs = basePollMs;
+      if (pollTimeoutId !== null) {
+        window.clearTimeout(pollTimeoutId);
+        pollTimeoutId = null;
+      }
     };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        fetchRooms();
         startPolling();
       } else {
         stopPolling();
