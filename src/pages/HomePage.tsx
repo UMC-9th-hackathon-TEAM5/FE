@@ -148,6 +148,8 @@ const HomePage = () => {
       return;
     }
 
+    let isMounted = true;
+    let intervalId: number | null = null;
     const fetchRooms = async () => {
       try {
         const response = await getNearbyRoom();
@@ -160,14 +162,40 @@ const HomePage = () => {
           if (!meetingDate) return true;
           return meetingDate.getTime() >= now.getTime();
         });
-        setRooms(filteredRooms);
+        if (isMounted) setRooms(filteredRooms);
       } catch (error) {
         console.error("근처 방 조회 실패:", error);
-        setRooms([]);
+        if (isMounted) setRooms([]);
       }
     };
 
-    fetchRooms();
+    const startPolling = () => {
+      if (intervalId !== null) return;
+      intervalId = window.setInterval(fetchRooms, 10000);
+    };
+
+    const stopPolling = () => {
+      if (intervalId === null) return;
+      window.clearInterval(intervalId);
+      intervalId = null;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchRooms();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    };
+
+    handleVisibilityChange();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      isMounted = false;
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [navigate]);
 
   const handleSelectRoom = useCallback(async (roomId: number) => {
