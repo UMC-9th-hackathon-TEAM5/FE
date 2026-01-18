@@ -427,6 +427,40 @@ export const handlers = [
     });
   }),
 
+  http.delete("/api/v1/rooms/:roomId/leave", ({ params, request }) => {
+    const roomId = Number(params.roomId);
+    const room = getRoomById(roomId);
+
+    if (!room) {
+      return jsonResponse(request, null, 404);
+    }
+
+    const participants = getParticipants(roomId);
+    const currentUser = ensureCurrentUser();
+    const targetIndex = participants.findIndex(
+      (participant) => participant.userId === currentUser.userId,
+    );
+
+    if (targetIndex < 0) {
+      return jsonResponse(request, null, 400);
+    }
+
+    participants.splice(targetIndex, 1);
+
+    if (participants.length === 0) {
+      mockState.rooms = mockState.rooms.filter(
+        (existingRoom) => existingRoom.roomId !== roomId,
+      );
+      delete mockState.participantsByRoomId[roomId];
+    }
+
+    return jsonResponse(request, {
+      roomId,
+      userId: currentUser.userId,
+      message: "left",
+    });
+  }),
+
   http.get("/api/v1/rooms/:roomId/participants", ({ params, request }) => {
     const roomId = Number(params.roomId);
     const room = roomId === 65 ? ensureWaitingRoom65() : getRoomById(roomId);

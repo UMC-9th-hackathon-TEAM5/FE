@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import CustomMarker from "@/components/map/CustomMarker";
 import axios from "axios";
+import { isAlreadyJoinedRoomError } from "@/utils/apiError";
 
 type GeocodeStatus = "OK" | string;
 
@@ -285,10 +286,18 @@ const HomePage = () => {
       await joinRoom(selectedRoom.roomId, {
         rolePreference: "RANDOM",
       });
+      localStorage.setItem("roomId", String(selectedRoom.roomId));
       navigate(`/party/waiting?roomId=${selectedRoom.roomId}`, {
         state: { roomId: selectedRoom.roomId },
       });
     } catch (error) {
+      if (isAlreadyJoinedRoomError(error)) {
+        localStorage.setItem("roomId", String(selectedRoom.roomId));
+        navigate(`/party/waiting?roomId=${selectedRoom.roomId}`, {
+          state: { roomId: selectedRoom.roomId },
+        });
+        return;
+      }
       let message = "참여 신청에 실패했습니다.";
       if (axios.isAxiosError(error)) {
         message = error.response?.data?.message ?? message;

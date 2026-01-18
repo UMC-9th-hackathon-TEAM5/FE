@@ -74,6 +74,87 @@ type GameStatusResponseDto = {
   participants: GameParticipant[];
 };
 
+type RoomMeta = {
+  description?: string;
+  escapeTime?: number;
+};
+
+const canUseStorage = () =>
+  typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+
+const roomMetaKey = (roomId: number) => `roomMeta:${roomId}`;
+
+const readRoomMeta = (roomId: number): RoomMeta | null => {
+  if (!canUseStorage()) return null;
+  const raw = window.localStorage.getItem(roomMetaKey(roomId));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as RoomMeta;
+  } catch {
+    return null;
+  }
+};
+
+const writeRoomMeta = (roomId: number, meta: RoomMeta) => {
+  if (!canUseStorage()) return;
+  const next: RoomMeta = {};
+
+  if (typeof meta.escapeTime === "number" && Number.isFinite(meta.escapeTime)) {
+    next.escapeTime = meta.escapeTime;
+  }
+  if (typeof meta.description === "string" && meta.description.trim().length) {
+    next.description = meta.description;
+  }
+  if (!Object.keys(next).length) return;
+
+  const existing = readRoomMeta(roomId) ?? {};
+  const merged = { ...existing, ...next };
+  window.localStorage.setItem(roomMetaKey(roomId), JSON.stringify(merged));
+};
+
+const readNumber = (value: unknown) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const readString = (value: unknown) => {
+  if (typeof value !== "string") return null;
+  return value.trim().length > 0 ? value : null;
+};
+
+const normalizeRoomDetail = (
+  room: RoomDetailResponseDto & Record<string, unknown>,
+): RoomDetailResponseDto => {
+  const stored = readRoomMeta(room.roomId);
+
+  const escapeTime =
+    readNumber(room.escapeTime) ??
+    readNumber(room.escape_time) ??
+    readNumber(room.escapeSeconds) ??
+    readNumber(room.escape_seconds) ??
+    stored?.escapeTime;
+
+  const description =
+    readString(room.description) ??
+    readString(room.desc) ??
+    readString(room.roomDescription) ??
+    readString(room.room_description) ??
+    stored?.description;
+
+  const normalized = {
+    ...room,
+    escapeTime,
+    description,
+  };
+
+  writeRoomMeta(room.roomId, { escapeTime, description });
+  return normalized;
+};
+
 // 방 생성
 export const postRoom = async (
   body: CreateRoomRequestDto,
@@ -82,6 +163,10 @@ export const postRoom = async (
     "/api/v1/rooms",
     body,
   );
+  writeRoomMeta(data.data.roomId, {
+    description: body.description,
+    escapeTime: body.escapeTime,
+  });
   return data;
 };
 
@@ -92,7 +177,12 @@ export const getRoom = async (
   const { data } = await axiosInstance.get<ApiResponse<RoomDetailResponseDto>>(
     `/api/v1/rooms/${roomId}`,
   );
-  return data;
+  return {
+    ...data,
+    data: normalizeRoomDetail(
+      data.data as RoomDetailResponseDto & Record<string, unknown>,
+    ),
+  };
 };
 
 // 근처 방 조회

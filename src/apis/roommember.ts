@@ -120,3 +120,18 @@ export const getParticipants = async (
   );
   return data;
 };
+
+export type LeaveRoomResponseDto = {
+  roomId: number;
+  userId: number;
+  message: string;
+};
+
+export const leaveRoom = async (
+  roomId: number,
+): Promise<ApiResponse<LeaveRoomResponseDto>> => {
+  const { data } = await axiosInstance.delete<
+    ApiResponse<LeaveRoomResponseDto>
+  >(`/api/v1/rooms/${roomId}/leave`);
+  return data;
+};

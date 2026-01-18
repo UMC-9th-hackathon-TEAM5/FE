@@ -12,6 +12,7 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/common/Button";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { isAlreadyJoinedRoomError } from "@/utils/apiError";
 
 type RoleType = "police" | "thief" | "random" | null;
 
@@ -210,6 +211,10 @@ export default function PartyDetailPage() {
       });
       navigate(`/party/waiting?roomId=${roomId}`, { state: { roomId } });
     } catch (error) {
+      if (isAlreadyJoinedRoomError(error)) {
+        navigate(`/party/waiting?roomId=${roomId}`, { state: { roomId } });
+        return;
+      }
       let message = "참여 신청에 실패했습니다.";
       if (axios.isAxiosError(error)) {
         message = error.response?.data?.message ?? message;
