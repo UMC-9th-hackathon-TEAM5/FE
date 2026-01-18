@@ -114,6 +114,26 @@ export default function WaitingPartyPage() {
   });
 
   const isHost = userId !== null && hostId !== null && userId === hostId;
+  const handleRoomStatus = useCallback(
+    (status: string) => {
+      if (!roomId) return false;
+      const normalized = status?.toUpperCase?.() ?? "";
+      if (normalized === "STARTING") {
+        navigate(`/game/start?roomId=${roomId}`, { replace: true });
+        return true;
+      }
+      if (normalized === "PLAYING") {
+        navigate(`/game/playing?roomId=${roomId}`, { replace: true });
+        return true;
+      }
+      if (normalized === "FINISHED") {
+        navigate(`/game/result?roomId=${roomId}`, { replace: true });
+        return true;
+      }
+      return false;
+    },
+    [navigate, roomId],
+  );
 
   useEffect(() => {
     if (import.meta.env.VITE_MOCK_API !== "true") return;
@@ -178,6 +198,7 @@ export default function WaitingPartyPage() {
       try {
         const roomRes = await getRoom(roomId);
         const roomData = roomRes.data;
+        if (handleRoomStatus(roomData.status)) return;
         setRoomDetail(roomData);
         setPlayers(mapParticipants(roomData.participants));
 
@@ -196,20 +217,33 @@ export default function WaitingPartyPage() {
     };
 
     fetchRoom();
-  }, [roomId, navigate, mapParticipants]);
+  }, [roomId, navigate, mapParticipants, handleRoomStatus]);
 
   const refreshParticipants = useCallback(async () => {
     if (!roomId) return;
     try {
       const { data: participantsRes } = await getParticipants(roomId);
-      const overrides = new Map<number, PlayerRole>(
-        players.map((player) => [player.userId, player.role]),
-      );
-      setPlayers(mapParticipants(participantsRes.participants, overrides));
+      setPlayers((prev) => {
+        const overrides = new Map<number, PlayerRole>(
+          prev.map((player) => [player.userId, player.role]),
+        );
+        return mapParticipants(participantsRes.participants, overrides);
+      });
     } catch (error) {
       console.error("대기방 참여자 갱신 실패:", error);
     }
-  }, [roomId, players, mapParticipants]);
+  }, [roomId, mapParticipants]);
+
+  const refreshRoom = useCallback(async () => {
+    if (!roomId) return;
+    try {
+      const { data } = await getRoom(roomId);
+      if (handleRoomStatus(data.status)) return;
+      setRoomDetail(data);
+    } catch (error) {
+      console.error("대기방 상태 갱신 실패:", error);
+    }
+  }, [roomId, handleRoomStatus]);
 
   useEffect(() => {
     if (!roomId) return;
@@ -219,6 +253,15 @@ export default function WaitingPartyPage() {
 
     return () => window.clearInterval(intervalId);
   }, [roomId, refreshParticipants]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const intervalId = window.setInterval(() => {
+      void refreshRoom();
+    }, POLL_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [roomId, refreshRoom]);
 
   const partyInfo: PartyInfo | undefined = useMemo(() => {
     if (!roomDetail) return undefined;
@@ -387,7 +430,9 @@ export default function WaitingPartyPage() {
                       : undefined
                   }
                   onToggleArrival={
-                    isHost ? () => handleToggleArrival(player.userId) : undefined
+                    isHost
+                      ? () => handleToggleArrival(player.userId)
+                      : undefined
                   }
                 />
               </div>

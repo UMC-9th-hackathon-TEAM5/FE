@@ -1,6 +1,6 @@
 import { getRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/common/Button";
 import CheckIcon from "@/assets/check/check_black.svg?react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +10,9 @@ const CheckSquare = () => (
     <CheckIcon />
   </div>
 );
+
+const READY_SECONDS = 3;
+const POLL_INTERVAL_MS = 3000;
 
 type Role = "police" | "thief";
 
@@ -61,7 +64,6 @@ const GameStartPage = () => {
   const [count, setCount] = useState(0);
   const [roomSeconds, setRoomSeconds] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const readySeconds = 3;
 
   useEffect(() => {
     if (gameStatus === "idle") return;
@@ -79,6 +81,24 @@ const GameStartPage = () => {
     }
   }, [count, gameStatus, navigate, roomId, roomSeconds]);
 
+  const applyRoomTiming = useCallback((data: {
+    countdownSeconds?: number;
+    escapeTime?: number;
+  }) => {
+    const countdownSeconds =
+      typeof data.countdownSeconds === "number" && data.countdownSeconds > 0
+        ? data.countdownSeconds
+        : 60;
+    const escapeSeconds =
+      typeof data.escapeTime === "number" && data.escapeTime > 0
+        ? data.escapeTime
+        : 30 * 60;
+    setRoomSeconds(countdownSeconds);
+    localStorage.setItem("gameSeconds", String(escapeSeconds));
+    setCount(READY_SECONDS);
+    setGameStatus("ready");
+  }, []);
+
   const handleStartGame = async () => {
     if (!roomId) {
       setErrorMessage("방 정보를 찾을 수 없습니다.");
@@ -87,24 +107,41 @@ const GameStartPage = () => {
     setErrorMessage(null);
     try {
       const response = await getRoom(roomId);
-      const countdownSeconds =
-        typeof response.data.countdownSeconds === "number" &&
-        response.data.countdownSeconds > 0
-          ? response.data.countdownSeconds
-          : 60;
-      const escapeSeconds =
-        typeof response.data.escapeTime === "number" &&
-        response.data.escapeTime > 0
-          ? response.data.escapeTime
-          : 30 * 60;
-      setRoomSeconds(countdownSeconds);
-      localStorage.setItem("gameSeconds", String(escapeSeconds));
-      setCount(readySeconds);
-      setGameStatus("ready");
+      applyRoomTiming(response.data);
     } catch {
       setErrorMessage("방 정보를 불러오지 못했습니다.");
     }
   };
+
+  const pollRoomStatus = useCallback(async () => {
+    if (!roomId || gameStatus !== "idle") return;
+    try {
+      const { data } = await getRoom(roomId);
+      const normalized = data.status?.toUpperCase?.() ?? "";
+      if (normalized === "STARTING") {
+        applyRoomTiming(data);
+        return;
+      }
+      if (normalized === "PLAYING") {
+        navigate(`/game/playing?roomId=${roomId}`, { replace: true });
+        return;
+      }
+      if (normalized === "FINISHED") {
+        navigate(`/game/result?roomId=${roomId}`, { replace: true });
+      }
+    } catch {
+      // ignore poll errors
+    }
+  }, [roomId, gameStatus, applyRoomTiming, navigate]);
+
+  useEffect(() => {
+    if (!roomId || gameStatus !== "idle") return;
+    void pollRoomStatus();
+    const intervalId = window.setInterval(() => {
+      void pollRoomStatus();
+    }, POLL_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, [roomId, gameStatus, pollRoomStatus]);
 
   useEffect(() => {
     if (stateRole) {
