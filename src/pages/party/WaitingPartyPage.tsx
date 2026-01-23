@@ -162,7 +162,10 @@ export default function WaitingPartyPage() {
       roleOverrides?: Map<number, PlayerRole>,
     ): PlayerState[] =>
       participants.map((participant) => {
-        const normalizedRole = participant.role?.trim().toUpperCase();
+        const normalizedRole =
+          typeof participant.role === "string"
+            ? participant.role.trim().toUpperCase()
+            : "";
         let mappedRole: PlayerRole;
 
         if (normalizedRole === "POLICE") {

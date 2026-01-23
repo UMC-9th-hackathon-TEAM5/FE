@@ -1,0 +1,2255 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Adult PlayGround API",
+    "description": "어른들의 놀이터 서비스의 REST API 문서",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://hackathon2026.kro.kr",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "jwtAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Room",
+      "description": "방 관련 API"
+    },
+    {
+      "name": "Room Game",
+      "description": "게임 상태 관련 API"
+    },
+    {
+      "name": "User",
+      "description": "사용자 관련 API"
+    },
+    {
+      "name": "Room Member",
+      "description": "방 참가자 관련 API"
+    }
+  ],
+  "paths": {
+    "/api/v1/user/session": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "로그인 및 세션 생성",
+        "description": "닉네임과 4자리 비밀번호로 로그인(또는 자동 가입)",
+        "operationId": "createSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/user/session"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_PASSWORD": {
+                    "description": "비밀번호가 일치하지 않습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 401,
+                      "code": "AUTH_005",
+                      "message": "비밀번호가 일치하지 않습니다.",
+                      "path": "/api/v1/user/session"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INTERNAL_SERVER_ERROR": {
+                    "description": "서버 내부 오류가 발생했습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 500,
+                      "code": "COMMON_003",
+                      "message": "서버 내부 오류가 발생했습니다.",
+                      "path": "/api/v1/user/session"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "USER_NOT_FOUND": {
+                    "description": "유저를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "AUTH_003",
+                      "message": "유저를 찾을 수 없습니다.",
+                      "path": "/api/v1/user/session"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms": {
+      "post": {
+        "tags": [
+          "Room"
+        ],
+        "summary": "방 생성",
+        "operationId": "createRoom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCreateRoomResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/rooms"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "USER_NOT_FOUND": {
+                    "description": "유저를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "AUTH_003",
+                      "message": "유저를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/join": {
+      "post": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "방 참가",
+        "description": "방에 참가합니다. 역할군(경찰/도둑/랜덤)을 선택할 수 있습니다.",
+        "operationId": "joinRoom",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRoomRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseJoinRoomResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_FULL": {
+                    "description": "방 정원이 가득 찼습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_004",
+                      "message": "방 정원이 가득 찼습니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  },
+                  "ROLE_CAPACITY_FULL": {
+                    "description": "선택한 역할군의 정원이 가득 찼습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_005",
+                      "message": "선택한 역할군의 정원이 가득 찼습니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  },
+                  "ROOM_NOT_IN_WAITING_STATUS": {
+                    "description": "대기 중인 방에서만 가능한 작업입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_002",
+                      "message": "대기 중인 방에서만 가능한 작업입니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  },
+                  "ALREADY_JOINED_ROOM": {
+                    "description": "이미 참가한 방입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_003",
+                      "message": "이미 참가한 방입니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "USER_NOT_FOUND": {
+                    "description": "유저를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "AUTH_003",
+                      "message": "유저를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  },
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/join"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/game/finish": {
+      "post": {
+        "tags": [
+          "Room Game"
+        ],
+        "summary": "게임 종료",
+        "description": "게임을 종료하고 결과를 반환합니다.",
+        "operationId": "finishGame",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinishGameRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseGameStatusResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/rooms/{roomId}/game/finish"
+                    }
+                  },
+                  "ROOM_NOT_IN_PLAYING_STATUS": {
+                    "description": "게임 중인 방에서만 가능한 작업입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_006",
+                      "message": "게임 중인 방에서만 가능한 작업입니다.",
+                      "path": "/api/v1/rooms/{roomId}/game/finish"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/game/finish"
+                    }
+                  },
+                  "GAME_STATE_NOT_FOUND": {
+                    "description": "game state를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_004",
+                      "message": "game state를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/game/finish"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/roles": {
+      "patch": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "팀 배정 및 게임 시작",
+        "description": "방장 전용",
+        "operationId": "assignRolesAndStartGame",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRolesRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAssignRolesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_IN_WAITING_STATUS": {
+                    "description": "대기 중인 방에서만 가능한 작업입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_002",
+                      "message": "대기 중인 방에서만 가능한 작업입니다.",
+                      "path": "/api/v1/rooms/{roomId}/roles"
+                    }
+                  },
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/rooms/{roomId}/roles"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ONLY_HOST_ALLOWED": {
+                    "description": "방장만 접근할 수 있습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 403,
+                      "code": "BUSINESS_001",
+                      "message": "방장만 접근할 수 있습니다.",
+                      "path": "/api/v1/rooms/{roomId}/roles"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/roles"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/participants/{thiefId}/capture": {
+      "patch": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "도둑 검거",
+        "operationId": "captureThief",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "thiefId",
+            "in": "path",
+            "description": "검거한 도둑의 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCaptureThiefResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{thiefId}/capture"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "FORBIDDEN": {
+                    "description": "권한이 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 403,
+                      "code": "AUTH_004",
+                      "message": "권한이 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{thiefId}/capture"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_MEMBER_NOT_FOUND": {
+                    "description": "방 참가자를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_003",
+                      "message": "방 참가자를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{thiefId}/capture"
+                    }
+                  },
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{thiefId}/capture"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/participants/{targetUserId}/arrival": {
+      "patch": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "도착으로 변경",
+        "description": "방장 전용 - 대기방에 있는 참여자의 도착 여부를 변경합니다.",
+        "operationId": "updateArrival",
+        "parameters": [
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "description": "바꾸려는 user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_IN_WAITING_STATUS": {
+                    "description": "대기 중인 방에서만 가능한 작업입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_002",
+                      "message": "대기 중인 방에서만 가능한 작업입니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{targetUserId}/arrival"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ONLY_HOST_ALLOWED": {
+                    "description": "방장만 접근할 수 있습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 403,
+                      "code": "BUSINESS_001",
+                      "message": "방장만 접근할 수 있습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{targetUserId}/arrival"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_MEMBER_NOT_FOUND": {
+                    "description": "방 참가자를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_003",
+                      "message": "방 참가자를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{targetUserId}/arrival"
+                    }
+                  },
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/{targetUserId}/arrival"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/participants/release": {
+      "patch": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "탈옥",
+        "description": "도둑이 본인것만",
+        "operationId": "releaseThief",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseReleaseThiefResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NOT_IN_JAIL": {
+                    "description": "현재 감옥에 갇힌 상태가 아닙니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_008",
+                      "message": "현재 감옥에 갇힌 상태가 아닙니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/release"
+                    }
+                  },
+                  "NOT_A_THIEF": {
+                    "description": "도둑만 탈옥할 수 있습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_007",
+                      "message": "도둑만 탈옥할 수 있습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/release"
+                    }
+                  },
+                  "GAME_NOT_STARTED": {
+                    "description": "게임이 진행 중일 때만 가능합니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_006",
+                      "message": "게임이 진행 중일 때만 가능합니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/release"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "FORBIDDEN": {
+                    "description": "권한이 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 403,
+                      "code": "AUTH_004",
+                      "message": "권한이 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/release"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "RESOURCE_NOT_FOUND": {
+                    "description": "요청한 리소스를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_001",
+                      "message": "요청한 리소스를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants/release"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}": {
+      "get": {
+        "tags": [
+          "Room"
+        ],
+        "summary": "방 세부정보 조회",
+        "description": "방 ID로 방의 세부정보를 조회합니다.",
+        "operationId": "getRoomDetail",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRoomDetailResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/participants": {
+      "get": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "도착 여부 조회",
+        "operationId": "getParticipants",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseParticipantResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "RESOURCE_NOT_FOUND": {
+                    "description": "요청한 리소스를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_001",
+                      "message": "요청한 리소스를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/participants"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/nearby": {
+      "get": {
+        "tags": [
+          "Room"
+        ],
+        "summary": "주변 방 조회",
+        "description": "사용자 위치 기반으로 주변 방 목록 조회",
+        "operationId": "getNearbyRooms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseNearbyRoomsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "INVALID_INPUT_VALUE": {
+                    "description": "잘못된 입력값입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "COMMON_001",
+                      "message": "잘못된 입력값입니다.",
+                      "path": "/api/v1/rooms/nearby"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "USER_NOT_FOUND": {
+                    "description": "유저를 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "AUTH_003",
+                      "message": "유저를 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/nearby"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomId}/leave": {
+      "delete": {
+        "tags": [
+          "Room Member"
+        ],
+        "summary": "방 나가기",
+        "description": "방에서 나갑니다. 방장이 나가면 다른 참가자에게 방장이 위임됩니다. 참가자가 없으면 방이 삭제됩니다.",
+        "operationId": "leaveRoom",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "description": "방 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLeaveRoomResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NOT_JOINED_ROOM": {
+                    "description": "참가하지 않은 방입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_010",
+                      "message": "참가하지 않은 방입니다.",
+                      "path": "/api/v1/rooms/{roomId}/leave"
+                    }
+                  },
+                  "ROOM_NOT_IN_WAITING_STATUS": {
+                    "description": "대기 중인 방에서만 가능한 작업입니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 400,
+                      "code": "BUSINESS_002",
+                      "message": "대기 중인 방에서만 가능한 작업입니다.",
+                      "path": "/api/v1/rooms/{roomId}/leave"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에러 응답",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ROOM_NOT_FOUND": {
+                    "description": "방을 찾을 수 없습니다.",
+                    "value": {
+                      "timestamp": "2025-06-30T12:00:00.000000",
+                      "status": 404,
+                      "code": "RESOURCE_002",
+                      "message": "방을 찾을 수 없습니다.",
+                      "path": "/api/v1/rooms/{roomId}/leave"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SessionRequestDto": {
+        "type": "object",
+        "description": "로그인 요청",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "비밀번호",
+            "minLength": 1
+          },
+          "lat": {
+            "type": "number",
+            "description": "위도"
+          },
+          "lng": {
+            "type": "number",
+            "description": "경도"
+          }
+        },
+        "required": [
+          "nickname",
+          "password",
+          "lat",
+          "lng"
+        ]
+      },
+      "ApiResponseSessionResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SessionResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "SessionResponseDto": {
+        "type": "object",
+        "description": "로그인 응답",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "사용자 고유 ID",
+            "example": 1
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "example": "나호"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "JWT 액세스 토큰"
+          },
+          "tokenType": {
+            "type": "string",
+            "description": "토큰 타입",
+            "example": "Bearer"
+          }
+        }
+      },
+      "CreateRoomRequestDto": {
+        "type": "object",
+        "description": "방 생성 요청",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "방 제목",
+            "example": "홍대 도둑을 찾아라",
+            "minLength": 1
+          },
+          "placeName": {
+            "type": "string",
+            "description": "장소 이름",
+            "example": "홍대입구역 9번 출구",
+            "minLength": 1
+          },
+          "lat": {
+            "type": "number",
+            "description": "위도",
+            "example": 37.5575,
+            "maximum": 90,
+            "minimum": -90
+          },
+          "lng": {
+            "type": "number",
+            "description": "경도",
+            "example": 126.9244,
+            "maximum": 180,
+            "minimum": -180
+          },
+          "meetingTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "만남 시간",
+            "example": "2026-01-20T18:00:00"
+          },
+          "police_capacity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "모집하는 경찰 수",
+            "example": 5,
+            "maximum": 10,
+            "minimum": 1
+          },
+          "thief_capacity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "모집하는 도둑 수",
+            "example": 5,
+            "maximum": 10,
+            "minimum": 1
+          },
+          "countdownSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "게임 카운트다운(초)",
+            "example": 60
+          },
+          "escapeTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "게임 플레이 시간(초)",
+            "example": 1800
+          }
+        },
+        "required": [
+          "title",
+          "placeName",
+          "lat",
+          "lng",
+          "meetingTime",
+          "police_capacity",
+          "thief_capacity",
+          "countdownSeconds",
+          "escapeTime"
+        ]
+      },
+      "ApiResponseCreateRoomResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateRoomResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "CreateRoomResponseDto": {
+        "type": "object",
+        "description": "방 생성 응답",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hostId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "JoinRoomRequestDto": {
+        "type": "object",
+        "properties": {
+          "rolePreference": {
+            "type": "string",
+            "enum": [
+              "POLICE",
+              "THIEF",
+              "RANDOM"
+            ]
+          }
+        },
+        "required": [
+          "rolePreference"
+        ]
+      },
+      "ApiResponseJoinRoomResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/JoinRoomResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "JoinRoomResponseDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rolePreference": {
+            "type": "string",
+            "enum": [
+              "POLICE",
+              "THIEF",
+              "RANDOM"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "FinishGameRequestDto": {
+        "type": "object",
+        "description": "게임 종료 요청",
+        "properties": {
+          "finishReason": {
+            "type": "string",
+            "description": "종료 이유 (TIME_OVER, GAME_END)",
+            "example": "GAME_END",
+            "enum": [
+              "TIME_OVER",
+              "GAME_END"
+            ]
+          },
+          "winningTeam": {
+            "type": "string",
+            "description": "승리 팀 (POLICE, THIEF, DRAW)",
+            "example": "POLICE",
+            "enum": [
+              "POLICE",
+              "THIEF",
+              "DRAW"
+            ]
+          }
+        },
+        "required": [
+          "finishReason",
+          "winningTeam"
+        ]
+      },
+      "ApiResponseGameStatusResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GameStatusResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "GameParticipant": {
+        "type": "object",
+        "description": "참가자 게임 정보",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "사용자 ID",
+            "example": 1
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "example": "도둑잡는사자"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할 (POLICE, THIEF)",
+            "example": "THIEF",
+            "enum": [
+              "POLICE",
+              "THIEF"
+            ]
+          },
+          "isAlive": {
+            "type": "string",
+            "description": "생존 여부",
+            "enum": [
+              "ALIVE",
+              "CAUGHT"
+            ],
+            "example": "ALIVE"
+          },
+          "isArrived": {
+            "type": "boolean",
+            "description": "도착 여부",
+            "example": true
+          },
+          "caughtCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "경찰일 경우에만 잡은 횟수 반환"
+          }
+        }
+      },
+      "GameStatusResponseDto": {
+        "type": "object",
+        "description": "게임 현황 응답",
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "시작 시간",
+            "example": "2026-01-10T15:54:00"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "게임 종료 시간",
+            "example": "2026-01-10T16:30:00"
+          },
+          "participants": {
+            "type": "array",
+            "description": "참가자 목록",
+            "items": {
+              "$ref": "#/components/schemas/GameParticipant"
+            }
+          }
+        }
+      },
+      "AssignRolesRequestDto": {
+        "type": "object",
+        "description": "팀 배정 요청",
+        "properties": {
+          "roles": {
+            "type": "array",
+            "description": "역할 배정 목록",
+            "items": {
+              "$ref": "#/components/schemas/RoleAssignment"
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "RoleAssignment": {
+        "type": "object",
+        "description": "사용자별 역할 배정",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "사용자 ID",
+            "example": 1
+          },
+          "role": {
+            "type": "string",
+            "description": "역할 (POLICE, THIEF)",
+            "example": "POLICE",
+            "enum": [
+              "POLICE",
+              "THIEF"
+            ]
+          }
+        },
+        "required": [
+          "role",
+          "userId"
+        ]
+      },
+      "ApiResponseAssignRolesResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AssignRolesResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "AssignRolesResponseDto": {
+        "type": "object",
+        "description": "팀 배정 응답",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "방 ID",
+            "example": 101
+          },
+          "stats": {
+            "$ref": "#/components/schemas/TeamStats",
+            "description": "팀 통계"
+          },
+          "participants": {
+            "type": "array",
+            "description": "참가자 목록",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantInfo"
+            }
+          }
+        }
+      },
+      "ParticipantInfo": {
+        "type": "object",
+        "description": "참가자 정보",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "사용자 ID",
+            "example": 1
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "example": "경찰사자"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할 (POLICE, THIEF)",
+            "example": "POLICE",
+            "enum": [
+              "POLICE",
+              "THIEF"
+            ]
+          },
+          "isArrived": {
+            "type": "boolean",
+            "description": "도착 여부",
+            "example": true
+          }
+        }
+      },
+      "TeamStats": {
+        "type": "object",
+        "description": "팀 통계",
+        "properties": {
+          "totalPolice": {
+            "type": "integer",
+            "format": "int32",
+            "description": "경찰 총 인원",
+            "example": 1
+          },
+          "totalThieves": {
+            "type": "integer",
+            "format": "int32",
+            "description": "도둑 총 인원",
+            "example": 3
+          }
+        }
+      },
+      "ApiResponseCaptureThiefResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CaptureThiefResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "CaptureThiefResponseDto": {
+        "type": "object",
+        "description": "도둑 검거 응답",
+        "properties": {
+          "thiefUserId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "검거당한 도둑 사용자 ID",
+            "example": 2
+          },
+          "thiefNickname": {
+            "type": "string",
+            "description": "검거당한 도둑 닉네임",
+            "example": "도둑라이언"
+          },
+          "policeUserId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "검거한 경찰 사용자 ID",
+            "example": 1
+          },
+          "policeNickname": {
+            "type": "string",
+            "description": "검거한 경찰 닉네임",
+            "example": "경찰라이언"
+          },
+          "remainingThieves": {
+            "type": "integer",
+            "format": "int32",
+            "description": "남은 도둑 수",
+            "example": 5
+          },
+          "message": {
+            "type": "string",
+            "description": "메시지",
+            "example": "도둑을 검거했습니다!"
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "type": "object",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "ApiResponseReleaseThiefResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReleaseThiefResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "ReleaseThiefResponseDto": {
+        "type": "object",
+        "description": "탈옥 성공 응답",
+        "properties": {
+          "thiefUserId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "탈옥한 도둑 사용자 ID",
+            "example": 2
+          },
+          "thiefNickname": {
+            "type": "string",
+            "description": "탈옥한 도둑 닉네임",
+            "example": "도둑라이언"
+          },
+          "remainingThieves": {
+            "type": "integer",
+            "format": "int32",
+            "description": "남은 도둑 수",
+            "example": 6
+          },
+          "message": {
+            "type": "string",
+            "description": "메시지",
+            "example": "탈옥에 성공했습니다!"
+          }
+        }
+      },
+      "ApiResponseRoomDetailResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RoomDetailResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "CapacityInfo": {
+        "type": "object",
+        "description": "정원 정보",
+        "properties": {
+          "current": {
+            "type": "integer",
+            "format": "int32",
+            "description": "현재 참가자 수",
+            "example": 5
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "description": "최대 참가자 수",
+            "example": 10
+          }
+        }
+      },
+      "RoomDetailResponseDto": {
+        "type": "object",
+        "description": "방 세부정보 조회 응답",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "방 ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "방 제목",
+            "example": "홍대 도둑을 찾아라"
+          },
+          "placeName": {
+            "type": "string",
+            "description": "장소 이름",
+            "example": "홍대입구역 9번 출구"
+          },
+          "meetingTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "만남 시간",
+            "example": "2026-01-10T18:00:00"
+          },
+          "status": {
+            "type": "string",
+            "description": "방 상태 (WAITING, STARTING, PLAYING, FINISHED)",
+            "example": "WAITING",
+            "enum": [
+              "WAITING",
+              "STARTING",
+              "PLAYING",
+              "FINISHED"
+            ]
+          },
+          "countdownSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "게임 카운트다운(초)",
+            "example": 60
+          },
+          "escapeTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "게임 플레이 시간(초)",
+            "example": 1800
+          },
+          "description": {
+            "type": "string",
+            "description": "방 설명",
+            "example": "홍대에서 도둑잡기 게임합니다!"
+          },
+          "capacity": {
+            "$ref": "#/components/schemas/CapacityInfo",
+            "description": "정원 정보"
+          },
+          "participants": {
+            "type": "array",
+            "description": "참가자 목록",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantInfo"
+            }
+          }
+        }
+      },
+      "ApiResponseParticipantResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ParticipantResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "ParticipantResponseDto": {
+        "type": "object",
+        "description": "참가자 정보 응답",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "방 ID",
+            "example": 101
+          },
+          "participants": {
+            "type": "array",
+            "description": "참가자 목록",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantInfo"
+            }
+          }
+        }
+      },
+      "ApiResponseNearbyRoomsResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/NearbyRoomsResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "NearbyRoomDataResponseDto": {
+        "type": "object",
+        "description": "주변 방 조회 응답",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "방 ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "방 제목",
+            "example": "홍대 도둑을 찾아라"
+          },
+          "placeName": {
+            "type": "string",
+            "description": "장소 이름",
+            "example": "홍대입구역 9번 출구"
+          },
+          "lat": {
+            "type": "number",
+            "description": "위도",
+            "example": 37.5575
+          },
+          "lng": {
+            "type": "number",
+            "description": "경도",
+            "example": 126.9244
+          },
+          "meetingTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "만남 시간",
+            "example": "2026-01-10T18:00:00"
+          },
+          "currentParticipants": {
+            "type": "integer",
+            "format": "int32",
+            "description": "현재 참가자 수",
+            "example": 5
+          },
+          "maxParticipants": {
+            "type": "integer",
+            "format": "int32",
+            "description": "최대 참가자 수",
+            "example": 12
+          },
+          "distance": {
+            "type": "number",
+            "format": "double",
+            "description": "사용자로부터의 거리(km)",
+            "example": 1.2
+          },
+          "status": {
+            "type": "string",
+            "description": "방 상태 (WAITING, STARTING, PLAYING, FINISHED)",
+            "example": "WAITING",
+            "enum": [
+              "WAITING",
+              "STARTING",
+              "PLAYING",
+              "FINISHED"
+            ]
+          }
+        }
+      },
+      "NearbyRoomsResponseDto": {
+        "type": "object",
+        "description": "주변 방 목록 응답",
+        "properties": {
+          "rooms": {
+            "type": "array",
+            "description": "방 목록",
+            "items": {
+              "$ref": "#/components/schemas/NearbyRoomDataResponseDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "전체 방 개수",
+            "example": 10
+          }
+        }
+      },
+      "ApiResponseLeaveRoomResponseDto": {
+        "type": "object",
+        "description": "API 응답",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "응답 시간",
+            "example": "2025-06-30T12:00:00.000000"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "HTTP 상태 코드",
+            "example": 200
+          },
+          "code": {
+            "type": "string",
+            "description": "응답 코드",
+            "example": "SUCCESS"
+          },
+          "message": {
+            "type": "string",
+            "description": "응답 메시지",
+            "example": "요청이 성공적으로 처리되었습니다."
+          },
+          "path": {
+            "type": "string",
+            "description": "요청 경로",
+            "example": "/api/v1/example"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LeaveRoomResponseDto",
+            "description": "응답 데이터"
+          }
+        }
+      },
+      "LeaveRoomResponseDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwtAuth": {
+        "type": "http",
+        "name": "jwtAuth",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

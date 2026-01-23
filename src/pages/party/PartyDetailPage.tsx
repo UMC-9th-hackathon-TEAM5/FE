@@ -125,7 +125,10 @@ export default function PartyDetailPage() {
     let police = 0;
     let thief = 0;
     participants.forEach((participant) => {
-      const normalizedRole = participant.role?.trim().toUpperCase();
+      const normalizedRole =
+        typeof participant.role === "string"
+          ? participant.role.trim().toUpperCase()
+          : "";
       if (normalizedRole === "POLICE") {
         police += 1;
       } else if (normalizedRole === "THIEF") {
