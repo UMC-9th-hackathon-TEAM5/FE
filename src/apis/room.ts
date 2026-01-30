@@ -27,12 +27,28 @@ export type NearbyRoomData = {
   totalCount: number;
 };
 
+export type PlaceSearchResult = {
+  name: string;
+  address: string;
+  lat?: number;
+  lng?: number;
+};
+
+export type PlaceSearchData = {
+  places: PlaceSearchResult[];
+};
+
 export type CreateRoomRequestDto = {
   title?: string;
   description?: string;
   placeName?: string;
-  lat: number;
-  lng: number;
+  address?: string;
+  prisonPlaceName?: string;
+  prisonAddress?: string;
+  lat?: number;
+  lng?: number;
+  prisonLat?: number;
+  prisonLng?: number;
   meetingTime: string;
   police_capacity: number;
   thief_capacity: number;
@@ -201,6 +217,19 @@ export const postFinishgame = async (
   const { data } = await axiosInstance.post<ApiResponse<GameStatusResponseDto>>(
     `/api/v1/rooms/${roomId}/game/finish`,
     body,
+  );
+  return data;
+};
+
+// 장소 검색
+export const searchPlaces = async (
+  keyword: string,
+): Promise<ApiResponse<PlaceSearchData>> => {
+  const { data } = await axiosInstance.get<ApiResponse<PlaceSearchData>>(
+    "/api/v1/rooms/places/search",
+    {
+      params: { keyword },
+    },
   );
   return data;
 };

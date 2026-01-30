@@ -23,6 +23,22 @@ type LocationState = {
 };
 
 const POLL_INTERVAL_MS = 3000;
+const legacyGameSecondsKey = "gameSeconds";
+const gameSecondsKey = (roomId: number) => `gameSeconds:${roomId}`;
+const gameEndAtKey = (roomId: number) => `gameEndAt:${roomId}`;
+
+const readStoredNumber = (key: string) => {
+  const value = localStorage.getItem(key);
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const clearStoredGameTimer = (roomId: number) => {
+  localStorage.removeItem(gameEndAtKey(roomId));
+  localStorage.removeItem(gameSecondsKey(roomId));
+  localStorage.removeItem(legacyGameSecondsKey);
+};
 
 export default function GamePlayPage() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -30,6 +46,7 @@ export default function GamePlayPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isEnding, setIsEnding] = useState(false);
   const [gameSeconds, setGameSeconds] = useState(0);
+  const [gameEndAt, setGameEndAt] = useState<number | null>(null);
   const autoFinishTriggeredRef = useRef(false);
   const prevGameSecondsRef = useRef<number | null>(null);
   const escapedThiefIdsRef = useRef<Set<number>>(new Set());
@@ -163,16 +180,37 @@ export default function GamePlayPage() {
   }, [roomId, navigate, mapParticipants]);
 
   useEffect(() => {
-    const storedSeconds = localStorage.getItem("gameSeconds");
-    if (storedSeconds) {
-      const parsed = Number(storedSeconds);
-      if (!Number.isNaN(parsed)) {
-        setGameSeconds(parsed);
-        return;
-      }
-    }
     if (!roomId) {
       setGameSeconds(0);
+      setGameEndAt(null);
+      return;
+    }
+
+    const storedEndAt = readStoredNumber(gameEndAtKey(roomId));
+    const now = Date.now();
+    if (storedEndAt && storedEndAt > now) {
+      setGameEndAt(storedEndAt);
+      setGameSeconds(Math.max(0, Math.ceil((storedEndAt - now) / 1000)));
+      return;
+    }
+
+    const storedRoomSeconds = readStoredNumber(gameSecondsKey(roomId));
+    if (storedRoomSeconds && storedRoomSeconds > 0) {
+      const endAt = now + storedRoomSeconds * 1000;
+      setGameEndAt(endAt);
+      setGameSeconds(storedRoomSeconds);
+      localStorage.setItem(gameEndAtKey(roomId), String(endAt));
+      return;
+    }
+
+    const legacySeconds = readStoredNumber(legacyGameSecondsKey);
+    if (legacySeconds && legacySeconds > 0) {
+      const endAt = now + legacySeconds * 1000;
+      setGameEndAt(endAt);
+      setGameSeconds(legacySeconds);
+      localStorage.setItem(gameEndAtKey(roomId), String(endAt));
+      localStorage.setItem(gameSecondsKey(roomId), String(legacySeconds));
+      localStorage.removeItem(legacyGameSecondsKey);
       return;
     }
 
@@ -183,11 +221,15 @@ export default function GamePlayPage() {
           typeof data.escapeTime === "number" && data.escapeTime > 0
             ? data.escapeTime
             : 30 * 60;
+        const endAt = Date.now() + escapeSeconds * 1000;
+        setGameEndAt(endAt);
         setGameSeconds(escapeSeconds);
-        localStorage.setItem("gameSeconds", String(escapeSeconds));
+        localStorage.setItem(gameEndAtKey(roomId), String(endAt));
+        localStorage.setItem(gameSecondsKey(roomId), String(escapeSeconds));
       } catch (error) {
         console.error("게임 시간 조회 실패:", error);
         setGameSeconds(0);
+        setGameEndAt(null);
       }
     };
 
@@ -195,12 +237,18 @@ export default function GamePlayPage() {
   }, [roomId]);
 
   useEffect(() => {
-    if (gameSeconds <= 0) return;
-    const timer = setInterval(() => {
-      setGameSeconds((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+    if (!gameEndAt) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((gameEndAt - Date.now()) / 1000));
+      setGameSeconds(remaining);
+      if (roomId) {
+        localStorage.setItem(gameSecondsKey(roomId), String(remaining));
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [gameSeconds]);
+  }, [gameEndAt, roomId]);
 
   const refreshParticipants = useCallback(async () => {
     if (!roomId) return;
@@ -270,6 +318,7 @@ export default function GamePlayPage() {
         finishReason: "GAME_END",
         winningTeam,
       });
+      clearStoredGameTimer(roomId);
       localStorage.setItem("gameResult", JSON.stringify(response.data));
       localStorage.setItem("gameResultWinningTeam", winningTeam);
       setIsEndConfirmOpen(false);
@@ -307,6 +356,7 @@ export default function GamePlayPage() {
     }
 
     if (roomId) {
+      clearStoredGameTimer(roomId);
       navigate(`/game/result?roomId=${roomId}`, { replace: true });
     }
   }, [gameSeconds, handleGameEnd, isHost, navigate, roomId]);
@@ -328,6 +378,7 @@ export default function GamePlayPage() {
     }
 
     if (roomId) {
+      clearStoredGameTimer(roomId);
       localStorage.setItem("gameResultWinningTeam", "POLICE");
       navigate(`/game/result?roomId=${roomId}`, { replace: true });
     }

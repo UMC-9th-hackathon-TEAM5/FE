@@ -60,8 +60,20 @@ describe("CreatePartyPage", () => {
       "테스트 파티",
     );
     await user.type(
-      screen.getByPlaceholderText("예 : 수지생태공원 분수대 앞"),
-      "서울",
+      screen.getByPlaceholderText("예 : 잠실역 2호선"),
+      "잠실역 2호선",
+    );
+    await user.type(
+      screen.getByPlaceholderText("예 : 서울특별시 송파구 올림픽로 265"),
+      "서울특별시 송파구 올림픽로 265",
+    );
+    await user.type(
+      screen.getByPlaceholderText("예 : 잠실역 2호선 (감옥)"),
+      "잠실역 2호선",
+    );
+    await user.type(
+      screen.getByPlaceholderText("예 : 서울특별시 송파구 올림픽로 265 (감옥)"),
+      "서울특별시 송파구 올림픽로 265",
     );
     await user.type(
       screen.getByPlaceholderText("경도팟에 대한 설명을 적어주세요"),
