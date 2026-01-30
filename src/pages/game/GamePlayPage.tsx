@@ -236,14 +236,17 @@ export default function GamePlayPage() {
       return;
     }
 
-    const storedEndAt = readStoredNumber(gameEndAtKey(roomId));
     const now = Date.now();
+
+    // Priority 1: Check for stored game end time
+    const storedEndAt = readStoredNumber(gameEndAtKey(roomId));
     if (storedEndAt && storedEndAt > now) {
       setGameEndAt(storedEndAt);
       setGameSeconds(Math.max(0, Math.ceil((storedEndAt - now) / 1000)));
       return;
     }
 
+    // Priority 2: Check for stored remaining seconds and recalculate end time
     const storedRoomSeconds = readStoredNumber(gameSecondsKey(roomId));
     if (storedRoomSeconds && storedRoomSeconds > 0) {
       const endAt = now + storedRoomSeconds * 1000;
@@ -253,6 +256,7 @@ export default function GamePlayPage() {
       return;
     }
 
+    // Priority 3: Check for legacy seconds (backward compatibility)
     const legacySeconds = readStoredNumber(legacyGameSecondsKey);
     if (legacySeconds && legacySeconds > 0) {
       const endAt = now + legacySeconds * 1000;
@@ -264,6 +268,7 @@ export default function GamePlayPage() {
       return;
     }
 
+    // Priority 4: Fetch game time from server only if no stored time exists
     const fetchRoomSeconds = async () => {
       try {
         const { data } = await getRoom(roomId);
@@ -271,7 +276,7 @@ export default function GamePlayPage() {
           typeof data.escapeTime === "number" && data.escapeTime > 0
             ? data.escapeTime
             : 30 * 60;
-        const endAt = Date.now() + escapeSeconds * 1000;
+        const endAt = now + escapeSeconds * 1000;
         setGameEndAt(endAt);
         setGameSeconds(escapeSeconds);
         localStorage.setItem(gameEndAtKey(roomId), String(endAt));
@@ -292,6 +297,8 @@ export default function GamePlayPage() {
       const remaining = Math.max(0, Math.ceil((gameEndAt - Date.now()) / 1000));
       setGameSeconds(remaining);
       if (roomId) {
+        // Save both the game end time and remaining seconds for reliable restoration
+        localStorage.setItem(gameEndAtKey(roomId), String(gameEndAt));
         localStorage.setItem(gameSecondsKey(roomId), String(remaining));
       }
     };
