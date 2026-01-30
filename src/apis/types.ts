@@ -22,6 +22,8 @@ export type ParticipantInfo = {
   isArrived: boolean;
   isAlive?: GameParticipantAliveState;
   caughtCount?: number;
+  lat?: number;
+  lng?: number;
 };
 
 export type GameParticipant = {

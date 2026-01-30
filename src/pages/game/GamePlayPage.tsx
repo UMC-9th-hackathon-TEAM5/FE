@@ -9,6 +9,48 @@ import EndConfirmModal from "@/components/common/Modal/EndConfirmModal";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
+type MapsApi = {
+  LatLng: new (lat: number, lng: number) => unknown;
+  Map: new (
+    el: HTMLElement,
+    options: {
+      center: unknown;
+      zoom: number;
+      minZoom: number;
+      scaleControl: boolean;
+      mapDataControl: boolean;
+      logoControlOptions: { position: unknown };
+    },
+  ) => {
+    setCenter: (pos: unknown) => void;
+  };
+  Marker: new (options: {
+    position: unknown;
+    map: unknown;
+    zIndex?: number;
+    icon?: {
+      content: string;
+      anchor?: unknown;
+    };
+  }) => unknown;
+  Point: new (x: number, y: number) => unknown;
+  Position: {
+    BOTTOM_LEFT: unknown;
+  };
+};
+
+type MapInstance = {
+  setCenter: (pos: unknown) => void;
+};
+
+declare global {
+  interface Window {
+    naver: {
+      maps: unknown;
+    };
+  }
+}
+
 type Player = {
   id: number;
   name: string;
@@ -16,6 +58,8 @@ type Player = {
   status: "escaped" | "jailed" | "caught" | "none";
   isHost?: boolean;
   isMe?: boolean;
+  lat?: number;
+  lng?: number;
 };
 
 type LocationState = {
@@ -51,6 +95,10 @@ export default function GamePlayPage() {
   const prevGameSecondsRef = useRef<number | null>(null);
   const escapedThiefIdsRef = useRef<Set<number>>(new Set());
   const previousCaughtRef = useRef<Map<number, boolean>>(new Map());
+  const mapElement = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapInstance | null>(null);
+  const mapsRef = useRef<MapsApi | null>(null);
+  const markersRef = useRef<unknown[]>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,6 +185,8 @@ export default function GamePlayPage() {
           status,
           isHost: hostId !== null && participant.userId === hostId,
           isMe: userId !== null && participant.userId === userId,
+          lat: participant.lat,
+          lng: participant.lng,
         };
       });
 
@@ -384,6 +434,114 @@ export default function GamePlayPage() {
     }
   }, [handleGameEnd, isHost, navigate, roomId, thieves]);
 
+  useEffect(() => {
+    const { naver } = window as {
+      naver?: {
+        maps: unknown;
+      };
+    };
+
+    if (!mapElement.current || !naver?.maps) return;
+    const maps = naver.maps as MapsApi;
+    mapsRef.current = maps;
+
+    const defaultPosition = new maps.LatLng(37.5665, 126.978);
+    const mapOptions = {
+      center: defaultPosition,
+      zoom: 16,
+      minZoom: 14,
+      scaleControl: false,
+      mapDataControl: false,
+      logoControlOptions: { position: maps.Position.BOTTOM_LEFT },
+    };
+
+    const mapInstance = new maps.Map(mapElement.current, mapOptions);
+    mapRef.current = mapInstance;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const currentPosition = new maps.LatLng(latitude, longitude);
+          mapInstance.setCenter(currentPosition);
+        },
+        (error) => {
+          console.error("Geolocation Error:", error);
+        },
+      );
+    }
+
+    return () => {
+      markersRef.current.forEach((marker) => {
+        const typed = marker as { setMap?: (map: unknown) => void };
+        if (typed?.setMap) typed.setMap(null);
+      });
+      markersRef.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    const mapInstance = mapRef.current;
+    const maps = mapsRef.current;
+
+    if (!mapInstance || !maps) return;
+
+    markersRef.current.forEach((marker) => {
+      if (
+        marker &&
+        typeof (marker as { setMap?: (map: unknown) => void }).setMap ===
+          "function"
+      ) {
+        (marker as { setMap: (map: unknown) => void }).setMap(null);
+      }
+    });
+    markersRef.current = [];
+
+    players.forEach((player) => {
+      if (
+        typeof player.id !== "number" ||
+        typeof (player as { lat?: number }).lat !== "number" ||
+        typeof (player as { lng?: number }).lng !== "number"
+      ) {
+        return;
+      }
+
+      const lat = (player as { lat: number }).lat;
+      const lng = (player as { lng: number }).lng;
+
+      const color = player.role === "police" ? "#4A90E2" : "#E74C3C";
+      const markerContent = `
+        <div style="
+          width: 24px;
+          height: 24px;
+          background: ${color};
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <span style="color: white; font-size: 12px; font-weight: bold;">
+            ${player.role === "police" ? "👮" : "🥷"}
+          </span>
+        </div>
+      `;
+
+      const marker = new maps.Marker({
+        position: new maps.LatLng(lat, lng),
+        map: mapInstance,
+        icon: {
+          content: markerContent,
+          anchor: new maps.Point(12, 12),
+        },
+        zIndex: player.isMe ? 100 : 10,
+      });
+
+      markersRef.current.push(marker);
+    });
+  }, [players]);
+
   return (
     <>
       {/* 상단 타이머 */}
@@ -397,6 +555,14 @@ export default function GamePlayPage() {
             {String(gameSeconds % 60).padStart(2, "0")}
           </span>
         </div>
+      </section>
+
+      {/* 맵 섹션 */}
+      <section className="h-60 w-full">
+        <div
+          ref={mapElement}
+          className="h-full w-full bg-gray-800 outline-none"
+        />
       </section>
 
       <main className="relative flex min-h-full w-full flex-col items-center px-7 pb-32">
