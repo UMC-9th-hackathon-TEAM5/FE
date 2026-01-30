@@ -41,6 +41,9 @@ type RoomDetail = {
   title: string;
   description?: string;
   placeName: string;
+  address?: string;
+  prisonPlaceName?: string;
+  prisonAddress?: string;
   meetingTime: string;
   status: string;
   countdownSeconds: number;
@@ -285,6 +288,7 @@ export default function WaitingPartyPage() {
     return {
       date: formattedTime,
       location: roomDetail.placeName,
+      prisonLocation: roomDetail.prisonPlaceName,
       countdownTime: `${Math.max(1, Math.round(countdownSeconds))}초`,
       playTime: `${playMinutes}분`,
       people: {

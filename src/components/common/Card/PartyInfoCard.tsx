@@ -3,6 +3,7 @@ import BaseCard from "./BaseCard";
 export interface PartyInfo {
   date: string;
   location: string;
+  prisonLocation?: string;
   playTime: string;
   countdownTime?: string;
   people: {
@@ -19,7 +20,10 @@ interface PartyInfoCardProps {
 export function PartyInfoCard({ info, className }: PartyInfoCardProps) {
   const items = [
     { label: "일시", value: info.date },
-    { label: "장소", value: info.location },
+    { label: "모임 장소", value: info.location },
+    ...(info.prisonLocation
+      ? [{ label: "감옥 장소", value: info.prisonLocation }]
+      : []),
     ...(info.countdownTime
       ? [{ label: "카운트다운", value: info.countdownTime }]
       : []),

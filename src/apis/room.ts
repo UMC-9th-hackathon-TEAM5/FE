@@ -73,6 +73,9 @@ type RoomDetailResponseDto = {
   title: string;
   description?: string;
   placeName: string;
+  address?: string;
+  prisonPlaceName?: string;
+  prisonAddress?: string;
   meetingTime: string;
   status: RoomStatus;
   countdownSeconds: number;
