@@ -1,8 +1,9 @@
-import { getRoom } from "@/apis/room";
+import { getRoom, restartRoom } from "@/apis/room";
 import { getParticipants } from "@/apis/roommember";
 import { toBlob } from "html-to-image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 import PartyInfoCard, {
   PartyInfo,
@@ -53,6 +54,8 @@ export default function GameResultPage() {
     ParticipantResult[] | null
   >(null);
   const [isCardBusy, setIsCardBusy] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+  const [restartError, setRestartError] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   const roomId = useMemo(() => {
@@ -81,6 +84,33 @@ export default function GameResultPage() {
     const parsed = Number(value);
     return Number.isNaN(parsed) ? null : parsed;
   }, []);
+
+  const isHost = useMemo(
+    () => userId !== null && hostId !== null && userId === hostId,
+    [userId, hostId],
+  );
+
+  const handleReplay = useCallback(async () => {
+    if (!roomId || !isHost || isRestarting) return;
+
+    setIsRestarting(true);
+    setRestartError(null);
+
+    try {
+      await restartRoom(roomId);
+      navigate(`/party/waiting?roomId=${roomId}`, {
+        state: { roomId, hostId },
+      });
+    } catch (error) {
+      let message = "방 재시작에 실패했습니다.";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message ?? message;
+      }
+      setRestartError(message);
+    } finally {
+      setIsRestarting(false);
+    }
+  }, [roomId, isHost, isRestarting, navigate, hostId]);
 
   useEffect(() => {
     if (!roomId) {
@@ -405,9 +435,26 @@ export default function GameResultPage() {
               <ShareIcon /> Instargram 스토리로 공유하기
             </div>
           </Button>
-          <Button width="xl" state={"active"} onClick={() => navigate("/home")}>
+          {isHost && (
+            <Button
+              width="xl"
+              state="active"
+              onClick={handleReplay}
+              disabled={isRestarting}
+            >
+              {isRestarting ? "준비 중..." : "한 판 더?!"}
+            </Button>
+          )}
+          <Button
+            width="xl"
+            state={isHost ? "default" : "active"}
+            onClick={() => navigate("/home")}
+          >
             메인으로 돌아가기
           </Button>
+          {restartError && (
+            <p className="text-xs text-red-400">* {restartError}</p>
+          )}
         </section>
       </main>
     </>

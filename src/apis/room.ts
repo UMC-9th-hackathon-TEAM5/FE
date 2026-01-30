@@ -236,3 +236,13 @@ export const searchPlaces = async (
   );
   return data;
 };
+
+// 방 재시작 (한 판 더)
+export const restartRoom = async (
+  roomId: number,
+): Promise<ApiResponse<{ roomId: number }>> => {
+  const { data } = await axiosInstance.post<ApiResponse<{ roomId: number }>>(
+    `/api/v1/rooms/${roomId}/restart`,
+  );
+  return data;
+};
